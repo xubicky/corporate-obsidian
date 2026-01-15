@@ -1384,8 +1384,22 @@
     <!-- Saved Scenarios Panel -->
     <div class="side-panel" id="savedScenariosPanel" style="width: 380px;">
         <div class="side-panel-header">
-            <h3>📁 Folder</h3>
-            <button class="side-panel-close" onclick="closePanel('savedScenariosPanel')">✕</button>
+            <h3 style="flex: 1;">📁 Folder</h3>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <input type="file" id="importScenariosInput" accept=".json" style="display: none;"
+                    onchange="handleImportScenarios(this)">
+                <button onclick="document.getElementById('importScenariosInput').click()"
+                    style="background: none; border: 1px solid var(--border-subtle); border-radius: 6px; padding: 4px 8px; font-size: 11px; cursor: pointer; color: var(--text-secondary);"
+                    title="Import JSON">
+                    Import
+                </button>
+                <button onclick="exportAllScenarios()"
+                    style="background: none; border: 1px solid var(--border-subtle); border-radius: 6px; padding: 4px 8px; font-size: 11px; cursor: pointer; color: var(--text-secondary);"
+                    title="Export All Scenarios">
+                    Export All
+                </button>
+                <button class="side-panel-close" onclick="closePanel('savedScenariosPanel')">✕</button>
+            </div>
         </div>
         <div class="side-panel-body" style="padding: 16px;">
             <div id="savedScenariosList" style="display: flex; flex-direction: column; gap: 12px;">
@@ -4675,6 +4689,64 @@ Be conversational, ask thoughtful questions, and help the user think through all
             document.body.appendChild(downloadAnchorNode); // required for firefox
             downloadAnchorNode.click();
             downloadAnchorNode.remove();
+        }
+
+        // Export all saved scenarios
+        function exportAllScenarios() {
+            if (savedAstraScenarios.length === 0) {
+                alert("No scenarios to export.");
+                return;
+            }
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(savedAstraScenarios, null, 2));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            const dateStr = new Date().toISOString().split('T')[0];
+            downloadAnchorNode.setAttribute("download", `astra_scenarios_backup_${dateStr}.json`);
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+        // Handle File Import
+        function handleImportScenarios(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    let count = 0;
+
+                    // Handle single scenario (object) or list (array)
+                    const scenariosToImport = Array.isArray(imported) ? imported : [imported];
+
+                    scenariosToImport.forEach(newScenario => {
+                        // Basic validation: ensure it has ID and severity
+                        if (!newScenario.id || !newScenario.severity) return;
+
+                        // Check for duplicate ID
+                        const existingIndex = savedAstraScenarios.findIndex(s => s.id === newScenario.id);
+                        if (existingIndex >= 0) {
+                            // Overwrite existing
+                            savedAstraScenarios[existingIndex] = newScenario;
+                        } else {
+                            savedAstraScenarios.push(newScenario);
+                        }
+                        count++;
+                    });
+
+                    saveToLocalStorage();
+                    updateSavedScenariosList();
+                    alert(`Successfully imported ${count} scenarios.`);
+                } catch (err) {
+                    console.error(err);
+                    alert("Failed to import scenarios. Invalid JSON file.");
+                }
+                // Reset input
+                input.value = '';
+            };
+            reader.readAsText(file);
         }
 
         // Load a saved scenario into the dashboard
