@@ -4067,38 +4067,27 @@ Be conversational, ask thoughtful questions, and help the user think through all
                 if (finalizeMatch) {
                     try {
                         const scenarioData = JSON.parse(finalizeMatch[0]);
-
                         customScenarioResult = scenarioData;
 
-
-
                         // Extract regular text before JSON
-
                         const textBeforeJson = aiResponse.substring(0, aiResponse.indexOf(finalizeMatch[0])).trim();
-
                         if (textBeforeJson) {
-
                             addMessageToChat('ai', textBeforeJson);
-
                         }
-
-
 
                         displayScenarioResult(scenarioData);
 
-                        document.getElementById('applyScenarioBtn').style.display = 'block';
-                        document.getElementById('saveScenarioBtn').style.display = 'block';
+                        // Safely show buttons if they exist
+                        const applyBtn = document.getElementById('applyScenarioBtn');
+                        if (applyBtn) applyBtn.style.display = 'block';
 
-
+                        const saveBtn = document.getElementById('saveScenarioBtn');
+                        if (saveBtn) saveBtn.style.display = 'block';
 
                     } catch (e) {
-
-                        console.error('Failed to parse finalization JSON:', e);
-
+                        console.error('Failed to parse finalization JSON or update UI:', e);
                         addMessageToChat('ai', aiResponse);
-
                     }
-
                 } else {
 
                     addMessageToChat('ai', aiResponse);
@@ -4220,9 +4209,9 @@ Be conversational, ask thoughtful questions, and help the user think through all
 
 
             const componentItems = Object.entries(scenarioData.componentSeverities).map(([comp, sev]) => {
-                const reason = scenarioData.componentReasons && scenarioData.componentReasons[comp]
-                    ? scenarioData.componentReasons[comp]
-                    : 'AI assessment based on scenario analysis.';
+                const reason = (scenarioData.componentRationale && scenarioData.componentRationale[comp]) ||
+                    (scenarioData.componentReasons && scenarioData.componentReasons[comp]) ||
+                    'AI assessment based on scenario analysis.';
 
                 const compId = comp.replace(/\s+/g, '_');
 
