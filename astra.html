@@ -1588,7 +1588,7 @@
                         <div style="display: flex; justify-content: flex-end; padding: 0 10px 5px 0;">
                             <button id="decompToggleBtn" onclick="toggleDecompositionMode()"
                                 style="background: none; border: 1px solid var(--border-subtle); padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; color: var(--text-secondary);">
-                                Show Cumulative
+                                Show Quarterly
                             </button>
                         </div>
                         <div class="chart-container" id="decompositionChart"></div>
@@ -3325,8 +3325,9 @@
             let currentRWA = JUMP_OFF_RWA;
 
             // Iterate quarter by quarter
-            // Modified: Always calculate for 20 quarters regardless of (unused) troughIndex
-            for (let q = 0; q < 20; q++) {
+            // Use the passed troughIndex parameter (trough for tables, 20 for decomposition)
+            const maxQ = troughIndex || 20;
+            for (let q = 0; q < maxQ; q++) {
                 const prevCapital = currentCapital;
                 const prevRWA = currentRWA;
 
@@ -3486,7 +3487,7 @@
 
         // Update decomposition chart
         // Decomposition chart state
-        let decompositionIsCumulative = false;
+        let decompositionIsCumulative = true; // Default to cumulative view
         let lastDecompArgs = null;
 
         function toggleDecompositionMode() {
