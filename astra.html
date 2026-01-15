@@ -4104,18 +4104,42 @@ Be conversational, ask thoughtful questions, and help the user think through all
 
 
             } catch (error) {
-
                 removeMessage(loadingId);
-
-                addMessageToChat('ai', `Sorry, I encountered an error: ${error.message}. Please try again.`);
-
                 console.error('Chat error:', error);
 
+                // Offer to use default severities when AI is unavailable
+                addMessageToChat('ai', `⚠️ AI service unavailable (${error.message}). 
+                    <br><br>You can still use this tool with default "Severe" severity for all components. 
+                    <br><br><button class="btn btn-primary" onclick="applyDefaultScenario()" style="margin-top: 10px;">Use Default Severities</button>`);
             }
 
         }
 
+        // Apply default scenario when AI is unavailable
+        function applyDefaultScenario() {
+            // Create a default scenario object with all components set to 'severe'
+            const defaultSeverities = {};
+            const defaultReasons = {};
 
+            COMPONENTS.forEach(comp => {
+                defaultSeverities[comp] = 'severe';
+                defaultReasons[comp] = 'Default severity applied (AI unavailable). Manually adjust as needed.';
+            });
+
+            customScenarioResult = {
+                title: 'Custom Scenario (Default)',
+                description: 'Custom scenario created with default severity levels. All components are set to "Severe" by default. You can manually adjust individual component severities using the dropdowns.',
+                severity: 'severe',
+                componentSeverities: defaultSeverities,
+                componentReasons: defaultReasons
+            };
+
+            // Display the result
+            displayScenarioResult(customScenarioResult);
+
+            // Add confirmation message
+            addMessageToChat('ai', '✅ Default severities applied! All 18 components are set to "Severe". You can now:<br><br>• Adjust individual component severities using the dropdowns on the left<br>• Click "Calculate & Apply to Dashboard" when ready');
+        }
 
         function addMessageToChat(sender, message) {
 
