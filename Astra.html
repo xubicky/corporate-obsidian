@@ -1034,6 +1034,112 @@
         .override-info strong {
             color: var(--text-main);
         }
+
+        /* Custom Scenario Builder Styling */
+        .scenario-result {
+            background: #F8FAFC;
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 16px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .severity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 16px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .severity-item {
+            background: white;
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 12px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .severity-item:hover {
+            box-shadow: var(--shadow-sm);
+            border-color: var(--primary-light);
+        }
+
+        .severity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .severity-label {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-main);
+        }
+
+        .severity-select {
+            padding: 6px 10px;
+            font-size: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-subtle);
+            background-color: white;
+            width: auto;
+            cursor: pointer;
+        }
+
+        .severity-reasoning {
+            font-size: 11px;
+            color: var(--text-secondary);
+            background: #F1F5F9;
+            padding: 8px 12px;
+            border-radius: 8px;
+            line-height: 1.4;
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+        }
+
+        .severity-reasoning::before {
+            content: '🤖';
+            font-size: 14px;
+            line-height: 1;
+            margin-top: 1px;
+        }
+
+        .severity-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .severity-badge.severity-very-severe {
+            background: #FEF2F2;
+            color: #991B1B;
+        }
+
+        .severity-badge.severity-severe {
+            background: #FFF7ED;
+            color: #9A3412;
+        }
+
+        .severity-badge.severity-moderate {
+            background: #EFF6FF;
+            color: #1E40AF;
+        }
+
+        .severity-badge.severity-benchmark {
+            background: #ECFDF5;
+            color: #065F46;
+        }
     </style>
 
 <body>
@@ -1397,9 +1503,8 @@
     <div id="inputScenarioModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Create Custom Scenario with AI</h3>
-                <button class="btn btn-secondary" onclick="closeInputScenarioModal()"
-                    style="padding:4px 12px;">✕</button>
+                <h3 style="margin:0; font-size:16px; font-weight:700;">Create Custom Scenario with AI</h3>
+                <button class="side-panel-close" onclick="closeInputScenarioModal()">✕</button>
             </div>
             <div class="modal-body">
                 <div class="chat-container" id="chatContainer">
@@ -3928,85 +4033,56 @@ Be conversational, ask thoughtful questions, and help the user think through all
 
 
             const componentItems = Object.entries(scenarioData.componentSeverities).map(([comp, sev]) => {
-
                 const reason = scenarioData.componentReasons && scenarioData.componentReasons[comp]
-
                     ? scenarioData.componentReasons[comp]
-
                     : 'AI assessment based on scenario analysis.';
-
-
 
                 const compId = comp.replace(/\s+/g, '_');
 
-
-
                 return `
-
-                <div class="severity-item severity-item-interactive" data-component="${comp}">
-
-                    <div class="severity-tooltip">
-
-                        <strong>AI Reasoning:</strong><br/>
-
-                        ${reason}
-
+                <div class="severity-item" data-component="${comp}">
+                    <div class="severity-header">
+                        <span class="severity-label">${comp}</span>
+                        <select class="severity-select" id="sev_${compId}" onchange="updateComponentSeverity('${comp}', this.value)">
+                            <option value="very_severe" ${sev === 'very_severe' ? 'selected' : ''}>Very Severe</option>
+                            <option value="severe" ${sev === 'severe' ? 'selected' : ''}>Severe</option>
+                            <option value="moderate" ${sev === 'moderate' ? 'selected' : ''}>Moderate</option>
+                            <option value="benchmark" ${sev === 'benchmark' ? 'selected' : ''}>Benchmark</option>
+                        </select>
                     </div>
-
-                    <div class="severity-item-label">${comp}</div>
-
-                    <div class="severity-item-value" style="color: ${severityColors[sev] || '#666'}">
-
-                        ${sev.replace('_', ' ')}
-
+                    <div class="severity-reasoning">
+                        <span>${reason}</span>
                     </div>
-
-                    <select class="severity-select" id="sev_${compId}" onchange="updateComponentSeverity('${comp}', this.value)">
-
-                        <option value="very_severe" ${sev === 'very_severe' ? 'selected' : ''}>Very Severe</option>
-
-                        <option value="severe" ${sev === 'severe' ? 'selected' : ''}>Severe</option>
-
-                        <option value="moderate" ${sev === 'moderate' ? 'selected' : ''}>Moderate</option>
-
-                        <option value="benchmark" ${sev === 'benchmark' ? 'selected' : ''}>Benchmark</option>
-
-                    </select>
-
                 </div>
-
                 `;
-
             }).join('');
 
 
 
             resultContainer.innerHTML = `
-
                 <div class="scenario-result">
+                    <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom: 12px;">
+                        <div>
+                             <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: var(--text-main);">${scenarioData.title}</h3>
 
-                    <h3 style="margin-bottom: 0.5rem; color: var(--dark-blue);">${scenarioData.title}</h3>
-
-                    <p style="margin-bottom: 0.75rem; color: var(--text-medium);">${scenarioData.description}</p>
-
-                    <span class="severity-badge severity-${scenarioData.severity.replace('_', '-')}">
-
-                        Overall: ${scenarioData.severity.replace('_', ' ').toUpperCase()}
-
-                    </span>
+                             <div style="margin-top: 6px;">
+                                <span class="severity-badge severity-${scenarioData.severity}">
+                                    Overall: ${scenarioData.severity.replace('_', ' ')}
+                                </span>
+                             </div>
+                        </div>
+                    </div>
+                    
+                    <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 16px;">${scenarioData.description}</p>
 
                     
 
-                    <h4 style="margin-top: 1rem; margin-bottom: 0.75rem; color: var(--dark-blue);">
-
-                        Component Severities <span style="font-size: 0.75rem; font-weight: 400; color: var(--text-medium);">(Hover to see AI reasoning, change dropdown to adjust)</span>
-
+                    <h4 style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px; margin-bottom: 8px;">
+                        Component Severities
                     </h4>
-
-                    <div class="severity-grid">
-
+                    
+                    <div class="severity-list">
                         ${componentItems}
-
                     </div>
 
                     
