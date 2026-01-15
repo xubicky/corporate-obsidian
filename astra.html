@@ -3621,6 +3621,19 @@
             const resultContainer = document.getElementById('scenarioConfigPanel');
             const defaultSeverity = 'severe';
 
+            // Initialize customScenarioResult with defaults so applyScenario works
+            const defaultSeverities = {};
+            COMPONENTS.forEach(comp => {
+                defaultSeverities[comp] = defaultSeverity;
+            });
+
+            customScenarioResult = {
+                title: 'Custom Scenario',
+                description: 'Custom stress scenario with default severity levels.',
+                severity: 'severe',
+                componentSeverities: defaultSeverities
+            };
+
             // Build component items with default severity
             const componentItems = COMPONENTS.map(comp => {
                 const compId = comp.replace(/\s+/g, '_');
@@ -4338,7 +4351,7 @@ Be conversational, ask thoughtful questions, and help the user think through all
 
             COMPONENTS.forEach(comp => {
 
-                const selectId = `comp_${comp.replace(/\s+/g, '_')} `;
+                const selectId = `comp_${comp.replace(/\s+/g, '_')}`;
 
                 const selectElement = document.getElementById(selectId);
 
