@@ -1615,16 +1615,17 @@
                         <textarea id="userInput" class="form-control" placeholder="Describe your stress scenario..."
                             style="height:60px; resize:none; margin-bottom: 10px;"
                             onkeypress="if(event.key==='Enter' && !event.shiftKey) {event.preventDefault(); sendMessage();}"></textarea>
-                        <div style="display:flex; gap:8px; align-items: center;">
+                        <div style="display:flex; gap:8px; align-items: stretch; height: 38px;">
                             <label class="btn btn-secondary"
-                                style="flex:1; text-align:center; padding: 10px 12px; font-size: 13px;">
+                                style="flex:1; display: flex; justify-content: center; align-items: center; margin: 0; padding: 0; font-size: 13px; text-transform: none;">
                                 📎 Upload
                                 <input type="file" id="fileUpload" style="display:none" accept=".txt,.pdf,.doc,.docx"
                                     onchange="handleFileUpload(event)">
                             </label>
                             <button class="btn btn-secondary" onclick="requestFinalization()" id="requestFinalizeBtn"
-                                style="flex:1; padding: 10px 12px; font-size: 13px;">Finalize</button>
-                            <button class="btn btn-primary" style="flex:1; padding: 10px 12px; font-size: 13px;"
+                                style="flex:1; padding: 0; font-size: 13px; text-transform: none;">Finalize</button>
+                            <button class="btn btn-primary"
+                                style="flex:1; padding: 0; font-size: 13px; text-transform: none;"
                                 onclick="sendMessage()">Send</button>
                         </div>
                     </div>
