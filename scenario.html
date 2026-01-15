@@ -1493,19 +1493,21 @@
         /* Heat Map Driver Card */
         .heatmap-driver {
             position: absolute;
+            /* Card expands FROM the velocity circle which is the anchor */
             display: flex;
             flex-direction: column;
-            width: 220px;
-            padding: 12px 14px;
+            width: 180px;
+            padding: 10px 12px;
             background: rgba(30, 41, 59, 0.95);
             backdrop-filter: blur(12px);
             border-radius: 12px;
-            cursor: pointer;
+            cursor: grab;
             transition: all 0.25s ease, width 0.25s ease, opacity 0.15s ease;
             z-index: 10;
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
             overflow: visible;
+            /* Default: expand down-right from top-left anchor */
             transform-origin: top left;
         }
 
@@ -1622,11 +1624,12 @@
             /* Push to back */
         }
 
-        /* HOVER STATE: Bring to front with subtle highlight */
-        .heatmap-driver:not(.dragging):not(.expanded):hover {
+        /* HOVER STATE: Expand to show details */
+        .heatmap-driver:not(.dragging):hover {
             z-index: 1000;
-            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
-            border-color: rgba(59, 130, 246, 0.4);
+            width: 260px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+            border-color: rgba(59, 130, 246, 0.5);
             /* Ensure opacity stays 1 */
             opacity: 1 !important;
             filter: none !important;
@@ -1647,14 +1650,20 @@
             max-height: 0;
             opacity: 0;
             overflow: hidden;
-            transition: max-height 0.3s ease, opacity 0.2s ease, margin 0.2s ease;
+            transition: max-height 0.25s ease, opacity 0.2s ease, margin 0.2s ease;
             margin-top: 0;
         }
 
-        /* Expand when .expanded class is applied (from click) */
+        .heatmap-driver:not(.dragging):hover .heatmap-driver-expand {
+            max-height: 150px;
+            opacity: 1;
+            margin-top: 8px;
+        }
+
+        /* Also expand when .expanded class is applied (from driver list hover) */
         .heatmap-driver.expanded {
             z-index: 1000;
-            width: 280px;
+            width: 260px;
             box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
             border-color: rgba(59, 130, 246, 0.5);
             opacity: 1 !important;
@@ -1662,7 +1671,7 @@
         }
 
         .heatmap-driver.expanded .heatmap-driver-expand {
-            max-height: 400px;
+            max-height: 150px;
             opacity: 1;
             margin-top: 8px;
         }
@@ -8218,59 +8227,20 @@ ${driverSummary}
                     // Default view: Card with title, category, description, and compact L/M/V row visible
                     // Detailed reasoning only shows on click/expansion
                     card.innerHTML = `
-                        <!--Card body - collapses during drag-->
+                        <div class="heatmap-driver-anchor ${velocityClass}" title="Click to change velocity">
+                            <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" /></svg>
+                        </div>
                         <div class="heatmap-driver-body">
                             <div class="heatmap-driver-header">
                                 <div class="heatmap-driver-title">${driver.title}</div>
                             </div>
                             <span class="heatmap-driver-category" style="background: ${driver.tagColor}; color: ${driver.textColor};">${driver.cat}</span>
-
-                            <!-- Description - always visible -->
-                            <div class="heatmap-driver-desc" style="font-size: 11px; color: rgba(255, 255, 255, 0.7); line-height: 1.4; margin-top: 8px; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${driver.desc}</div>
-
-                            <!-- Compact L/M/V row with lightning bolt - always visible -->
-                            <div class="heatmap-driver-meta" style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
-                                <div style="display: flex; gap: 8px; font-size: 10px; color: rgba(255, 255, 255, 0.6);">
-                                    <span>Likelihood: <strong style="color: white;">${likelihoodAbbr}</strong></span>
-                                    <span>Materiality: <strong style="color: white;">${materialityAbbr}</strong></span>
-                                    <span>Velocity: <strong style="color: white;">${velocityAbbr}</strong></span>
-                                </div>
-                                <!-- Lightning bolt indicator -->
-                                <div class="heatmap-driver-velocity-icon ${velocityClass}" style="width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: ${data.velocity === 3 ? '#EF4444' : data.velocity === 2 ? '#F59E0B' : '#22C55E'}; box-shadow: 0 2px 8px ${data.velocity === 3 ? 'rgba(239, 68, 68, 0.4)' : data.velocity === 2 ? 'rgba(245, 158, 11, 0.4)' : 'rgba(34, 197, 94, 0.4)'};">
-                                    <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: white;"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" /></svg>
-                                </div>
-                            </div>
-
-                            <!-- Expandable details - hidden by default, shown on click -->
                             <div class="heatmap-driver-expand">
-                                <!-- Assessment Justifications Section -->
-                                <div class="heatmap-driver-assessment" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
-                                    ${likelihoodReasoning ? `
-                                        <div class="assessment-item" style="margin-bottom: 8px;">
-                                            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 3px;">
-                                                <span style="font-size: 11px; font-weight: 600; color: #60A5FA;">📊 Likelihood: ${likelihoodLevel} (${data.likelihood}/10)</span>
-                                            </div>
-                                            <div style="font-size: 11px; color: rgba(255, 255, 255, 0.7); line-height: 1.4; padding-left: 2px;">${likelihoodReasoning}</div>
-                                        </div>
-                                    ` : ''}
-
-                                    ${materialityReasoning ? `
-                                        <div class="assessment-item" style="margin-bottom: 8px;">
-                                            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 3px;">
-                                                <span style="font-size: 11px; font-weight: 600; color: #F87171;">💥 Materiality: ${materialityLevel} (${data.materiality}/10)</span>
-                                            </div>
-                                            <div style="font-size: 11px; color: rgba(255, 255, 255, 0.7); line-height: 1.4; padding-left: 2px;">${materialityReasoning}</div>
-                                        </div>
-                                    ` : ''}
-
-                                    ${velocityReasoning ? `
-                                        <div class="assessment-item">
-                                            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 3px;">
-                                                <span style="font-size: 11px; font-weight: 600; color: #FBBF24;">⚡ Velocity: ${velocityLabel}</span>
-                                            </div>
-                                            <div style="font-size: 11px; color: rgba(255, 255, 255, 0.7); line-height: 1.4; padding-left: 2px;">${velocityReasoning}</div>
-                                        </div>
-                                    ` : ''}
+                                <div class="heatmap-driver-expand-desc">${driver.desc}</div>
+                                <div class="heatmap-driver-expand-meta">
+                                    <div style="flex: 1;">Likelihood: <strong style="color: white;">${driver.likelihood}</strong></div>
+                                    <div style="flex: 1;">Materiality: <strong style="color: white;">${driver.materiality}</strong></div>
+                                    <div style="flex: 1;">Velocity: <strong style="color: white;">${driver.velocity}</strong></div>
                                 </div>
                             </div>
                         </div>
@@ -8310,16 +8280,16 @@ ${driverSummary}
                         return;
                     }
 
-                    // For default view: check if clicked on velocity icon to cycle velocity
-                    const isVelocityIcon = e.target.closest('.heatmap-driver-velocity-icon');
-                    if (isVelocityIcon) {
+                    // For default view
+                    const isAnchor = e.target.closest('.heatmap-driver-anchor');
+                    if (isAnchor) {
                         e.stopPropagation();
                         cycleVelocity(driver.id);
                         return;
                     }
 
-                    // Otherwise toggle the expanded state to show/hide reasoning details
-                    card.classList.toggle('expanded');
+                    // Otherwise open details
+                    openDriverDetails(driver.id);
                 });
 
                 // Add drag handlers with threshold to distinguish from clicks
