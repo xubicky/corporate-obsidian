@@ -3883,15 +3883,18 @@ Be conversational, ask thoughtful questions, and help the user think through all
 
             document.getElementById('uploadedFileDisplay').innerHTML = '';
 
-            document.getElementById('scenarioResultContainer').innerHTML = '';
+            // Clear old non-existent references if any
+            const resultContainer = document.getElementById('scenarioResultContainer');
+            if (resultContainer) resultContainer.innerHTML = '';
 
-            document.getElementById('applyScenarioBtn').style.display = 'none';
-            document.getElementById('saveScenarioBtn').style.display = 'none';
+            const applyBtn = document.getElementById('applyScenarioBtn');
+            if (applyBtn) applyBtn.style.display = 'none';
+
+            const saveBtn = document.getElementById('saveScenarioBtn');
+            if (saveBtn) saveBtn.style.display = 'none';
 
             uploadedFileContent = null;
-
             customScenarioResult = null;
-
         }
 
 
