@@ -7296,8 +7296,10 @@ If the user just wants clarification or discussion without changes, don't includ
             btn.style.background = '#10B981';
 
             setTimeout(() => {
-                // Open Astra in new tab
-                window.open(location.origin + '/Astra.html', '_blank');
+                // Get the base path from current location and append Astra.html
+                const currentPath = window.location.pathname;
+                const basePath = currentPath.substring(0, currentPath.lastIndexOf('/') + 1);
+                window.open(basePath + 'Astra.html', '_blank');
 
                 // Reset button after short delay
                 setTimeout(() => {
