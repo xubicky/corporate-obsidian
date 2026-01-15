@@ -4407,12 +4407,14 @@ Be conversational, ask thoughtful questions, and help the user think through all
 
             // Select custom scenario in the filter
 
+            // Ensure the overriden scenario is selected in the filter so it appears
             const options = document.getElementById('scenarioDisplay').options;
+            const overrideVal = document.getElementById('scenarioToOverride')?.value || 'severe';
 
             for (let i = 0; i < options.length; i++) {
-
-                options[i].selected = options[i].value === 'custom';
-
+                if (options[i].value === overrideVal) {
+                    options[i].selected = true;
+                }
             }
 
 
