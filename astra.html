@@ -1595,7 +1595,14 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 style="margin:0; font-size:16px; font-weight:700;">Create Custom Scenario with AI</h3>
-                <button class="side-panel-close" onclick="closeInputScenarioModal()">✕</button>
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <button
+                        style="background: none; border: 1px solid var(--border-subtle); border-radius: 6px; padding: 6px 12px; font-size: 12px; cursor: pointer; color: var(--text-secondary); height: 32px;"
+                        onclick="if(confirm('Start new scenario conversation? This will clear current progress.')) { resetConversation(); initializeDefaultSeverities(); }">
+                        Start New
+                    </button>
+                    <button class="side-panel-close" onclick="closeInputScenarioModal()">✕</button>
+                </div>
             </div>
             <div class="modal-body" style="padding: 0; display: flex; overflow: hidden; height: calc(85vh - 60px);">
                 <!-- Left Panel: Component Severity Grid -->
@@ -3672,8 +3679,12 @@
 
         function openInputScenarioModal() {
             document.getElementById('inputScenarioModal').style.display = 'block';
-            resetConversation();
-            initializeDefaultSeverities();
+
+            // Only reset if it's a fresh session (empty history)
+            if (conversationHistory.length === 0) {
+                resetConversation();
+                initializeDefaultSeverities();
+            }
         }
 
         // Initialize the left panel with default component severities
