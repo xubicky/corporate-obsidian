@@ -4581,17 +4581,17 @@ Be conversational, ask thoughtful questions, and help the user think through all
                 const breakdownText = breakdownParts.join(', ');
 
                 return `
-                < div class="saved-scenario-card" style = "
-            background: white;
-            border: 1px solid var(--border - subtle);
-            border - radius: 12px;
-            padding: 14px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            margin - bottom: 12px;
-            " onmouseover="this.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)'" 
-            onmouseout = "this.style.boxShadow='none'"
-            onclick = "loadSavedScenario('${s.id}')" >
+                <div class="saved-scenario-card" style="
+                    background: white;
+                    border: 1px solid var(--border-subtle);
+                    border-radius: 12px;
+                    padding: 14px;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    margin-bottom: 12px;"
+                onmouseover="this.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)'" 
+                onmouseout="this.style.boxShadow='none'"
+                onclick="loadSavedScenario('${s.id}')">
                         <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
                             <span style="
                                 font-size: 10px;
