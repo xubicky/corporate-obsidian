@@ -2964,8 +2964,9 @@
                     // split to keep title if possible
                     // logic: if textContent contains "OVERALL:", replace after it, otherwise append
                     const currentTitle = customLabel.textContent.split('OVERALL:')[0].trim();
-                    const severityColors = { 'very_severe': '#991B1B', 'severe': '#92400E', 'moderate': '#1E3A8A', 'benchmark': '#065F46' };
-                    customLabel.innerHTML = `${currentTitle} <span class="severity-badge severity-${closestSeverity}" style="margin-left: 10px; font-size: 0.8em; padding: 4px 8px; border-radius: 4px; color: white; background-color: ${severityColors[closestSeverity]};">OVERALL: ${severitiesLabel[closestSeverity].toUpperCase()}</span>`;
+                    // We calculate the correct severity but DO NOT display the badge on the dashboard as requested
+                    // customLabel.innerHTML = ... (REMOVED)
+                    customLabel.textContent = currentTitle;
                 }
 
                 const descContainer = document.getElementById('customScenarioDescription');
