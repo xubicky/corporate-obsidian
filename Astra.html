@@ -1,0 +1,4739 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Enterprise Stress Testing Dashboard</title>
+
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            /* Palette from Scenario.html */
+            --primary: #2563EB;
+            --primary-dark: #1E40AF;
+            --primary-light: #60A5FA;
+            --accent: #F59E0B;
+            --bg-canvas: #F8FAFC;
+            --bg-surface: #FFFFFF;
+            --bg-surface-glass: rgba(255, 255, 255, 0.85);
+
+            --text-main: #0F172A;
+            --text-secondary: #475569;
+            --text-muted: #94A3B8;
+            --border-subtle: #E2E8F0;
+
+            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+            --shadow-float: 0 20px 40px -5px rgba(0, 0, 0, 0.1);
+
+            /* Astra Specific - Mapped to new palette */
+            --success: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --dark-blue: #1E3A8A;
+            --light-blue: #EFF6FF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-canvas);
+            background-image: radial-gradient(#CBD5E1 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+            color: var(--text-main);
+            display: flex;
+            padding: 24px;
+            gap: 24px;
+        }
+
+        @keyframes floatIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* --- Navigation Rail (Floating Dock) --- */
+        .nav-rail {
+            width: 76px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            gap: 12px;
+            z-index: 50;
+            background: var(--bg-surface);
+            border-radius: 40px;
+            box-shadow: var(--shadow-float);
+            height: fit-content;
+            align-self: center;
+            border: 1px solid var(--border-subtle);
+            flex-shrink: 0;
+        }
+
+        .nav-logo {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #2563EB 0%, #4F46E5 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+            cursor: pointer;
+        }
+
+        .nav-logo svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .nav-item {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            font-size: 22px;
+            background: transparent;
+            border: none;
+        }
+
+        .nav-item:hover {
+            color: var(--primary);
+            background: #EFF6FF;
+            transform: scale(1.1);
+        }
+
+        .nav-item.active {
+            color: white;
+            background: var(--primary);
+            box-shadow: 0 8px 16px rgba(37, 99, 235, 0.25);
+        }
+
+        .nav-item svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        /* --- Expandable Side Panel --- */
+        .side-panel {
+            position: fixed;
+            left: 110px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 320px;
+            max-height: 80vh;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--border-subtle);
+            border-radius: 24px;
+            box-shadow: var(--shadow-float);
+            z-index: 45;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .side-panel.open {
+            display: flex;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50%) translateX(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(-50%) translateX(0);
+            }
+        }
+
+        .side-panel-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #F8FAFC;
+        }
+
+        .side-panel-header h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .side-panel-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 20px;
+            padding: 4px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .side-panel-close:hover {
+            background: #F1F5F9;
+            color: var(--text-main);
+        }
+
+        .side-panel-body {
+            padding: 20px 24px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        /* Legacy support - keep these for existing styles */
+        .left-panel-basket {
+            display: none;
+            /* Hidden - replaced by nav-rail */
+        }
+
+        .basket-header {
+            padding: 24px 28px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .basket-header h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .app-logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .app-logo-icon svg {
+            width: 18px;
+            height: 18px;
+            stroke: white;
+        }
+
+        .basket-list {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Control Cards */
+        .control-section {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .control-title {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-title::before {
+            content: '';
+            width: 4px;
+            height: 12px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .form-control,
+        select,
+        input {
+            width: 100%;
+            padding: 10px 14px;
+            font-size: 13px;
+            border-radius: 12px;
+            border: 1px solid var(--border-subtle);
+            background: var(--bg-canvas);
+            color: var(--text-main);
+            outline: none;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+
+        .form-control:focus,
+        select:focus,
+        input:focus {
+            background: white;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .btn {
+            border: none;
+            border-radius: 100px;
+            padding: 10px 20px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: white;
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+        }
+
+        .btn-secondary:hover {
+            background: #F1F5F9;
+            color: var(--text-main);
+        }
+
+        .basket-footer {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.5);
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        /* --- MAIN AREA --- */
+        .main-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow: hidden;
+            position: relative;
+            z-index: 10;
+        }
+
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 8px;
+        }
+
+        .header-title h1 {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        .header-title p {
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .content-panels {
+            flex: 1;
+            display: flex;
+            gap: 24px;
+            overflow: hidden;
+        }
+
+        .center-panel {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 32px;
+            box-shadow: var(--shadow-md);
+            padding: 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Cards in Main Area */
+        .card {
+            background: white;
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-subtle);
+            overflow: visible;
+            /* Allow chart labels to extend outside */
+        }
+
+        .chart-container {
+            overflow: visible !important;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        /* --- Metric Cards Redesign --- */
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 16px;
+        }
+
+        .metric-card {
+            background: white;
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 20px 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .metric-card:hover {
+            border-color: var(--primary-light);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .metric-card.selected {
+            background: #EFF6FF;
+            /* var(--light-blue) */
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+        }
+
+        .metric-card.selected .metric-label {
+            color: var(--primary-dark);
+        }
+
+        .metric-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .metric-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+        }
+
+        /* Color-coded values based on context (via JS or simple classes if added later) */
+        /* For now, keep text dark for readability, rely on card selection */
+
+
+        /* --- Temperature Bar Redesign --- */
+        .temperature-bar-container {
+            height: 12px;
+            background: linear-gradient(to right,
+                    #EF4444 0%,
+                    /* Red - Danger */
+                    #F59E0B 30%,
+                    /* Orange */
+                    #10B981 60%,
+                    /* Green - Safe */
+                    #3B82F6 100%
+                    /* Blue - Excellent */
+                );
+            border-radius: 6px;
+            margin: 70px 10px 40px 10px;
+            position: relative;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .temp-bar-labels {
+            display: flex;
+            justify-content: space-between;
+            margin: 0 -10px;
+            /* Offset margin of container */
+            padding: 0 10px;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .temp-bar-marker {
+            position: absolute;
+            width: 4px;
+            height: 24px;
+            /* Taller marker */
+            top: -6px;
+            /* Center vertically on the 12px bar */
+            background: white;
+            /* Will be overridden by JS inline style */
+            border: 2px solid white;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            transition: transform 0.2s, z-index 0.2s;
+            z-index: 10;
+        }
+
+        .temp-bar-marker:hover {
+            transform: scale(1.2) translateY(-2px);
+            z-index: 20;
+        }
+
+        /* Staggered Labels */
+        .temp-bar-marker::after {
+            content: attr(data-label);
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+            color: white;
+            background: inherit;
+            /* Match marker color */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+            /* Visibility & Positioning based on stagger */
+            opacity: 1;
+            visibility: visible;
+            transition: all 0.2s;
+        }
+
+        /* Stagger levels (Alternating Top/Bottom/High Top) */
+        .temp-bar-marker[data-stagger="0"]::after {
+            bottom: 24px;
+        }
+
+        .temp-bar-marker[data-stagger="1"]::after {
+            top: 24px;
+        }
+
+        .temp-bar-marker[data-stagger="2"]::after {
+            /* Level 2: Higher up to avoid Level 0 overlap */
+            bottom: 50px;
+            z-index: 25;
+            /* Ensure on top */
+        }
+
+        .temp-bar-marker.edge-left::after {
+            left: 0;
+            transform: translateX(0);
+        }
+
+        .temp-bar-marker.edge-right::after {
+            left: auto;
+            right: 0;
+            transform: translateX(0);
+        }
+
+        /* View Toggle Tabs */
+        .view-tabs {
+            display: inline-flex;
+            background: #F1F5F9;
+            padding: 4px;
+            border-radius: 12px;
+            gap: 2px;
+        }
+
+        .view-tab {
+            padding: 8px 16px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            border: none;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .view-tab.active {
+            background: white;
+            color: var(--primary);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Modal & Chat */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            width: 800px;
+            max-width: 90%;
+            border-radius: 24px;
+            margin: 5% auto;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-subtle);
+            background: #F8FAFC;
+            border-radius: 24px 24px 0 0;
+        }
+
+        .modal-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-container {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            background: white;
+        }
+
+        .chat-message {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            max-width: 80%;
+        }
+
+        .chat-message.user {
+            margin-left: auto;
+            flex-direction: row-reverse;
+        }
+
+        .chat-bubble {
+            padding: 12px 16px;
+            border-radius: 16px 16px 16px 4px;
+            /* AI bubble style */
+            font-size: 14px;
+            line-height: 1.5;
+            background: #F1F5F9;
+            color: var(--text-main);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .chat-message.user .chat-bubble {
+            background: var(--primary);
+            color: white;
+            border-radius: 16px 16px 4px 16px;
+            /* User bubble style */
+        }
+
+        .input-area {
+            padding: 20px;
+            background: #F8FAFC;
+            border-top: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid #E2E8F0;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .scenario-card {
+            border: 1px solid var(--border-subtle);
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+        }
+
+        .scenario-card:hover {
+            border-color: var(--primary);
+        }
+
+        .view-content {
+            display: none;
+        }
+
+        .view-content.active {
+            display: block;
+            animation: floatIn 0.3s;
+        }
+
+        /* Detailed Table Styling */
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            background: white;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            min-width: 1000px;
+        }
+
+        th,
+        td {
+            padding: 12px 16px;
+            text-align: right;
+            border-bottom: 1px solid var(--border-subtle);
+            white-space: nowrap;
+        }
+
+        /* Sticky Headers */
+        thead th {
+            position: sticky;
+            top: 0;
+            background: #F8FAFC;
+            color: var(--text-secondary);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 11px;
+            z-index: 10;
+            box-shadow: 0 1px 0 var(--border-subtle);
+        }
+
+        /* Sticky First Column */
+        th:first-child,
+        td:first-child {
+            position: sticky;
+            left: 0;
+            background: white;
+            z-index: 5;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-main);
+            border-right: 1px solid var(--border-subtle);
+            width: 200px;
+            min-width: 200px;
+        }
+
+        thead th:first-child {
+            z-index: 15;
+            /* Higher than normal headers and normal cells */
+            background: #F8FAFC;
+        }
+
+        tr:hover td {
+            background: #F1F5F9;
+        }
+
+        /* Maintain white bg for sticky column on hover */
+        tr:hover td:first-child {
+            background: #F1F5F9;
+        }
+
+        /* Totals Row */
+        tr:last-child td {
+            font-weight: 800;
+            background: #F8FAFC;
+            border-top: 2px solid var(--border-subtle);
+        }
+
+        .positive {
+            color: var(--success);
+        }
+
+        .negative {
+            color: var(--danger);
+        }
+
+        /* Component Override List */
+        .component-override-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .component-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            background: #F8FAFC;
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .component-item:hover {
+            background: #EFF6FF;
+            border-color: var(--primary);
+        }
+
+        .component-item.has-override {
+            background: linear-gradient(135deg, #EFF6FF 0%, #E0E7FF 100%);
+            border-color: var(--primary);
+        }
+
+        .component-item .comp-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-main);
+        }
+
+        .component-item .comp-status {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .component-item.has-override .comp-status {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Component Override Modal */
+        .override-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .override-modal.open {
+            display: flex;
+        }
+
+        .override-modal-content {
+            background: white;
+            width: 900px;
+            max-width: 95%;
+            max-height: 85vh;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: floatIn 0.3s ease-out;
+        }
+
+        .override-modal-header {
+            padding: 20px 24px;
+            background: #F8FAFC;
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .override-modal-header h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .override-modal-body {
+            padding: 24px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .override-chart-container {
+            height: 200px;
+            margin-bottom: 20px;
+            background: #F8FAFC;
+            border-radius: 12px;
+            padding: 12px;
+        }
+
+        .override-table-container {
+            overflow-x: auto;
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+        }
+
+        .override-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        .override-table th,
+        .override-table td {
+            padding: 10px 12px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-subtle);
+            min-width: 60px;
+        }
+
+        .override-table th {
+            background: #F8FAFC;
+            font-weight: 600;
+            color: var(--text-secondary);
+            position: sticky;
+            top: 0;
+        }
+
+        .override-table input {
+            width: 60px;
+            padding: 6px 8px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            text-align: center;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .override-table input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .override-table input.modified {
+            background: #FEF3C7;
+            border-color: #F59E0B;
+        }
+
+        .override-modal-footer {
+            padding: 16px 24px;
+            background: #F8FAFC;
+            border-top: 1px solid var(--border-subtle);
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .override-info {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+            padding: 12px 16px;
+            background: #EFF6FF;
+            border-radius: 10px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .override-info strong {
+            color: var(--text-main);
+        }
+    </style>
+
+<body>
+
+    <!-- Navigation Rail (outside main-area, as sibling) -->
+    <nav class="nav-rail">
+        <div class="nav-logo" title="ASTRA">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                <polyline points="2 17 12 22 22 17"></polyline>
+                <polyline points="2 12 12 17 22 12"></polyline>
+            </svg>
+        </div>
+        <button class="nav-item" id="navScenarioBuilder" onclick="togglePanel('scenarioBuilderPanel')"
+            title="Scenario Builder">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+        </button>
+        <button class="nav-item" id="navOverlayControls" onclick="togglePanel('overlayControlsPanel')"
+            title="Overlay Controls">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="4" y1="21" x2="4" y2="14"></line>
+                <line x1="4" y1="10" x2="4" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12" y2="3"></line>
+                <line x1="20" y1="21" x2="20" y2="16"></line>
+                <line x1="20" y1="12" x2="20" y2="3"></line>
+                <line x1="1" y1="14" x2="7" y2="14"></line>
+                <line x1="9" y1="8" x2="15" y2="8"></line>
+                <line x1="17" y1="16" x2="23" y2="16"></line>
+            </svg>
+        </button>
+        <button class="nav-item" id="navSavedScenarios" onclick="togglePanel('savedScenariosPanel')" title="Folder">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+            </svg>
+        </button>
+    </nav>
+
+    <!-- Scenario Builder Panel (fixed position) -->
+    <div class="side-panel" id="scenarioBuilderPanel">
+        <div class="side-panel-header">
+            <h3>Scenario Builder</h3>
+            <button class="side-panel-close" onclick="closePanel('scenarioBuilderPanel')">✕</button>
+        </div>
+        <div class="side-panel-body">
+            <div class="form-group">
+                <label>Scenario Name</label>
+                <input type="text" id="customScenarioName" class="form-control" value="My Custom Scenario"
+                    onchange="updateCustomScenarioName()">
+            </div>
+            <div class="form-group">
+                <label>Component Severities</label>
+                <div class="component-grid" id="componentBuilder"
+                    style="max-height: 350px; overflow-y: auto; padding-right: 4px;"></div>
+            </div>
+            <div style="padding-top: 12px; border-top: 1px solid var(--border-subtle); margin-top: 12px;">
+                <button class="btn btn-primary" onclick="saveScenarioFromBuilder()" style="width: 100%;">
+                    💾 Save Scenario
+                </button>
+                <small
+                    style="display: block; margin-top: 8px; color: var(--text-muted); font-size: 10px; text-align: center;">
+                    Saves current configuration to Folder
+                </small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay Controls Panel (rebuilt for component overrides) -->
+    <div class="side-panel" id="overlayControlsPanel">
+        <div class="side-panel-header">
+            <h3>Component Overrides</h3>
+            <button class="side-panel-close" onclick="closePanel('overlayControlsPanel')">✕</button>
+        </div>
+        <div class="side-panel-body">
+            <div class="form-group">
+                <label>Scenario to Override</label>
+                <select id="scenarioToOverride" class="form-control" onchange="selectScenarioToOverride(this.value)">
+                    <option value="very_severe">Very Severe</option>
+                    <option value="severe" selected>Severe</option>
+                    <option value="moderate">Moderate</option>
+                    <option value="benchmark">Benchmark</option>
+                    <option value="custom">Custom</option>
+                </select>
+                <small style="display: block; margin-top: 6px; color: var(--text-muted); font-size: 11px;">
+                    Select which scenario the component overrides will be applied to
+                </small>
+            </div>
+            <!-- Hidden scenarioDisplay for backwards compatibility -->
+            <select id="scenarioDisplay" multiple style="display: none;">
+                <option value="very_severe" selected>Very Severe</option>
+                <option value="severe" selected>Severe</option>
+                <option value="moderate" selected>Moderate</option>
+                <option value="benchmark" selected>Benchmark</option>
+                <option value="custom">Custom</option>
+            </select>
+            <!-- Direct Overlay Section -->
+            <div class="form-group"
+                style="margin-top: 12px; padding: 12px; background: rgba(59, 130, 246, 0.05); border-radius: 8px; border: 1px solid rgba(59, 130, 246, 0.15);">
+                <label
+                    style="font-weight: 600; color: var(--primary-blue); margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
+                    <span style="display: flex; align-items: center; gap: 6px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                        </svg>
+                        Direct Overlay
+                    </span>
+                    <button class="btn btn-secondary" style="padding: 2px 8px; font-size: 10px;"
+                        onclick="clearDirectOverlay()">Clear</button>
+                </label>
+
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; padding: 6px; background: white; border-radius: 4px; border: 1px solid #E2E8F0;">
+                        <span style="color: var(--text-muted);">Status:</span>
+                        <span id="directOverlayStatus" style="font-weight: 600; color: var(--text-dark);">None</span>
+                    </div>
+
+                    <button class="btn btn-secondary" style="width: 100%; font-size: 11px;"
+                        onclick="openDirectOverlayModal()">
+                        <span id="editOverlayBtnText">Edit Overlay</span>
+                    </button>
+                </div>
+
+                <small style="display: block; margin-top: 6px; color: var(--text-muted); font-size: 10px;">
+                    Adjust Capital, RWA, or BPS for specific quarters
+                </small>
+            </div>
+            <!-- Hidden legacy inputs for compatibility -->
+            <input type="hidden" id="overlayType" value="none">
+            <input type="hidden" id="overlayAmount" value="0">
+
+            <!-- Hidden legacy inputs for compatibility -->
+            <input type="hidden" id="overlayAmount" value="0">
+            <div class="form-group">
+                <label style="display: flex; align-items: center; justify-content: space-between;">
+                    <span>Component Overrides</span>
+                    <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 11px;"
+                        onclick="clearAllOverrides()">Clear All</button>
+                </label>
+                <div class="component-override-list" id="componentOverrideList">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Saved Scenarios Panel -->
+    <div class="side-panel" id="savedScenariosPanel" style="width: 380px;">
+        <div class="side-panel-header">
+            <h3>📁 Folder</h3>
+            <button class="side-panel-close" onclick="closePanel('savedScenariosPanel')">✕</button>
+        </div>
+        <div class="side-panel-body" style="padding: 16px;">
+            <div id="savedScenariosList" style="display: flex; flex-direction: column; gap: 12px;">
+                <!-- Populated by JS -->
+            </div>
+            <div id="noSavedScenarios" style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
+                <div style="font-size: 40px; margin-bottom: 12px; opacity: 0.5;">📁</div>
+                <p style="font-size: 14px; font-weight: 500;">No saved scenarios</p>
+                <p style="font-size: 12px; margin-top: 8px;">Use the AI Assistant to create and save custom scenarios.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="override-modal" id="componentOverrideModal">
+        <div class="override-modal-content">
+            <div class="override-modal-header">
+                <h3 id="overrideModalTitle">Edit Component: PCL Canada</h3>
+                <button class="side-panel-close" onclick="closeOverrideModal()">✕</button>
+            </div>
+            <div class="override-modal-body">
+                <div class="override-info">
+                    <div><strong>Base Scenario:</strong> <span id="overrideBaseScenario">Severe</span></div>
+                    <div><strong>Component:</strong> <span id="overrideComponentName">PCL Canada</span></div>
+                    <div><strong>Modified Quarters:</strong> <span id="overrideModifiedCount">0</span></div>
+                </div>
+                <div class="override-chart-container" id="overrideChart"></div>
+                <div class="override-table-container">
+                    <table class="override-table">
+                        <thead>
+                            <tr id="overrideTableHeader">
+                                <!-- Q1-Q20 headers -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr id="overrideTableBaseRow">
+                                <!-- Base values -->
+                            </tr>
+                            <tr id="overrideTableInputRow">
+                                <!-- Input fields -->
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="override-modal-footer">
+                <button class="btn btn-secondary" onclick="resetComponentOverride()">Reset to Default</button>
+                <button class="btn btn-primary" onclick="applyComponentOverride()">Apply Override</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Direct Overlay Modal -->
+    <div class="override-modal" id="directOverlayModal">
+        <div class="override-modal-content" style="width: 900px; max-width: 95%;">
+            <div class="override-modal-header">
+                <h3>Direct Scenario Overlay</h3>
+                <button class="side-panel-close" onclick="closeDirectOverlayModal()">✕</button>
+            </div>
+            <div class="override-modal-body">
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <label
+                        style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 12px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">OVERLAY
+                        TYPE</label>
+                    <select id="modalOverlayType" class="form-control"
+                        style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-subtle); font-size: 14px; background-color: var(--bg-surface); color: var(--text-main); outline: none;"
+                        onchange="handleModalOverlayTypeChange()">
+                        <option value="none">None</option>
+                        <option value="dollar">Capital ($M)</option>
+                        <option value="rwa">RWA ($M)</option>
+                        <option value="bps">Basis Points (bps)</option>
+                    </select>
+                    <small id="modalOverlayDescription"
+                        style="display: block; margin-top: 5px; color: var(--text-muted);">
+                        Select an overlay type
+                    </small>
+                </div>
+
+                <!-- Chart Container for Visualization -->
+                <div id="modalOverlayChart" style="width: 100%; height: 250px; margin-top: 15px; display: none;"></div>
+
+                <div id="modalOverlayTableContainer" style="display: none; margin-top: 15px;">
+                    <label>Quarterly Adjustments</label>
+                    <div class="override-table-container">
+                        <table class="override-table">
+                            <thead>
+                                <tr id="modalOverlayHeaders">
+                                    <!-- Headers generated by JS -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr id="modalOverlayInputs">
+                                    <!-- Inputs generated by JS -->
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="override-modal-footer">
+                <button class="btn btn-secondary" onclick="closeDirectOverlayModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="applyDirectOverlay()">Apply Overlay</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-area">
+        <div class="header-bar">
+            <div class="header-title">
+                <h1>Astra Studio</h1>
+                <p>CET1 Capital Adequacy Analysis Platform</p>
+            </div>
+            <div style="display:flex; gap:10px;">
+                <button class="btn btn-secondary" onclick="exportPDF()">Export Report</button>
+                <button class="btn btn-primary" onclick="openInputScenarioModal()">AI Assistant</button>
+            </div>
+        </div>
+
+        <div class="content-panels">
+            <div class="center-panel">
+                <div class="card" id="cet1TroughCard">
+                    <div class="card-header">
+                        <div class="card-title">Projected CET1 Ratios (Trough)</div>
+                    </div>
+                    <div class="metric-grid">
+                        <div class="metric-card">
+                            <div class="metric-label">Jump-Off</div>
+                            <div class="metric-value">13.2%</div>
+                        </div>
+                        <div class="metric-card selected" id="vsevereCard"
+                            onclick="selectScenarioForDetails('very_severe')">
+                            <div class="metric-label">Very Severe</div>
+                            <div class="metric-value" id="vsevereTrough">9.3%</div>
+                        </div>
+                        <div class="metric-card" id="severeCard" onclick="selectScenarioForDetails('severe')">
+                            <div class="metric-label">Severe</div>
+                            <div class="metric-value" id="severeTrough">10.8%</div>
+                        </div>
+                        <div class="metric-card" id="moderateCard" onclick="selectScenarioForDetails('moderate')">
+                            <div class="metric-label">Moderate</div>
+                            <div class="metric-value" id="moderateTrough">12.5%</div>
+                        </div>
+                        <div class="metric-card" id="benchmarkCard" onclick="selectScenarioForDetails('benchmark')">
+                            <div class="metric-label">Benchmark</div>
+                            <div class="metric-value" id="benchmarkTrough">12.8%</div>
+                        </div>
+                        <div class="metric-card" id="customCard" onclick="selectScenarioForDetails('custom')">
+                            <div class="metric-label" id="customScenarioLabel">Custom</div>
+                            <div class="metric-value" id="customTrough">--</div>
+                        </div>
+                    </div>
+
+                    <div class="temperature-bar-container" id="tempBar" style="margin-top: 30px;"></div>
+                    <div class="temp-bar-labels">
+                        <span>0% (Min)</span>
+                        <span>4.5% (CCB)</span>
+                        <span>8.0% (DSB)</span>
+                        <span>11.5%</span>
+                        <span>15.0%</span>
+                    </div>
+                </div>
+
+
+
+                <div class="card" id="capitalProjectionCard">
+                    <div class="card-header">
+                        <div class="card-title">Capital Projection</div>
+                    </div>
+                    <div class="chart-container" id="cet1Chart"></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Detailed Impact Analysis</div>
+                        <div class="view-tabs">
+                            <button class="view-tab active" onclick="switchView('waterfall')">Waterfall</button>
+                            <button class="view-tab" onclick="switchView('decomposition')">Decomposition</button>
+                            <button class="view-tab" onclick="switchView('dollarImpact')">$ Impact</button>
+                            <button class="view-tab" onclick="switchView('bpsImpact')">BPS Impact</button>
+                        </div>
+                    </div>
+
+                    <div id="waterfall" class="view-content active">
+                        <div class="chart-container" id="waterfallChart"></div>
+                    </div>
+                    <div id="decomposition" class="view-content">
+                        <div class="chart-container" id="decompositionChart"></div>
+                    </div>
+                    <div id="dollarImpact" class="view-content">
+                        <div class="table-container" id="dollarTable"></div>
+                    </div>
+                    <div id="bpsImpact" class="view-content">
+                        <div class="table-container" id="bpsTable"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="inputScenarioModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create Custom Scenario with AI</h3>
+                <button class="btn btn-secondary" onclick="closeInputScenarioModal()"
+                    style="padding:4px 12px;">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="chat-container" id="chatContainer">
+                    <div class="chat-message ai">
+                        <div class="chat-bubble">
+                            Hello! Describe your stress testing scenario or upload a document. I'll help you assess the
+                            impact on RBC's capital components.
+                        </div>
+                    </div>
+                </div>
+                <div id="scenarioResultContainer"></div>
+                <div class="input-area">
+                    <div id="uploadedFileDisplay"></div>
+                    <textarea id="userInput" class="form-control" placeholder="Type your scenario description..."
+                        style="height:80px; resize:none;"
+                        onkeypress="if(event.key==='Enter' && !event.shiftKey) {event.preventDefault(); sendMessage();}"></textarea>
+                    <div style="display:flex; gap:10px;">
+                        <label class="btn btn-secondary">
+                            📎 Upload
+                            <input type="file" id="fileUpload" style="display:none" accept=".txt,.pdf,.doc,.docx"
+                                onchange="handleFileUpload(event)">
+                        </label>
+                        <button class="btn btn-primary" style="flex:1" onclick="sendMessage()">Send</button>
+                        <button class="btn btn-secondary" onclick="requestFinalization()"
+                            id="requestFinalizeBtn">Complete Setup</button>
+                    </div>
+                    <div style="display: flex; gap: 8px; margin-top: 8px;">
+                        <button class="btn btn-secondary" onclick="saveCurrentScenario()" id="saveScenarioBtn"
+                            style="display: none; flex: 1;">💾 Save Scenario</button>
+                        <button class="btn btn-primary" onclick="applyScenario()" id="applyScenarioBtn"
+                            style="display: none; flex: 1;">Apply to Dashboard</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+
+        // Initial CET1 data
+
+        const JUMP_OFF_CET1 = 13.2;
+
+        const JUMP_OFF_CAPITAL = 88936; // $ Millions
+
+        const JUMP_OFF_RWA = 672282; // $ Millions
+
+
+
+        // Component names
+
+        const COMPONENTS = [
+
+            'PPNR Canada',
+
+            'PPNR US',
+
+            'PPNR International',
+
+            'PCL Canada',
+
+            'PCL US',
+
+            'PCL International',
+
+            'Dividend',
+
+            'Trading PnL',
+
+            'AFS Losses',
+
+            'Operational Risk Losses',
+
+            'Currency Translation Adj',
+
+            'Shortfall in Allowance',
+
+            'Credit RWA Change Canada',
+
+            'Credit RWA Change US',
+
+            'Credit RWA Change International',
+
+            'Market CCR CVA RWA Change',
+
+            'Operational Risk RWA Change',
+
+            'Other'
+
+        ];
+
+
+
+        // ---
+
+        // *** MODIFIED 'scenarioData' OBJECT (Moderate scenario updated) ***
+
+        // ---
+
+        const scenarioData = {
+
+            very_severe: {
+
+                'PPNR Canada': [950, 820, 720, 650, 580, 520, 480, 450, 420, 400, 430, 480, 540, 610, 680, 750, 810, 860, 900, 930],
+
+                'PPNR US': [480, 420, 380, 350, 320, 290, 270, 250, 230, 220, 240, 270, 310, 350, 390, 420, 440, 460, 470, 480],
+
+                'PPNR International': [210, 180, 160, 145, 130, 120, 110, 105, 100, 95, 105, 120, 135, 150, 165, 180, 190, 200, 205, 210],
+
+                'PCL Canada': [-420, -680, -920, -1150, -1340, -1480, -1580, -1650, -1680, -1700, -1620, -1480, -1300, -1080, -840, -620, -450, -320, -220, -150],
+
+                'PCL US': [-220, -340, -450, -550, -640, -710, -760, -790, -810, -820, -780, -710, -620, -520, -410, -310, -230, -170, -120, -80],
+
+                'PCL International': [-95, -145, -190, -230, -265, -295, -315, -328, -335, -340, -325, -295, -260, -220, -180, -145, -115, -90, -70, -55],
+
+                'Dividend': [-550, -550, -550, -550, -550, -550, -550, -550, -550, -550, -550, -550, -550, -550, -550, -550, -550, -550, -550, -550],
+
+                'Trading PnL': [-85, -125, -160, -185, -205, -220, -230, -235, -238, -240, -220, -185, -145, -105, -70, -40, -20, -10, -5, 0],
+
+                'AFS Losses': [-60, -88, -112, -132, -148, -160, -168, -173, -176, -178, -165, -145, -120, -92, -65, -42, -25, -15, -8, -5],
+
+                'Operational Risk Losses': [-52, -68, -82, -94, -104, -112, -118, -122, -125, -127, -118, -105, -90, -73, -57, -43, -32, -24, -18, -14],
+
+                'Currency Translation Adj': [-45, 30, -45, 30, -45, 30, -45, 30, -45, 30, -45, 30, -45, 30, -45, 30, -45, 30, -45, 30],
+
+                'Shortfall in Allowance': [-280, -280, -280, -280, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+
+                'Credit RWA Change Canada': [1850, 2450, 3020, 3540, 4010, 4420, 4770, 5050, 5260, 5400, 5180, 4720, 4120, 3420, 2680, 2020, 1480, 1080, 760, 520],
+
+                'Credit RWA Change US': [980, 1280, 1560, 1810, 2030, 2220, 2380, 2510, 2610, 2680, 2570, 2340, 2040, 1700, 1340, 1020, 760, 560, 400, 280],
+
+                'Credit RWA Change International': [420, 550, 670, 780, 880, 970, 1045, 1105, 1150, 1180, 1130, 1030, 910, 770, 620, 485, 370, 280, 210, 155],
+
+                'Market CCR CVA RWA Change': [520, 680, 820, 940, 1040, 1120, 1180, 1220, 1245, 1260, 1210, 1110, 980, 830, 670, 530, 410, 310, 230, 170],
+
+                'Operational Risk RWA Change': [410, 530, 640, 730, 810, 875, 925, 960, 985, 1000, 960, 880, 780, 660, 540, 430, 340, 270, 215, 175],
+
+                'Other': [0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99]
+
+            },
+
+            severe: {
+
+                'PPNR Canada': [1180, 1050, 950, 880, 820, 780, 820, 890, 970, 1050, 1120, 1180, 1230, 1270, 1300, 1320, 1340, 1350, 1360, 1370],
+
+                'PPNR US': [580, 520, 475, 440, 410, 390, 410, 450, 495, 540, 580, 615, 645, 670, 690, 705, 715, 725, 730, 735],
+
+                'PPNR International': [245, 220, 200, 185, 172, 165, 172, 188, 208, 228, 245, 260, 273, 284, 293, 300, 306, 310, 313, 315],
+
+                'PCL Canada': [-280, -485, -680, -860, -1020, -1150, -1090, -960, -800, -630, -480, -360, -270, -200, -150, -115, -90, -70, -55, -45],
+
+                'PCL US': [-145, -250, -350, -440, -520, -585, -555, -490, -410, -325, -250, -190, -145, -110, -85, -65, -50, -40, -32, -26],
+
+                'PCL International': [-62, -108, -150, -188, -222, -250, -237, -210, -176, -140, -108, -82, -63, -48, -37, -29, -23, -18, -15, -12],
+
+                'Dividend': [-550, -550, -550, -550, -550, -550, -550, -550, -550, -550, -550, -550, -550, -550, -550, -550, -550, -550, -550, -550],
+
+                'Trading PnL': [-55, -92, -125, -152, -172, -185, -170, -142, -108, -75, -48, -28, -15, -8, -4, -2, 0, 0, 0, 0],
+
+                'AFS Losses': [-40, -68, -92, -112, -127, -137, -126, -105, -80, -56, -37, -23, -14, -8, -5, -3, -2, -1, -1, 0],
+
+                'Operational Risk Losses': [-35, -55, -72, -86, -96, -103, -95, -82, -67, -52, -40, -31, -24, -19, -15, -12, -10, -8, -7, -6],
+
+                'Currency Translation Adj': [-30, 20, -30, 20, -30, 20, -30, 20, -30, 20, -30, 20, -30, 20, -30, 20, -30, 20, -30, 20],
+
+                'Shortfall in Allowance': [-180, -180, -180, -180, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+
+                'Credit RWA Change Canada': [1250, 1820, 2350, 2820, 3230, 3560, 3410, 3080, 2650, 2180, 1730, 1340, 1020, 780, 590, 450, 345, 265, 205, 160],
+
+                'Credit RWA Change US': [660, 960, 1240, 1485, 1700, 1875, 1795, 1625, 1400, 1155, 920, 715, 550, 425, 325, 250, 195, 155, 125, 100],
+
+                'Credit RWA Change International': [285, 415, 535, 645, 735, 810, 775, 700, 605, 500, 400, 315, 245, 190, 148, 117, 93, 74, 60, 49],
+
+                'Market CCR CVA RWA Change': [350, 510, 660, 790, 905, 1000, 955, 865, 745, 615, 495, 395, 315, 252, 202, 163, 132, 108, 89, 74],
+
+                'Operational Risk RWA Change': [290, 420, 540, 650, 745, 820, 785, 710, 615, 510, 415, 335, 270, 220, 180, 148, 123, 103, 87, 74],
+
+                'Other': [0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99]
+
+            },
+
+            moderate: {
+
+                'PPNR Canada': [1400, 1350, 1300, 1250, 1220, 1250, 1300, 1350, 1400, 1440, 1490, 1530, 1560, 1585, 1605, 1620, 1630, 1638, 1644, 1650],
+
+                'PPNR US': [680, 650, 630, 600, 590, 600, 620, 655, 690, 720, 745, 765, 782, 795, 805, 812, 817, 821, 824, 826],
+
+                'PPNR International': [290, 280, 270, 260, 250, 260, 265, 280, 295, 308, 318, 326, 333, 338, 342, 345, 347, 349, 350, 351],
+
+                'PCL Canada': [-120, -3250, -3350, -3420, -450, -400, -350, -300, -250, -200, -185, -140, -108, -84, -66, -53, -43, -36, -30, -26],
+
+                'PCL US': [-60, -100, -150, -200, -220, -200, -180, -160, -140, -127, -96, -73, -57, -45, -36, -29, -24, -20, -17, -15],
+
+                'PCL International': [-20, -40, -60, -80, -100, -90, -80, -70, -60, -55, -42, -32, -25, -20, -16, -13, -11, -9, -8, -7],
+
+                'Dividend': [-550, -550, -550, -550, -550, -550, -550, -550, -550, -550, -550, -550, -550, -550, -550, -550, -550, -550, -550, -550],
+
+                'Trading PnL': [-20, -40, -60, -80, -90, -80, -70, -50, -30, -20, -16, -9, -5, -3, -2, -1, 0, 0, 0, 0],
+
+                'AFS Losses': [-15, -25, -35, -45, -50, -45, -40, -30, -20, -10, -12, -7, -4, -3, -2, -1, -1, 0, 0, 0],
+
+                'Operational Risk Losses': [-15, -25, -35, -40, -45, -40, -35, -30, -25, -20, -20, -16, -12, -10, -8, -7, -6, -5, -4, -4],
+
+                'Currency Translation Adj': [-15, 10, -15, 10, -15, 10, -15, 10, -15, 10, -15, 10, -15, 10, -15, 10, -15, 10, -15, 10],
+
+                'Shortfall in Allowance': [-60, -60, -60, -60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+
+                'Credit RWA Change Canada': [500, 800, 1000, 1200, 1400, 1300, 1100, 900, 700, 500, 400, 300, 200, 150, 100, 80, 60, 40, 30, 20],
+
+                'Credit RWA Change US': [250, 400, 500, 600, 700, 650, 550, 450, 350, 300, 250, 200, 150, 120, 100, 80, 60, 40, 30, 20],
+
+                'Credit RWA Change International': [100, 150, 200, 250, 300, 280, 250, 200, 150, 100, 80, 60, 40, 30, 20, 10, 10, 10, 10, 10],
+
+                'Market CCR CVA RWA Change': [150, 200, 250, 300, 350, 300, 250, 200, 150, 100, 80, 60, 40, 30, 20, 10, 10, 10, 10, 10],
+
+                'Operational Risk RWA Change': [100, 150, 200, 250, 300, 280, 250, 200, 150, 100, 80, 60, 40, 30, 20, 10, 10, 10, 10, 10],
+
+                'Other': [0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99]
+
+            },
+
+            benchmark: {
+
+                'PPNR Canada': [1450, 1470, 1490, 1505, 1520, 1535, 1550, 1565, 1580, 1595, 1610, 1625, 1640, 1655, 1670, 1685, 1700, 1710, 1720, 1730],
+
+                'PPNR US': [715, 725, 735, 743, 750, 758, 765, 773, 780, 788, 795, 803, 810, 818, 825, 833, 840, 845, 850, 855],
+
+                'PPNR International': [302, 308, 314, 319, 323, 328, 332, 337, 341, 346, 350, 355, 359, 364, 368, 373, 377, 380, 383, 386],
+
+                'PCL Canada': [-120, -135, -148, -158, -165, -155, -140, -120, -100, -85, -72, -62, -54, -48, -43, -39, -36, -33, -31, -29],
+
+                'PCL US': [-62, -70, -76, -81, -85, -80, -72, -62, -52, -44, -37, -32, -28, -25, -22, -20, -19, -17, -16, -15],
+
+                'PCL International': [-27, -30, -33, -35, -37, -35, -31, -27, -22, -19, -16, -14, -12, -11, -10, -9, -8, -7, -7, -6],
+
+                'Dividend': [-550, -550, -550, -550, -550, -550, -550, -550, -550, -550, -550, -550, -550, -550, -550, -550, -550, -550, -550, -550],
+
+                'Trading PnL': [-18, -25, -30, -34, -36, -32, -25, -18, -12, -8, -5, -3, -2, -1, 0, 0, 0, 0, 0, 0],
+
+                'AFS Losses': [-12, -17, -20, -23, -24, -22, -17, -12, -8, -5, -3, -2, -1, -1, 0, 0, 0, 0, 0, 0],
+
+                'Operational Risk Losses': [-15, -22, -27, -31, -33, -30, -25, -20, -16, -12, -10, -8, -6, -5, -4, -4, -3, -3, -2, -2],
+
+                'Currency Translation Adj': [-15, 10, -15, 10, -15, 10, -15, 10, -15, 10, -15, 10, -15, 10, -15, 10, -15, 10, -15, 10],
+
+                'Shortfall in Allowance': [-50, -50, -50, -50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+
+                'Credit RWA Change Canada': [520, 785, 1035, 1265, 1470, 1410, 1270, 1095, 910, 745, 600, 480, 385, 310, 252, 207, 172, 144, 122, 104],
+
+                'Credit RWA Change US': [275, 415, 545, 665, 775, 745, 670, 580, 485, 395, 320, 258, 208, 169, 139, 116, 98, 83, 71, 62],
+
+                'Credit RWA Change International': [120, 180, 237, 290, 337, 323, 291, 252, 210, 172, 140, 113, 92, 75, 62, 52, 44, 37, 32, 28],
+
+                'Market CCR CVA RWA Change': [145, 220, 289, 352, 408, 391, 352, 304, 253, 207, 168, 137, 112, 92, 76, 64, 54, 46, 40, 35],
+
+                'Operational Risk RWA Change': [120, 182, 240, 293, 340, 326, 294, 254, 212, 173, 141, 115, 94, 78, 65, 55, 46, 40, 34, 30],
+
+                'Other': [0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99]
+
+            }
+
+        };
+
+
+
+        let customScenarioComponents = {};
+
+        let customScenarioName = 'My Custom Scenario'; // Track custom scenario name
+
+
+
+        let selectedDetailScenario = 'very_severe'; // Track which scenario to show in detailed views
+
+        // Panel toggle functions for nav-rail
+        function togglePanel(panelId) {
+            const panel = document.getElementById(panelId);
+            const allPanels = document.querySelectorAll('.side-panel');
+            const allNavItems = document.querySelectorAll('.nav-item');
+
+            // Check if this panel is already open
+            const isOpen = panel.classList.contains('open');
+
+            // Close all panels first
+            allPanels.forEach(p => p.classList.remove('open'));
+            allNavItems.forEach(n => n.classList.remove('active'));
+
+            // If it wasn't open, open it
+            if (!isOpen) {
+                panel.classList.add('open');
+                // Activate the corresponding nav button
+                if (panelId === 'scenarioBuilderPanel') {
+                    document.getElementById('navScenarioBuilder').classList.add('active');
+                } else if (panelId === 'overlayControlsPanel') {
+                    document.getElementById('navOverlayControls').classList.add('active');
+                } else if (panelId === 'savedScenariosPanel') {
+                    document.getElementById('navSavedScenarios').classList.add('active');
+                    renderSavedScenariosList(); // Refresh the list when opening
+                }
+            }
+        }
+
+        function closePanel(panelId) {
+            document.getElementById(panelId).classList.remove('open');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        }
+
+        // ====== COMPONENT OVERRIDE SYSTEM ======
+        let componentOverrides = {}; // { 'PCL Canada': [v1, v2, ..., v20], ... }
+        let currentEditingComponent = null;
+        let tempOverrideValues = []; // Temporary storage during editing
+
+        // ====== QUARTERLY OVERLAY SYSTEM ======
+        let quarterlyOverlayValues = Array(20).fill(0); // Per-quarter overlay values
+
+        // All components that can be overridden
+        const OVERRIDE_COMPONENTS = [
+            'PPNR Canada', 'PPNR US', 'PPNR International',
+            'PCL Canada', 'PCL US', 'PCL International',
+            'Dividend', 'Trading PnL', 'AFS Losses',
+            'Operational Risk Losses', 'Currency Translation Adj',
+            'Shortfall in Allowance',
+            'Credit RWA Change Canada', 'Credit RWA Change US', 'Credit RWA Change International',
+            'Market CCR CVA RWA Change', 'Operational Risk RWA Change',
+            'Other'
+        ];
+
+        // Initialize the component override list
+        function initComponentOverrideList() {
+            const container = document.getElementById('componentOverrideList');
+            if (!container) return;
+
+            container.innerHTML = OVERRIDE_COMPONENTS.map(comp => {
+                const hasOverride = componentOverrides[comp] !== undefined;
+                return `
+                    <div class="component-item ${hasOverride ? 'has-override' : ''}" 
+                         onclick="openComponentOverride('${comp}')">
+                        <span class="comp-name">${comp}</span>
+                        <span class="comp-status">${hasOverride ? '✓ Modified' : 'Default'}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ====== DIRECT OVERLAY MODAL MANAGMENT ======
+        let tempDirectOverlayValues = [];
+        let directOverlayDragState = { isDragging: false, pointIndex: -1 };
+        let directOverlayListenersAttached = false;
+
+        function openDirectOverlayModal() {
+            const currentType = document.getElementById('overlayType').value;
+            document.getElementById('modalOverlayType').value = currentType;
+
+            // Initialize temp values
+            tempDirectOverlayValues = [...quarterlyOverlayValues];
+
+            handleModalOverlayTypeChange();
+            document.getElementById('directOverlayModal').classList.add('open');
+
+            // Allow Plotly to resize correctly after modal opens
+            setTimeout(() => {
+                const type = document.getElementById('modalOverlayType').value;
+                if (type !== 'none') {
+                    renderDirectOverlayChart();
+                }
+            }, 100);
+        }
+
+        function closeDirectOverlayModal() {
+            document.getElementById('directOverlayModal').classList.remove('open');
+        }
+
+        function handleModalOverlayTypeChange() {
+            const type = document.getElementById('modalOverlayType').value;
+            const tableContainer = document.getElementById('modalOverlayTableContainer');
+            const chartContainer = document.getElementById('modalOverlayChart');
+            const description = document.getElementById('modalOverlayDescription');
+
+            if (type === 'none') {
+                tableContainer.style.display = 'none';
+                chartContainer.style.display = 'none';
+                description.textContent = 'Select an overlay type';
+            } else {
+                tableContainer.style.display = 'block';
+                chartContainer.style.display = 'block';
+                initModalOverlayTable();
+
+                // Render chart (will happen in timeout for open, but immediate for change)
+                if (document.getElementById('directOverlayModal').classList.contains('open')) {
+                    renderDirectOverlayChart();
+                }
+
+                if (type === 'dollar') description.textContent = 'Capital adjustment in $M (positive = increase capital)';
+                if (type === 'rwa') description.textContent = 'RWA adjustment in $M (positive = increase RWA)';
+                if (type === 'bps') description.textContent = 'Basis points adjustment (100 bps = 1% CET1 ratio)';
+            }
+        }
+
+        function initModalOverlayTable() {
+            const headersRow = document.getElementById('modalOverlayHeaders');
+            const inputsRow = document.getElementById('modalOverlayInputs');
+
+            headersRow.innerHTML = Array.from({ length: 20 }, (_, i) => `<th>Q${i + 1}</th>`).join('');
+
+            inputsRow.innerHTML = tempDirectOverlayValues.map((val, i) => `
+                <td>
+                    <input type="number" 
+                           id="direct_input_${i}"
+                           value="${val}" 
+                           onchange="updateDirectOverlayValue(${i}, this.value)"
+                           onfocus="this.select()">
+                </td>
+            `).join('');
+        }
+
+        function updateDirectOverlayValue(i, val) {
+            tempDirectOverlayValues[i] = parseFloat(val) || 0;
+            renderDirectOverlayChart();
+        }
+
+        function renderDirectOverlayChart() {
+            const quarters = Array.from({ length: 20 }, (_, i) => `Q${i + 1}`);
+            const type = document.getElementById('modalOverlayType').value;
+            let yTitle = 'Value';
+            if (type === 'dollar' || type === 'rwa') yTitle = '$ Million';
+            if (type === 'bps') yTitle = 'BPS';
+
+            const traces = [
+                {
+                    x: quarters,
+                    y: Array(20).fill(0),
+                    name: 'Baseline (0)',
+                    type: 'scatter',
+                    mode: 'lines',
+                    line: { color: '#94A3B8', width: 2, dash: 'dot' },
+                    hoverinfo: 'none'
+                },
+                {
+                    x: quarters,
+                    y: tempDirectOverlayValues,
+                    name: 'Overlay Value',
+                    type: 'scatter',
+                    mode: 'lines+markers',
+                    line: { color: '#2563EB', width: 2 },
+                    marker: { size: 8 }
+                }
+            ];
+
+            const layout = {
+                font: { family: 'Inter, sans-serif', size: 10 },
+                paper_bgcolor: 'transparent',
+                plot_bgcolor: 'transparent',
+                margin: { t: 20, b: 30, l: 50, r: 20 },
+                xaxis: { tickfont: { size: 9 }, gridcolor: '#E2E8F0', fixedrange: true },
+                yaxis: { tickfont: { size: 9 }, gridcolor: '#E2E8F0', title: yTitle, zeroline: true, zerolinecolor: '#94A3B8' },
+                showlegend: true,
+                legend: { orientation: 'h', y: 1.1, x: 0.5, xanchor: 'center' },
+                dragmode: false,
+                hovermode: 'closest'
+            };
+
+            Plotly.newPlot('modalOverlayChart', traces, layout, {
+                displayModeBar: false,
+                responsive: true,
+                scrollZoom: false
+            });
+
+            setupDirectOverlayDrag();
+        }
+
+        function setupDirectOverlayDrag() {
+            const chartEl = document.getElementById('modalOverlayChart');
+            if (!chartEl) return;
+
+            // Click to start drag
+            chartEl.on('plotly_click', function (data) {
+                if (data.points[0].curveNumber === 1) { // Overlay trace
+                    directOverlayDragState.isDragging = true;
+                    directOverlayDragState.pointIndex = data.points[0].pointIndex;
+                    chartEl.style.cursor = 'ns-resize';
+
+                    // Highlight point
+                    const colors = tempDirectOverlayValues.map((_, i) =>
+                        i === directOverlayDragState.pointIndex ? '#F59E0B' : '#2563EB'
+                    );
+                    Plotly.restyle('modalOverlayChart', { 'marker.color': [colors] }, [1]);
+                }
+            });
+
+            if (directOverlayListenersAttached) return;
+
+            // Mouse move
+            document.addEventListener('mousemove', function (e) {
+                if (!directOverlayDragState.isDragging || directOverlayDragState.pointIndex < 0) return;
+
+                const gd = document.getElementById('modalOverlayChart');
+                if (!gd || !gd._fullLayout) return;
+
+                // Only process if modal is open
+                if (!document.getElementById('directOverlayModal').classList.contains('open')) return;
+
+                const yaxis = gd._fullLayout.yaxis;
+                const rect = gd.getBoundingClientRect();
+                const margin = gd._fullLayout.margin;
+                const plotTop = rect.top + margin.t;
+                const plotHeight = rect.height - margin.t - margin.b;
+                const relY = e.clientY - plotTop;
+
+                const yRange = yaxis.range;
+                const yValue = yRange[1] - (relY / plotHeight) * (yRange[1] - yRange[0]);
+
+                const newValue = Math.round(yValue);
+
+                tempDirectOverlayValues[directOverlayDragState.pointIndex] = newValue;
+
+                // Fast update
+                Plotly.restyle('modalOverlayChart', { y: [tempDirectOverlayValues] }, [1]);
+
+                // Update input
+                const input = document.getElementById(`direct_input_${directOverlayDragState.pointIndex}`);
+                if (input) input.value = newValue;
+            });
+
+            // End drag
+            const endDrag = () => {
+                if (directOverlayDragState.isDragging) {
+                    directOverlayDragState.isDragging = false;
+                    // Reset point colors
+                    Plotly.restyle('modalOverlayChart', { 'marker.color': [null] }, [1]); // Reset color
+                    directOverlayDragState.pointIndex = -1;
+                    chartEl.style.cursor = '';
+                }
+            };
+
+            document.addEventListener('mouseup', endDrag);
+            chartEl.addEventListener('dblclick', endDrag);
+
+            directOverlayListenersAttached = true;
+        }
+
+        function applyDirectOverlay() {
+            const type = document.getElementById('modalOverlayType').value;
+
+            // Update global state
+            document.getElementById('overlayType').value = type;
+            quarterlyOverlayValues = [...tempDirectOverlayValues];
+
+            // Update UI Sidebar Status
+            const statusEl = document.getElementById('directOverlayStatus');
+            const btnText = document.getElementById('editOverlayBtnText');
+
+            if (type === 'none') {
+                statusEl.textContent = 'None';
+                btnText.textContent = 'Add Overlay';
+                quarterlyOverlayValues = Array(20).fill(0); // Reset values if none
+            } else {
+                let label = type === 'dollar' ? 'Capital ($M)' : (type === 'rwa' ? 'RWA ($M)' : 'Basis Points');
+                statusEl.textContent = `${label}`;
+                btnText.textContent = 'Edit Overlay';
+            }
+
+            calculateScenario();
+            closeDirectOverlayModal();
+        }
+
+        // Clear all direct overlay values
+        function clearDirectOverlay() {
+            quarterlyOverlayValues = Array(20).fill(0);
+            document.getElementById('overlayType').value = 'none';
+            document.getElementById('directOverlayStatus').textContent = 'None';
+            document.getElementById('editOverlayBtnText').textContent = 'Add Overlay';
+            calculateScenario();
+        }
+
+        // Handle scenario selection for overrides
+        function selectScenarioToOverride(scenarioValue) {
+            // Update the detailed view to show the selected scenario
+            selectScenarioForDetails(scenarioValue);
+
+            // If custom is selected, make sure it's enabled
+            if (scenarioValue === 'custom') {
+                const scenarioDisplay = document.getElementById('scenarioDisplay');
+                const customOption = Array.from(scenarioDisplay.options).find(opt => opt.value === 'custom');
+                if (customOption && !customOption.selected) {
+                    customOption.selected = true;
+                }
+            }
+
+            // Recalculate with the new base scenario
+            calculateScenario();
+
+            // Re-initialize the component override list to reflect the new base scenario
+            initComponentOverrideList();
+        }
+
+        // Open the component override modal
+        function openComponentOverride(componentName) {
+            currentEditingComponent = componentName;
+
+            // Get the currently selected scenario to override
+            const selectedOverrideScenario = document.getElementById('scenarioToOverride')?.value || 'severe';
+
+            // Get base values - use custom scenario components if custom is selected
+            let baseData;
+            let displayScenarioName;
+
+            if (selectedOverrideScenario === 'custom') {
+                // Use custom scenario components if available, otherwise fall back to severe
+                if (customScenarioComponents[componentName]) {
+                    baseData = [...customScenarioComponents[componentName]];
+                } else {
+                    baseData = scenarioData.severe[componentName] || Array(20).fill(0);
+                }
+                displayScenarioName = customScenarioName || 'Custom';
+            } else {
+                const scenarioKey = selectedOverrideScenario === 'very_severe' ? 'very_severe' : selectedOverrideScenario;
+                baseData = scenarioData[scenarioKey][componentName] || Array(20).fill(0);
+                displayScenarioName = selectedOverrideScenario.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+            }
+
+            // Use existing override or base values
+            tempOverrideValues = componentOverrides[componentName]
+                ? [...componentOverrides[componentName]]
+                : [...baseData];
+
+            // Update modal header
+            document.getElementById('overrideModalTitle').textContent = `Edit: ${componentName}`;
+            document.getElementById('overrideBaseScenario').textContent = displayScenarioName;
+            document.getElementById('overrideComponentName').textContent = componentName;
+
+            // Render the table
+            renderOverrideTable(baseData);
+
+            // Render the chart
+            renderOverrideChart(baseData);
+
+            // Update modified count
+            updateModifiedCount(baseData);
+
+            // Show modal
+            document.getElementById('componentOverrideModal').classList.add('open');
+        }
+
+        // Render the override table
+        function renderOverrideTable(baseData) {
+            const headerRow = document.getElementById('overrideTableHeader');
+            const baseRow = document.getElementById('overrideTableBaseRow');
+            const inputRow = document.getElementById('overrideTableInputRow');
+
+            // Headers
+            headerRow.innerHTML = '<th>Quarter</th>' +
+                Array.from({ length: 20 }, (_, i) => `<th>Q${i + 1}</th>`).join('');
+
+            // Base values row
+            baseRow.innerHTML = '<td style="font-weight: 600; background: #F8FAFC;">Base</td>' +
+                baseData.map(v => `<td style="color: var(--text-muted);">${v.toFixed(0)}</td>`).join('');
+
+            // Input row
+            inputRow.innerHTML = '<td style="font-weight: 600; background: #F8FAFC;">Override</td>' +
+                tempOverrideValues.map((v, i) => {
+                    const isModified = v !== baseData[i];
+                    return `<td>
+                        <input type="number" 
+                               value="${v.toFixed(0)}" 
+                               class="${isModified ? 'modified' : ''}"
+                               onchange="updateTempOverride(${i}, this.value, ${baseData[i]})"
+                               onfocus="this.select()">
+                    </td>`;
+                }).join('');
+        }
+
+        // Render the mini line chart with drag-to-edit
+        function renderOverrideChart(baseData) {
+            const quarters = Array.from({ length: 20 }, (_, i) => `Q${i + 1}`);
+
+            const traces = [
+                {
+                    x: quarters,
+                    y: baseData,
+                    name: 'Base',
+                    type: 'scatter',
+                    mode: 'lines+markers',
+                    line: { color: '#94A3B8', width: 2, dash: 'dot' },
+                    marker: { size: 5 }
+                },
+                {
+                    x: quarters,
+                    y: tempOverrideValues,
+                    name: 'Override (drag to edit)',
+                    type: 'scatter',
+                    mode: 'lines+markers',
+                    line: { color: '#2563EB', width: 2 },
+                    marker: { size: 10 } // Larger for easier dragging
+                }
+            ];
+
+            const layout = {
+                font: { family: 'Inter, sans-serif', size: 10 },
+                paper_bgcolor: 'transparent',
+                plot_bgcolor: 'transparent',
+                margin: { t: 10, b: 30, l: 50, r: 20 },
+                xaxis: { tickfont: { size: 9 }, gridcolor: '#E2E8F0', fixedrange: true },
+                yaxis: { tickfont: { size: 9 }, gridcolor: '#E2E8F0', title: 'Value' },
+                showlegend: true,
+                legend: { orientation: 'h', y: 1.15, x: 0.5, xanchor: 'center' },
+                dragmode: false,
+                hovermode: 'closest'
+            };
+
+            Plotly.newPlot('overrideChart', traces, layout, {
+                displayModeBar: false,
+                responsive: true,
+                scrollZoom: false
+            });
+
+            // Setup drag-to-edit with immediate response
+            setupDragToEdit(baseData);
+        }
+
+        // Drag state
+        let chartDragState = {
+            isDragging: false,
+            pointIndex: -1,
+            baseData: null
+        };
+
+        function setupDragToEdit(baseData) {
+            const chartEl = document.getElementById('overrideChart');
+            if (!chartEl) return;
+
+            chartDragState.baseData = baseData;
+
+            // Click on a point to select it for dragging
+            chartEl.on('plotly_click', function (data) {
+                // Only respond to clicks on the Override trace (index 1)
+                if (data.points[0].curveNumber === 1) {
+                    chartDragState.isDragging = true;
+                    chartDragState.pointIndex = data.points[0].pointIndex;
+                    chartEl.style.cursor = 'ns-resize';
+
+                    // Highlight the selected point
+                    const colors = tempOverrideValues.map((_, i) =>
+                        i === chartDragState.pointIndex ? '#F59E0B' : '#2563EB'
+                    );
+                    Plotly.restyle('overrideChart', { 'marker.color': [colors] }, [1]);
+                }
+            });
+
+            // Handle mouse movement for dragging
+            document.addEventListener('mousemove', function (e) {
+                if (!chartDragState.isDragging || chartDragState.pointIndex < 0) return;
+
+                const gd = document.getElementById('overrideChart');
+                if (!gd || !gd._fullLayout) return;
+
+                const yaxis = gd._fullLayout.yaxis;
+                const rect = gd.getBoundingClientRect();
+                const margin = gd._fullLayout.margin;
+
+                // Calculate relative position in plot area
+                const plotTop = rect.top + margin.t;
+                const plotHeight = rect.height - margin.t - margin.b;
+                const relY = e.clientY - plotTop;
+
+                // Clamp to chart bounds
+                const clampedY = Math.max(0, Math.min(plotHeight, relY));
+
+                // Convert to data value
+                const yRange = yaxis.range;
+                const yValue = yRange[1] - (clampedY / plotHeight) * (yRange[1] - yRange[0]);
+                const newValue = Math.round(yValue);
+
+                // Update value
+                tempOverrideValues[chartDragState.pointIndex] = newValue;
+
+                // Update chart
+                Plotly.restyle('overrideChart', { y: [tempOverrideValues] }, [1]);
+
+                // Update table input
+                const inputs = document.querySelectorAll('#overrideTableInputRow input');
+                if (inputs[chartDragState.pointIndex]) {
+                    inputs[chartDragState.pointIndex].value = newValue;
+                    inputs[chartDragState.pointIndex].classList.toggle('modified',
+                        newValue !== chartDragState.baseData[chartDragState.pointIndex]);
+                }
+
+                updateModifiedCount(chartDragState.baseData);
+            });
+
+            // End drag on click anywhere or mouseup
+            document.addEventListener('click', function (e) {
+                // Delay to allow the plotly_click to fire first
+                setTimeout(() => {
+                    if (chartDragState.isDragging && !chartEl.contains(e.target)) {
+                        endChartDrag();
+                    }
+                }, 50);
+            });
+
+            document.addEventListener('mouseup', function () {
+                if (chartDragState.isDragging) {
+                    endChartDrag();
+                }
+            });
+
+            // Double-click to end drag mode
+            chartEl.addEventListener('dblclick', endChartDrag);
+        }
+
+        function endChartDrag() {
+            if (!chartDragState.isDragging) return;
+
+            chartDragState.isDragging = false;
+            chartDragState.pointIndex = -1;
+
+            const chartEl = document.getElementById('overrideChart');
+            if (chartEl) {
+                chartEl.style.cursor = 'default';
+                // Reset colors
+                Plotly.restyle('overrideChart', { 'marker.color': '#2563EB' }, [1]);
+            }
+        }
+
+        // Update a single override value
+        function updateTempOverride(index, value, baseValue) {
+            const numValue = parseFloat(value) || 0;
+            tempOverrideValues[index] = numValue;
+
+            // Update input styling
+            const inputs = document.querySelectorAll('#overrideTableInputRow input');
+            if (inputs[index]) {
+                inputs[index].classList.toggle('modified', numValue !== baseValue);
+            }
+
+            // Update chart
+            const baseScenario = selectedDetailScenario === 'custom' ? 'severe' : selectedDetailScenario;
+            const baseData = scenarioData[baseScenario === 'very_severe' ? 'very_severe' : baseScenario][currentEditingComponent] || Array(20).fill(0);
+            renderOverrideChart(baseData);
+            updateModifiedCount(baseData);
+        }
+
+        // Update modified count display
+        function updateModifiedCount(baseData) {
+            let count = 0;
+            tempOverrideValues.forEach((v, i) => {
+                if (v !== baseData[i]) count++;
+            });
+            document.getElementById('overrideModifiedCount').textContent = count;
+        }
+
+        // Apply the component override
+        function applyComponentOverride() {
+            if (!currentEditingComponent) return;
+
+            // Get base data based on selected scenario
+            const selectedOverrideScenario = document.getElementById('scenarioToOverride')?.value || 'severe';
+            let baseData;
+
+            if (selectedOverrideScenario === 'custom' && customScenarioComponents[currentEditingComponent]) {
+                baseData = [...customScenarioComponents[currentEditingComponent]];
+            } else {
+                const scenarioKey = selectedOverrideScenario === 'custom' ? 'severe' :
+                    (selectedOverrideScenario === 'very_severe' ? 'very_severe' : selectedOverrideScenario);
+                baseData = scenarioData[scenarioKey][currentEditingComponent] || Array(20).fill(0);
+            }
+
+            // Check if any values are actually modified
+            let hasChanges = false;
+            tempOverrideValues.forEach((v, i) => {
+                if (v !== baseData[i]) hasChanges = true;
+            });
+
+            if (hasChanges) {
+                componentOverrides[currentEditingComponent] = [...tempOverrideValues];
+            } else {
+                // No changes, remove override if it exists
+                delete componentOverrides[currentEditingComponent];
+            }
+
+            // Update the list UI
+            initComponentOverrideList();
+
+            // Close modal
+            closeOverrideModal();
+
+            // Always recalculate after applying overrides
+            calculateScenario();
+        }
+
+        // Reset component to default values
+        function resetComponentOverride() {
+            if (!currentEditingComponent) return;
+
+            // Get base data based on selected scenario
+            const selectedOverrideScenario = document.getElementById('scenarioToOverride')?.value || 'severe';
+            let baseData;
+
+            if (selectedOverrideScenario === 'custom' && customScenarioComponents[currentEditingComponent]) {
+                baseData = [...customScenarioComponents[currentEditingComponent]];
+            } else {
+                const scenarioKey = selectedOverrideScenario === 'custom' ? 'severe' :
+                    (selectedOverrideScenario === 'very_severe' ? 'very_severe' : selectedOverrideScenario);
+                baseData = scenarioData[scenarioKey][currentEditingComponent] || Array(20).fill(0);
+            }
+
+            tempOverrideValues = [...baseData];
+            renderOverrideTable(baseData);
+            renderOverrideChart(baseData);
+            updateModifiedCount(baseData);
+        }
+
+        // Close the override modal
+        function closeOverrideModal() {
+            document.getElementById('componentOverrideModal').classList.remove('open');
+            currentEditingComponent = null;
+            tempOverrideValues = [];
+        }
+
+        // Clear all overrides
+        function clearAllOverrides() {
+            componentOverrides = {};
+            initComponentOverrideList();
+            calculateScenario();
+        }
+
+        // Get component value with override applied
+        function getComponentValue(componentName, quarterIndex, scenarioData) {
+            if (componentOverrides[componentName]) {
+                return componentOverrides[componentName][quarterIndex];
+            }
+            return scenarioData[componentName] ? scenarioData[componentName][quarterIndex] : 0;
+        }
+
+        // Toggle collapse for expandable sections
+
+        function toggleCollapse(contentId) {
+
+            const content = document.getElementById(contentId);
+
+            const icon = document.getElementById(contentId.replace('Content', 'Icon'));
+
+
+
+            if (content.classList.contains('collapsed')) {
+
+                content.classList.remove('collapsed');
+
+                icon.classList.remove('collapsed');
+
+            } else {
+
+                content.classList.add('collapsed');
+
+                icon.classList.add('collapsed');
+
+            }
+
+        }
+
+
+
+        // Update custom scenario name
+
+        function updateCustomScenarioName() {
+
+            const nameInput = document.getElementById('customScenarioName');
+
+            customScenarioName = nameInput.value || 'My Custom Scenario';
+
+
+
+            // Update the metric card label
+
+            const metricLabel = document.getElementById('customScenarioLabel');
+
+            if (metricLabel) {
+
+                metricLabel.textContent = customScenarioName + ' Trough';
+
+            }
+
+            // Recalculate to update chart legends and temp bar
+
+            calculateScenario();
+
+        }
+
+
+
+        // Set custom scenario name (called when AI generates a scenario)
+
+        function setCustomScenarioName(name) {
+
+            customScenarioName = name;
+
+            const nameInput = document.getElementById('customScenarioName');
+
+            if (nameInput) {
+
+                nameInput.value = name;
+
+            }
+
+
+
+            // Update the metric card label
+
+            const metricLabel = document.getElementById('customScenarioLabel');
+
+            if (metricLabel) {
+
+                metricLabel.textContent = name + ' Trough';
+
+            }
+
+        }
+
+
+
+        // Switch between detailed analysis views
+        function switchView(viewName) {
+            // Hide all view contents
+            document.querySelectorAll('.view-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Remove active class from all tabs
+            document.querySelectorAll('.view-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected view content
+            const activeView = document.getElementById(viewName);
+            activeView.classList.add('active');
+
+            // Add active class to clicked tab
+            if (window.event && window.event.target) {
+                window.event.target.classList.add('active');
+            }
+
+            // Re-render charts when their tab becomes visible
+            // This ensures they render at the correct width (after display:block is applied)
+            const overlayType = document.getElementById('overlayType').value;
+            const overlayAmount = parseFloat(document.getElementById('overlayAmount').value) || 0;
+
+            requestAnimationFrame(() => {
+                if (viewName === 'waterfall') {
+                    updateWaterfallChart(selectedDetailScenario, overlayType, overlayAmount);
+                } else if (viewName === 'decomposition') {
+                    updateDecompositionChart(selectedDetailScenario, overlayType, overlayAmount);
+                }
+            });
+        }
+
+
+
+        // Select which scenario to view in detailed tables and charts
+
+        function selectScenarioForDetails(scenario) {
+
+            selectedDetailScenario = scenario;
+
+
+
+            // Update visual selection on metric cards
+
+            ['vsevereCard', 'severeCard', 'moderateCard', 'benchmarkCard', 'customCard'].forEach(cardId => {
+
+                const card = document.getElementById(cardId);
+
+                if (card) card.classList.remove('selected');
+
+            });
+
+
+
+            const scenarioCardMap = {
+
+                'very_severe': 'vsevereCard',
+
+                'severe': 'severeCard',
+
+                'moderate': 'moderateCard',
+
+                'benchmark': 'benchmarkCard',
+
+                'custom': 'customCard'
+
+            };
+
+
+
+            const selectedCard = document.getElementById(scenarioCardMap[scenario]);
+
+            if (selectedCard) selectedCard.classList.add('selected');
+
+
+
+            // Recalculate to update all visualizations
+
+            const overlayType = document.getElementById('overlayType').value;
+
+            const overlayAmount = parseFloat(document.getElementById('overlayAmount').value) || 0;
+
+            updateWaterfallChart(selectedDetailScenario, overlayType, overlayAmount);
+
+            updateDecompositionChart(selectedDetailScenario, overlayType, overlayAmount);
+
+            updateTables(selectedDetailScenario, overlayType, overlayAmount);
+
+
+
+            // Ensure charts are properly sized after update
+
+            setTimeout(() => {
+
+                if (document.getElementById('waterfallChart')) {
+
+                    Plotly.Plots.resize('waterfallChart');
+
+                }
+
+                if (document.getElementById('decompositionChart')) {
+
+                    Plotly.Plots.resize('decompositionChart');
+
+                }
+
+            }, 100);
+
+        }
+
+
+
+        // Initialize component builder
+
+        function initComponentBuilder() {
+
+            const builder = document.getElementById('componentBuilder');
+
+            builder.innerHTML = COMPONENTS.map(comp => `
+
+                <div class="form-group">
+
+                    <label>${comp}</label>
+
+                    <select id="comp_${comp.replace(/\s+/g, '_')}" onchange="updateCustomScenario(true)">
+
+                        <option value="very_severe">Very Severe</option>
+
+                        <option value="severe" selected>Severe</option>
+
+                        <option value="moderate">Moderate</option>
+
+                        <option value="benchmark">Benchmark</option>
+
+                    </select>
+
+                </div>
+
+            `).join('');
+
+        }
+
+
+
+        // Update custom scenario based on selections
+
+        function updateCustomScenario(autoCalculate = false) {
+
+            customScenarioComponents = {};
+
+            COMPONENTS.forEach(comp => {
+
+                const selectId = `comp_${comp.replace(/\s+/g, '_')}`;
+
+                const selectedScenario = document.getElementById(selectId).value;
+
+                customScenarioComponents[comp] = scenarioData[selectedScenario][comp];
+
+            });
+
+
+
+            // Automatically enable custom scenario and recalculate when triggered by user
+
+            if (autoCalculate && Object.keys(customScenarioComponents).length > 0) {
+
+                // Ensure custom is selected in the scenario display
+
+                const scenarioDisplay = document.getElementById('scenarioDisplay');
+
+                const customOption = Array.from(scenarioDisplay.options).find(opt => opt.value === 'custom');
+
+                if (customOption && !customOption.selected) {
+
+                    customOption.selected = true;
+
+                }
+
+
+
+                // Automatically switch to custom scenario for detailed view
+
+                selectScenarioForDetails('custom');
+
+
+
+                // Recalculate everything
+
+                calculateScenario();
+
+            }
+
+        }
+
+
+
+        // Calculate CET1 for a scenario with overlay
+
+        function calculateCET1Path(scenario, overlayType, quarterlyOverlays, applyOverrides = true) {
+            let capital = JUMP_OFF_CAPITAL;
+            let rwa = JUMP_OFF_RWA;
+            const cet1Path = [JUMP_OFF_CET1];
+
+            // Helper to get value with override support (only if applyOverrides is true)
+            const getValue = (comp, q) => {
+                if (applyOverrides && componentOverrides[comp]) {
+                    return componentOverrides[comp][q];
+                }
+                return scenario[comp] ? scenario[comp][q] : 0;
+            };
+
+            for (let q = 0; q < 20; q++) {
+                // Capital changes (with override support)
+                let capitalChange = 0;
+                ['PPNR Canada', 'PPNR US', 'PPNR International',
+                    'PCL Canada', 'PCL US', 'PCL International',
+                    'Dividend', 'Trading PnL', 'AFS Losses', 'Operational Risk Losses',
+                    'Currency Translation Adj', 'Shortfall in Allowance', 'Other'].forEach(comp => {
+                        capitalChange += getValue(comp, q);
+                    });
+
+                // RWA changes (with override support)
+                let rwaChange = 0;
+                ['Credit RWA Change Canada', 'Credit RWA Change US', 'Credit RWA Change International',
+                    'Market CCR CVA RWA Change', 'Operational Risk RWA Change'].forEach(comp => {
+                        rwaChange += getValue(comp, q);
+                    });
+
+                // Apply quarterly overlay (only to the selected scenario)
+                if (applyOverrides && overlayType !== 'none') {
+                    const quarterOverlay = quarterlyOverlays[q] || 0;
+                    if (overlayType === 'dollar') {
+                        // Dollar overlay adds directly to capital ($M)
+                        capitalChange += quarterOverlay;
+                    } else if (overlayType === 'rwa') {
+                        // RWA overlay adds directly to RWA ($M)
+                        // Positive value = Increase RWA (Denominator) = Decrease Ratio
+                        rwaChange += quarterOverlay;
+                    } else if (overlayType === 'bps') {
+                        // BPS overlay: convert bps to capital impact
+                        // 1 bps = 0.01% of RWA
+                        capitalChange += (rwa * quarterOverlay / 10000);
+                    }
+                }
+
+                capital += capitalChange;
+                rwa += rwaChange;
+
+                const cet1 = (capital / rwa) * 100;
+                cet1Path.push(cet1);
+            }
+
+            return cet1Path;
+        }
+
+
+
+        // ---
+
+        // *** MODIFIED FUNCTION (LOGIC FIX) ***
+
+        // ---
+
+        // Calculate and plot
+
+        function calculateScenario() {
+
+            updateCustomScenario();
+
+
+
+            const overlayType = document.getElementById('overlayType').value;
+
+            const selectedScenarios = Array.from(document.getElementById('scenarioDisplay').selectedOptions).map(o => o.value);
+
+            // Get the scenario selected for override
+            const scenarioToOverride = document.getElementById('scenarioToOverride')?.value || 'severe';
+
+
+            // 1. Calculate paths for ALL scenarios (only apply overrides to the selected scenario)
+
+            const allPaths = {};
+
+            allPaths['Very Severe'] = calculateCET1Path(scenarioData.very_severe, overlayType, quarterlyOverlayValues, scenarioToOverride === 'very_severe');
+
+            allPaths['Severe'] = calculateCET1Path(scenarioData.severe, overlayType, quarterlyOverlayValues, scenarioToOverride === 'severe');
+
+            allPaths['Moderate'] = calculateCET1Path(scenarioData.moderate, overlayType, quarterlyOverlayValues, scenarioToOverride === 'moderate');
+
+            allPaths['Benchmark'] = calculateCET1Path(scenarioData.benchmark, overlayType, quarterlyOverlayValues, scenarioToOverride === 'benchmark');
+
+            if (Object.keys(customScenarioComponents).length > 0) {
+
+                const customData = {};
+
+                COMPONENTS.forEach(comp => {
+
+                    customData[comp] = customScenarioComponents[comp] || scenarioData.severe[comp];
+
+                });
+
+                allPaths[customScenarioName] = calculateCET1Path(customData, overlayType, quarterlyOverlayValues, scenarioToOverride === 'custom');
+
+            }
+
+
+
+            // 2. Create a filtered list of paths for the line chart
+
+            const pathsForChart = {};
+
+            if (selectedScenarios.includes('very_severe')) {
+
+                pathsForChart['Very Severe'] = allPaths['Very Severe'];
+
+            }
+
+            if (selectedScenarios.includes('severe')) {
+
+                pathsForChart['Severe'] = allPaths['Severe'];
+
+            }
+
+            if (selectedScenarios.includes('moderate')) {
+
+                pathsForChart['Moderate'] = allPaths['Moderate'];
+
+            }
+
+            if (selectedScenarios.includes('benchmark')) {
+
+                pathsForChart['Benchmark'] = allPaths['Benchmark'];
+
+            }
+
+            if (selectedScenarios.includes('custom') && Object.keys(customScenarioComponents).length > 0) {
+
+                pathsForChart[customScenarioName] = allPaths[customScenarioName];
+
+            }
+
+
+
+            // 3. Update the temperature bar using ALL paths
+
+            updateTemperatureBar(allPaths);
+
+
+
+            // 4. Update the line chart using ONLY the filtered paths
+
+            plotCET1Chart(pathsForChart);
+
+
+
+            // 5. Update the detailed analysis views
+
+            updateWaterfallChart(selectedDetailScenario, overlayType, overlayAmount);
+
+            updateDecompositionChart(selectedDetailScenario, overlayType, overlayAmount);
+
+            updateTables(selectedDetailScenario, overlayType, overlayAmount);
+
+
+
+            // 6. Ensure charts are properly sized after update
+
+            setTimeout(() => {
+
+                if (document.getElementById('waterfallChart')) {
+
+                    Plotly.Plots.resize('waterfallChart');
+
+                }
+
+                if (document.getElementById('decompositionChart')) {
+
+                    Plotly.Plots.resize('decompositionChart');
+
+                }
+
+            }, 100);
+
+        }
+
+
+
+        // ---
+
+        // *** MODIFIED FUNCTION (COLORS & LOGIC & LABEL STAGGERING & ABBREVIATIONS) ***
+
+        // ---
+
+        // Update temperature bar
+
+        // Update temperature bar
+        function updateTemperatureBar(paths) {
+            const tempBar = document.getElementById('tempBar');
+            tempBar.innerHTML = '';
+
+            const troughs = {};
+            // 'paths' here is allPaths, so all scenarios are looped
+            Object.keys(paths).forEach(scenario => {
+                troughs[scenario] = Math.min(...paths[scenario]);
+            });
+
+            // Update metric cards
+            if (troughs['Very Severe']) document.getElementById('vsevereTrough').textContent = troughs['Very Severe'].toFixed(1) + '%';
+            if (troughs['Severe']) document.getElementById('severeTrough').textContent = troughs['Severe'].toFixed(1) + '%';
+            if (troughs['Moderate']) document.getElementById('moderateTrough').textContent = troughs['Moderate'].toFixed(1) + '%';
+            if (troughs['Benchmark']) document.getElementById('benchmarkTrough').textContent = troughs['Benchmark'].toFixed(1) + '%';
+            if (troughs[customScenarioName]) document.getElementById('customTrough').textContent = troughs[customScenarioName].toFixed(1) + '%';
+
+            // --- COLORS & LABELS ---
+            const colors = {
+                'Very Severe': '#EF4444',
+                'Severe': '#F59E0B',
+                'Moderate': '#10B981',
+                'Benchmark': '#64748B'
+            };
+            colors[customScenarioName] = '#2563EB';
+
+            const labelMap = {
+                'Very Severe': 'V. Severe', // Shortened
+                'Severe': 'Severe',
+                'Moderate': 'Moderate',
+                'Benchmark': 'Benchmark'
+            };
+            // Dynamic map for custom
+            labelMap[customScenarioName] = 'Custom';
+
+            // 1. Sort Data
+            const troughList = Object.keys(troughs).map(scenario => ({
+                name: scenario,
+                trough: troughs[scenario],
+                position: Math.max(0, Math.min(100, (troughs[scenario] / 15) * 100))
+            }));
+            troughList.sort((a, b) => a.position - b.position);
+
+            // 2. Smart Stagger Logic (Collision Detection)
+            // We track the last position used for each visual level to ensure clearance
+            const levelLastPos = [-100, -100, -100]; // Tracks position % of last item in Level 0, 1, 2
+            const SAFE_DISTANCE = 16; // Increased to prevent text overlap
+
+            troughList.forEach(markerData => {
+                let chosenLevel = 0;
+
+                // Find first level where we fit
+                let foundInt = false;
+                for (let i = 0; i < 3; i++) {
+                    if (markerData.position - levelLastPos[i] > SAFE_DISTANCE) {
+                        chosenLevel = i;
+                        foundInt = true;
+                        break;
+                    }
+                }
+
+                // If no level fits (very crowded), pick the one that is 'furthest' away (least overlap)
+                if (!foundInt) {
+                    let maxDist = -1;
+                    for (let i = 0; i < 3; i++) {
+                        let dist = markerData.position - levelLastPos[i];
+                        if (dist > maxDist) {
+                            maxDist = dist;
+                            chosenLevel = i;
+                        }
+                    }
+                }
+
+                // Update usage
+                levelLastPos[chosenLevel] = markerData.position;
+
+                // Render
+                const marker = document.createElement('div');
+                marker.className = 'temp-bar-marker';
+                marker.style.left = markerData.position + '%';
+                marker.style.backgroundColor = colors[markerData.name] || '#8B5CF6';
+                marker.style.borderColor = 'white';
+
+                const scenarioLabel = labelMap[markerData.name] || 'Custom';
+                marker.setAttribute('data-label', `${scenarioLabel}: ${markerData.trough.toFixed(1)}%`);
+                marker.dataset.stagger = chosenLevel;
+
+                // Edge fixing
+                if (markerData.position < 10) marker.classList.add('edge-left');
+                if (markerData.position > 90) marker.classList.add('edge-right');
+
+                tempBar.appendChild(marker);
+            });
+        }
+
+
+
+        // ---
+
+        // *** MODIFIED FUNCTION (COLORS) ***
+
+        // ---
+
+        // Plot CET1 chart
+
+        // Plot CET1 chart
+        function plotCET1Chart(paths) {
+            const quarters = Array.from({ length: 21 }, (_, i) => `Q${i}`);
+
+            // --- COLOR SCHEME ---
+            const scenarioColors = {
+                'Very Severe': '#EF4444',  // Red
+                'Severe': '#F59E0B',       // Orange
+                'Moderate': '#10B981',     // Green
+                'Benchmark': '#64748B'     // Slate
+            };
+            scenarioColors[customScenarioName] = '#2563EB'; // Blue
+
+            // Create main traces
+            const traces = Object.keys(paths).map(scenario => ({
+                x: quarters,
+                y: paths[scenario],
+                name: scenario,
+                type: 'scatter',
+                mode: 'lines',
+                line: {
+                    width: 3,
+                    shape: 'spline',
+                    smoothing: 0.5,
+                    color: scenarioColors[scenario] || '#9CA3AF'
+                },
+                hovertemplate: '<b>%{y:.2f}%</b><extra></extra>' // Clean float hover
+            }));
+
+            // Add Threshold Lines with annotations instead of legend items
+            const addThreshold = (value, label, color) => ({
+                x: [quarters[0], quarters[quarters.length - 1]],
+                y: [value, value],
+                mode: 'lines',
+                name: label,
+                line: { dash: 'dash', color: color, width: 1.5 },
+                hoverinfo: 'none',
+                showlegend: false // Hide from legend to cleaner look
+            });
+
+            traces.push(addThreshold(4.5, 'Min Req', '#EF4444'));
+            traces.push(addThreshold(8.0, 'DSB', '#F59E0B'));
+            traces.push(addThreshold(11.5, 'Internal', '#3B82F6'));
+
+            // Calculate range
+            const allValues = Object.values(paths).flat();
+            allValues.push(4.5, 11.5, JUMP_OFF_CET1);
+            const avgVal = allValues.reduce((a, b) => a + b, 0) / allValues.length;
+            const minVal = Math.min(...allValues);
+            const maxVal = Math.max(...allValues);
+
+            const layout = {
+                font: { family: 'Inter, sans-serif' },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                xaxis: {
+                    title: '',
+                    tickfont: { size: 11, color: '#64748B' },
+                    gridcolor: 'transparent',
+                    showgrid: false,
+                    fixedrange: true
+                },
+                yaxis: {
+                    title: 'CET1 Ratio (%)',
+                    tickfont: { size: 11, color: '#64748B' },
+                    gridcolor: '#F1F5F9', // Subtle grid
+                    zeroline: false,
+                    fixedrange: true,
+                    range: [minVal - 1.5, maxVal + 1.5]
+                },
+                hovermode: 'x unified',
+                hoverlabel: {
+                    bgcolor: 'white',
+                    font: { family: 'Inter', size: 12 },
+                    bordercolor: '#E2E8F0'
+                },
+                showlegend: true,
+                legend: {
+                    orientation: 'h',
+                    y: 1.1,         // Top of chart
+                    x: 1,           // Right align
+                    xanchor: 'right',
+                    yanchor: 'bottom',
+                    bgcolor: 'rgba(255,255,255,0.8)',
+                    bordercolor: '#E2E8F0',
+                    borderwidth: 0
+                },
+                margin: { t: 40, b: 40, l: 60, r: 20 },
+                annotations: [
+                    {
+                        x: quarters[quarters.length - 1],
+                        y: 4.5,
+                        xref: 'x', yref: 'y',
+                        text: 'Min (4.5%)',
+                        showarrow: false,
+                        xanchor: 'left',
+                        font: { size: 10, color: '#EF4444' }
+                    },
+                    {
+                        x: quarters[quarters.length - 1],
+                        y: 8.0,
+                        xref: 'x', yref: 'y',
+                        text: 'DSB (8.0%)',
+                        showarrow: false,
+                        xanchor: 'left',
+                        font: { size: 10, color: '#F59E0B' }
+                    },
+                    {
+                        x: quarters[quarters.length - 1],
+                        y: 11.5,
+                        xref: 'x', yref: 'y',
+                        text: 'Target (11.5%)',
+                        showarrow: false,
+                        xanchor: 'left',
+                        font: { size: 10, color: '#3B82F6' }
+                    }
+                ]
+            };
+
+            Plotly.newPlot('cet1Chart', traces, layout, { displayModeBar: false, responsive: true });
+        }
+
+
+
+        // Update waterfall chart
+
+        // Helper to perform accurate BPS attribution
+        function calculateAttributedBps(data, troughIndex) {
+            const impacts = {
+                // Non-RWA Components
+                'PPNR': [], 'PCL': [], 'Dividend': [], 'Trading PnL': [], 'AFS Losses': [],
+                'Operational Risk Losses': [], 'Currency Translation Adj': [], 'Shortfall in Allowance': [], 'Other': [],
+                // RWA Components
+                'Credit RWA Change': [], 'Market CCR CVA RWA Change': [], 'Operational Risk RWA Change': []
+            };
+
+            let currentCapital = JUMP_OFF_CAPITAL;
+            let currentRWA = JUMP_OFF_RWA;
+
+            // Iterate quarter by quarter
+            for (let q = 0; q < troughIndex; q++) {
+                const prevCapital = currentCapital;
+                const prevRWA = currentRWA;
+
+                // --- 1. Update Aggregates for CURRENT Quarter ($) ---
+
+                // PPNR
+                const ppnrDollar = (data['PPNR Canada'][q] || 0) + (data['PPNR US'][q] || 0) + (data['PPNR International'][q] || 0);
+
+                // PCL (Negative)
+                const pclDollar = (data['PCL Canada'][q] || 0) + (data['PCL US'][q] || 0) + (data['PCL International'][q] || 0);
+
+                // Other Capital Changes
+                let otherCapitalChanges = 0;
+                ['Dividend', 'Trading PnL', 'AFS Losses', 'Operational Risk Losses', 'Currency Translation Adj', 'Shortfall in Allowance', 'Other'].forEach(k => {
+                    otherCapitalChanges += (data[k][q] || 0);
+                });
+
+                // Update Capital
+                currentCapital = prevCapital + ppnrDollar + pclDollar + otherCapitalChanges;
+
+                // RWA Changes
+                const creditRwaDollar = (data['Credit RWA Change Canada'][q] || 0) + (data['Credit RWA Change US'][q] || 0) + (data['Credit RWA Change International'][q] || 0);
+                const marketRwaDollar = (data['Market CCR CVA RWA Change'][q] || 0);
+                const opRwaDollar = (data['Operational Risk RWA Change'][q] || 0);
+
+                const totalRwaChangeDollar = creditRwaDollar + marketRwaDollar + opRwaDollar;
+                currentRWA = prevRWA + totalRwaChangeDollar;
+
+                // --- 2. Calculate BPS Impacts ---
+
+                // A. Non-RWA Drivers (Numerator Impact) = $Driver / Current RWA
+                // Note: The prompt says "divide by the rwa of that quarter".
+                // We use Current RWA as the denominator for the impact in this quarter.
+
+                impacts['PPNR'].push((ppnrDollar / currentRWA) * 10000);
+                impacts['PCL'].push((pclDollar / currentRWA) * 10000);
+
+                ['Dividend', 'Trading PnL', 'AFS Losses', 'Operational Risk Losses', 'Currency Translation Adj', 'Shortfall in Allowance', 'Other'].forEach(k => {
+                    impacts[k].push(((data[k][q] || 0) / currentRWA) * 10000);
+                });
+
+
+                // B. RWA Drivers (Denominator Impact)
+                // Formula: (Prev Cap / Current RWA - Prev Cap / Prev RWA) * Share
+
+                const totalRwaBpsEffect = (prevCapital / currentRWA - prevCapital / prevRWA) * 10000;
+
+                if (totalRwaChangeDollar !== 0) {
+                    impacts['Credit RWA Change'].push(totalRwaBpsEffect * (creditRwaDollar / totalRwaChangeDollar));
+                    impacts['Market CCR CVA RWA Change'].push(totalRwaBpsEffect * (marketRwaDollar / totalRwaChangeDollar));
+                    impacts['Operational Risk RWA Change'].push(totalRwaBpsEffect * (opRwaDollar / totalRwaChangeDollar));
+                } else {
+                    impacts['Credit RWA Change'].push(0);
+                    impacts['Market CCR CVA RWA Change'].push(0);
+                    impacts['Operational Risk RWA Change'].push(0);
+                }
+            }
+            return impacts;
+        }
+
+
+        // Update waterfall chart
+        function updateWaterfallChart(scenario, overlayType, overlayAmount) {
+            const data = scenario === 'custom' ? customScenarioComponents : scenarioData[scenario];
+            if (!data || (scenario === 'custom' && Object.keys(customScenarioComponents).length === 0)) {
+                Plotly.purge('waterfallChart');
+                return;
+            }
+
+            const cet1Path = calculateCET1Path(data, overlayType, overlayAmount);
+            const troughIndex = cet1Path.indexOf(Math.min(...cet1Path));
+            const troughCET1 = cet1Path[troughIndex];
+
+            // 1. Calculate Quarter-by-Quarter BPS
+            const quarterImpacts = calculateAttributedBps(data, troughIndex);
+
+            // 2. Sum to get Total Waterfall Impact
+            const totalImpacts = {};
+            Object.keys(quarterImpacts).forEach(key => {
+                totalImpacts[key] = quarterImpacts[key].reduce((a, b) => a + b, 0);
+            });
+
+            const displayComponents = ['PPNR', 'PCL', 'Dividend', 'Trading PnL', 'AFS Losses',
+                'Operational Risk Losses', 'Currency Translation Adj',
+                'Shortfall in Allowance', 'Other', 'Credit RWA Change',
+                'Market CCR CVA RWA Change', 'Operational Risk RWA Change'];
+
+            const labels = ['Jump-Off', ...displayComponents, 'Trough'];
+            const values = [JUMP_OFF_CET1 * 100]; // Start % * 100 for BPS scale visual consistency? No, usually waterfall mixes unit. 
+            // Wait, previous code chart was BPS. User asks for BPS impact.
+            // Let's stick to BPS for changes, but the Start/End are Ratio %.
+            // To make visual stacking work, standard practice is to convert Start/End to BPS (e.g. 13.2% -> 1320 bps) OR convert deltas to %.
+            // The previous code kept Start/End as % (e.g. 1320) but displayed "bps". 
+            // Let's use BPS scale internally for cleaner math. 13.2% = 1320 bps.
+
+            const valuesBps = [JUMP_OFF_CET1 * 100]; // 13.2 -> 1320 is wrong if we want small numbers.
+            // Actually, plotly waterfall usually needs consistent units.
+            // Previous chart was confusing: Jumpoff=1320, deltas=35, End=930. 
+            // Let's display EVERYTHING in BPS, but label start/end as %.
+
+            // Re-map start to BPS
+            const startVal = JUMP_OFF_CET1 * 10000 / 100; // 13.2 * 100 = 1320 bps.
+
+            const wValues = [startVal];
+            const measures = ['absolute'];
+
+            displayComponents.forEach(comp => {
+                wValues.push(totalImpacts[comp]);
+                measures.push('relative');
+            });
+
+            wValues.push(troughCET1 * 10000 / 100); // End value in bps
+            measures.push('total');
+
+            const trace = {
+                type: 'waterfall',
+                orientation: 'v',
+                measure: measures,
+                x: labels,
+                y: wValues,
+                text: wValues.map((v, i) => {
+                    if (i === 0 || i === wValues.length - 1) return (v / 100).toFixed(1) + '%'; // Convert back to % for labels
+                    return (v > 0 ? '+' : '') + v.toFixed(0);
+                }),
+                textposition: 'outside',
+                cliponaxis: false,  // Prevent text from being clipped
+                textfont: { size: 11 },
+                decreasing: { marker: { color: '#EF4444' } },
+                increasing: { marker: { color: '#10B981' } },
+                totals: { marker: { color: '#2563EB' } },
+                connector: { line: { color: '#CBD5E1', width: 1, dash: 'dot' } }
+            };
+
+            const layout = {
+                font: { family: 'Inter, sans-serif' },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                xaxis: {
+                    tickangle: -45,
+                    tickfont: { size: 10, color: '#64748B' },
+                    fixedrange: true
+                },
+                yaxis: {
+                    title: 'Impact (bps)',
+                    gridcolor: '#F1F5F9',
+                    zerolinecolor: '#CBD5E1',
+                    fixedrange: true
+                },
+                margin: { t: 40, b: 140, l: 60, r: 20 },
+                showlegend: false,
+                autosize: true
+            };
+
+            Plotly.newPlot('waterfallChart', [trace], layout, { displayModeBar: false, responsive: true });
+        }
+
+
+        // Update decomposition chart
+        function updateDecompositionChart(scenario, overlayType, overlayAmount) {
+            const data = scenario === 'custom' ? customScenarioComponents : scenarioData[scenario];
+            if (!data || (scenario === 'custom' && Object.keys(customScenarioComponents).length === 0)) {
+                Plotly.purge('decompositionChart');
+                return;
+            }
+
+            const cet1Path = calculateCET1Path(data, overlayType, overlayAmount);
+            const troughIndex = cet1Path.indexOf(Math.min(...cet1Path));
+
+            // Use the new precise BPS calculation
+            const quarterImpacts = calculateAttributedBps(data, troughIndex);
+
+            const quarters = Array.from({ length: troughIndex }, (_, i) => `Q${i + 1}`);
+
+            // Palette
+            const palette = {
+                'PPNR': '#10B981', 'PCL': '#EF4444', 'Dividend': '#F59E0B',
+                'Trading PnL': '#8B5CF6', 'Credit RWA Change': '#3B82F6', 'Other': '#64748B'
+            };
+            const getColor = (name) => palette[name] || palette['Other'];
+
+            const traces = [];
+
+            // PPNR
+            traces.push({ x: quarters, y: quarterImpacts['PPNR'], name: 'PPNR', type: 'bar', marker: { color: getColor('PPNR') } });
+
+            // PCL
+            traces.push({ x: quarters, y: quarterImpacts['PCL'], name: 'PCL', type: 'bar', marker: { color: getColor('PCL') } });
+
+            // Credit RWA
+            traces.push({ x: quarters, y: quarterImpacts['Credit RWA Change'], name: 'Credit RWA', type: 'bar', marker: { color: getColor('Credit RWA Change') } });
+
+            // Others
+            ['Dividend', 'Trading PnL', 'AFS Losses', 'Operational Risk Losses', 'Currency Translation Adj', 'Shortfall in Allowance', 'Other'].forEach(comp => {
+                traces.push({ x: quarters, y: quarterImpacts[comp], name: comp, type: 'bar', marker: { color: getColor(comp) } });
+            });
+
+            // RWA Others
+            ['Market CCR CVA RWA Change', 'Operational Risk RWA Change'].forEach(comp => {
+                traces.push({ x: quarters, y: quarterImpacts[comp], name: comp, type: 'bar', marker: { color: '#94A3B8' } });
+            });
+
+            const layout = {
+                barmode: 'relative',
+                font: { family: 'Inter, sans-serif' },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                xaxis: {
+                    tickfont: { size: 11, color: '#64748B' },
+                    gridcolor: 'transparent'
+                },
+                yaxis: {
+                    title: 'Quarterly Impact (bps)',
+                    gridcolor: '#F1F5F9',
+                    zerolinecolor: '#475569'
+                },
+                margin: { t: 30, b: 100, l: 60, r: 20 }, // Increased bottom margin
+                legend: {
+                    orientation: 'h',
+                    y: -0.25, // Moved legend down
+                    x: 0.5,
+                    xanchor: 'center'
+                },
+                autosize: true
+            };
+
+            Plotly.newPlot('decompositionChart', traces, layout, { displayModeBar: false, responsive: true });
+        }
+
+
+        // Update tables
+        function updateTables(scenario, overlayType, overlayAmount) {
+            const data = scenario === 'custom' ? customScenarioComponents : scenarioData[scenario];
+            if (!data || (scenario === 'custom' && Object.keys(customScenarioComponents).length === 0)) {
+                // Clear tables
+                document.getElementById('dollarTable').innerHTML = '<p style="text-align:center; color: var(--text-medium);">No data to display for this scenario.</p>';
+                document.getElementById('bpsTable').innerHTML = '<p style="text-align:center; color: var(--text-medium);">No data to display for this scenario.</p>';
+                return;
+            }
+
+            const cet1Path = calculateCET1Path(data, overlayType, overlayAmount);
+            const troughIndex = cet1Path.indexOf(Math.min(...cet1Path));
+
+            // Use precise BPS
+            const quarterImpacts = calculateAttributedBps(data, troughIndex);
+
+            // 1. $ Impact Table (unchanged logic, just raw numbers)
+            let dollarHTML = `<table><thead><tr><th>Component</th>`;
+            for (let q = 0; q < troughIndex; q++) dollarHTML += `<th>Q${q + 1}</th>`;
+            dollarHTML += `<th>Total</th></tr></thead><tbody>`;
+
+            const dollarComps = ['PPNR', 'PCL', 'Dividend', 'Trading PnL', 'AFS Losses', 'Operational Risk Losses',
+                'Currency Translation Adj', 'Shortfall in Allowance', 'Other', 'Credit RWA Change', 'Market CCR CVA RWA Change', 'Operational Risk RWA Change'];
+
+            let grandTotalDollar = 0;
+            let quarterTotalsDollar = Array(troughIndex).fill(0);
+
+            dollarComps.forEach(key => {
+                // Handle aggregates for table rows
+                let rowData = [];
+                if (key === 'PPNR') {
+                    for (let q = 0; q < troughIndex; q++) rowData.push(
+                        (data['PPNR Canada'][q] || 0) + (data['PPNR US'][q] || 0) + (data['PPNR International'][q] || 0)
+                    );
+                } else if (key === 'PCL') {
+                    for (let q = 0; q < troughIndex; q++) rowData.push(
+                        (data['PCL Canada'][q] || 0) + (data['PCL US'][q] || 0) + (data['PCL International'][q] || 0)
+                    );
+                } else if (key === 'Credit RWA Change') {
+                    for (let q = 0; q < troughIndex; q++) rowData.push(
+                        (data['Credit RWA Change Canada'][q] || 0) + (data['Credit RWA Change US'][q] || 0) + (data['Credit RWA Change International'][q] || 0)
+                    );
+                } else if (key === 'Other') {
+                    // Other component - scalar array
+                    for (let q = 0; q < troughIndex; q++) rowData.push(data['Other'][q] || 0);
+                } else {
+                    // scalar arrays
+                    for (let q = 0; q < troughIndex; q++) rowData.push(data[key][q] || 0);
+                }
+
+                dollarHTML += `<tr><td>${key}</td>`;
+                let rowSum = 0;
+                rowData.forEach((val, i) => {
+                    const cls = val >= 0 ? 'positive' : 'negative'; // Simply color by sign
+                    dollarHTML += `<td class="${cls}">${val >= 0 ? '+' : ''}${val.toFixed(0)}</td>`;
+                    rowSum += val;
+                    quarterTotalsDollar[i] += val;
+                });
+                dollarHTML += `<td><strong>${rowSum >= 0 ? '+' : ''}${rowSum.toFixed(0)}</strong></td></tr>`;
+                grandTotalDollar += rowSum;
+            });
+
+            // Dollar Totals
+            dollarHTML += `<tr><td><strong>Total</strong></td>`;
+            quarterTotalsDollar.forEach(val => {
+                dollarHTML += `<td><strong>${val >= 0 ? '+' : ''}${val.toFixed(0)}</strong></td>`;
+            });
+            dollarHTML += `<td><strong>${grandTotalDollar >= 0 ? '+' : ''}${grandTotalDollar.toFixed(0)}</strong></td></tr></tbody></table>`;
+            document.getElementById('dollarTable').innerHTML = dollarHTML;
+
+
+            // 2. BPS Impact Table (Using new logic)
+            let bpsHTML = `<table><thead><tr><th>Component</th>`;
+            for (let q = 0; q < troughIndex; q++) bpsHTML += `<th>Q${q + 1}</th>`;
+            bpsHTML += `<th>Total</th></tr></thead><tbody>`;
+
+            const bpsComps = ['PPNR', 'PCL', 'Dividend', 'Trading PnL', 'AFS Losses', 'Operational Risk Losses',
+                'Currency Translation Adj', 'Shortfall in Allowance', 'Other', 'Credit RWA Change', 'Market CCR CVA RWA Change', 'Operational Risk RWA Change'];
+
+            let grandTotalBps = 0;
+            let quarterTotalsBps = Array(troughIndex).fill(0);
+
+            bpsComps.forEach(key => {
+                const rowData = quarterImpacts[key];
+                bpsHTML += `<tr><td>${key}</td>`;
+                let rowSum = 0;
+
+                rowData.forEach((val, i) => {
+                    const cls = val >= 0 ? 'positive' : 'negative';
+                    bpsHTML += `<td class="${cls}">${val >= 0 ? '+' : ''}${val.toFixed(0)}</td>`;
+                    rowSum += val;
+                    quarterTotalsBps[i] += val;
+                });
+                grandTotalBps += rowSum;
+                bpsHTML += `<td><strong>${rowSum >= 0 ? '+' : ''}${rowSum.toFixed(0)}</strong></td></tr>`;
+            });
+
+            // BPS Totals Look check
+            bpsHTML += `<tr><td><strong>Total Impact</strong></td>`;
+            quarterTotalsBps.forEach(val => {
+                const cls = val >= 0 ? 'positive' : 'negative';
+                bpsHTML += `<td class="${cls}"><strong>${val >= 0 ? '+' : ''}${val.toFixed(0)}</strong></td>`;
+            });
+            bpsHTML += `<td class="${grandTotalBps >= 0 ? 'positive' : 'negative'}"><strong>${grandTotalBps >= 0 ? '+' : ''}${grandTotalBps.toFixed(0)}</strong></td></tr></tbody></table>`;
+
+            document.getElementById('bpsTable').innerHTML = bpsHTML;
+        }
+
+
+
+
+
+
+        // Interactive Scenario Input Feature
+
+        let conversationHistory = [];
+
+        let uploadedFileContent = null;
+
+        let customScenarioResult = null;
+
+
+
+        function openInputScenarioModal() {
+
+            document.getElementById('inputScenarioModal').style.display = 'block';
+
+            resetConversation();
+
+        }
+
+
+
+        function closeInputScenarioModal() {
+
+            document.getElementById('inputScenarioModal').style.display = 'none';
+
+        }
+
+
+
+        // Close modal when clicking outside
+
+        window.onclick = function (event) {
+
+            const modal = document.getElementById('inputScenarioModal');
+
+            if (event.target === modal) {
+
+                closeInputScenarioModal();
+
+            }
+
+        }
+
+
+
+        function resetConversation() {
+
+            conversationHistory = [{
+
+                role: 'system',
+
+                content: `You are a financial risk analyst helping to create stress testing scenarios for Royal Bank of Canada (RBC). 
+
+
+
+Your job is to:
+
+1. Have a conversation with the user to understand their scenario
+
+2. Ask clarifying questions about the scenario details, potential impacts, and magnitude
+
+3. When you have enough information, assess the severity impact on each of the 18 CET1 components
+
+
+
+The 18 CET1 components are:
+
+- PPNR Canada, PPNR US, PPNR International
+
+- PCL Canada, PCL US, PCL International (Provision for Credit Losses by geography)
+
+- Dividend
+
+- Trading PnL
+
+- AFS Losses
+
+- Operational Risk Losses
+
+- Currency Translation Adj
+
+- Shortfall in Allowance
+
+- Credit RWA Change Canada, Credit RWA Change US, Credit RWA Change International (Credit Risk-Weighted Assets by geography)
+
+- Market CCR CVA RWA Change
+
+- Operational Risk RWA Change
+
+- Other
+
+
+
+When the user asks you to finalize or you believe you have enough information, respond with a JSON object in this EXACT format:
+
+{
+
+  "FINALIZE": true,
+
+  "title": "Scenario Title",
+
+  "description": "Brief description",
+
+  "severity": "very_severe|severe|moderate|benchmark",
+
+  "componentSeverities": {
+
+    "PPNR Canada": "very_severe|severe|moderate|benchmark",
+
+    "PPNR US": "very_severe|severe|moderate|benchmark",
+
+    "PPNR International": "very_severe|severe|moderate|benchmark",
+
+    "PCL Canada": "very_severe|severe|moderate|benchmark",
+
+    "PCL US": "very_severe|severe|moderate|benchmark",
+
+    "PCL International": "very_severe|severe|moderate|benchmark",
+
+    "Dividend": "very_severe|severe|moderate|benchmark",
+
+    "Trading PnL": "very_severe|severe|moderate|benchmark",
+
+    "AFS Losses": "very_severe|severe|moderate|benchmark",
+
+    "Operational Risk Losses": "very_severe|severe|moderate|benchmark",
+
+    "Currency Translation Adj": "very_severe|severe|moderate|benchmark",
+
+    "Shortfall in Allowance": "very_severe|severe|moderate|benchmark",
+
+    "Credit RWA Change Canada": "very_severe|severe|moderate|benchmark",
+
+    "Credit RWA Change US": "very_severe|severe|moderate|benchmark",
+
+    "Credit RWA Change International": "very_severe|severe|moderate|benchmark",
+
+    "Market CCR CVA RWA Change": "very_severe|severe|moderate|benchmark",
+
+    "Operational Risk RWA Change": "very_severe|severe|moderate|benchmark",
+
+    "Other": "very_severe|severe|moderate|benchmark"
+
+  },
+
+  "componentReasons": {
+
+    "PPNR Canada": "1-2 sentence explanation for why this severity was chosen",
+
+    "PPNR US": "1-2 sentence explanation for why this severity was chosen",
+
+    "PPNR International": "1-2 sentence explanation for why this severity was chosen",
+
+    "PCL Canada": "1-2 sentence explanation for why this severity was chosen",
+
+    "PCL US": "1-2 sentence explanation for why this severity was chosen",
+
+    "PCL International": "1-2 sentence explanation for why this severity was chosen",
+
+    "Dividend": "1-2 sentence explanation for why this severity was chosen",
+
+    "Trading PnL": "1-2 sentence explanation for why this severity was chosen",
+
+    "AFS Losses": "1-2 sentence explanation for why this severity was chosen",
+
+    "Operational Risk Losses": "1-2 sentence explanation for why this severity was chosen",
+
+    "Currency Translation Adj": "1-2 sentence explanation for why this severity was chosen",
+
+    "Shortfall in Allowance": "1-2 sentence explanation for why this severity was chosen",
+
+    "Credit RWA Change Canada": "1-2 sentence explanation for why this severity was chosen",
+
+    "Credit RWA Change US": "1-2 sentence explanation for why this severity was chosen",
+
+    "Credit RWA Change International": "1-2 sentence explanation for why this severity was chosen",
+
+    "Market CCR CVA RWA Change": "1-2 sentence explanation for why this severity was chosen",
+
+    "Operational Risk RWA Change": "1-2 sentence explanation for why this severity was chosen",
+
+    "Other": "1-2 sentence explanation for why this severity was chosen"
+
+  }
+
+}
+
+
+
+Be conversational, ask thoughtful questions, and help the user think through all aspects of their scenario.`
+
+            }, {
+
+                role: 'assistant',
+
+                content: "Hello! I'm here to help you create a custom stress testing scenario for RBC. You can describe your scenario in detail, or upload a document. I'll ask clarifying questions and then determine the severity impact on each CET1 component. What scenario would you like to explore?"
+
+            }];
+
+
+
+            const chatContainer = document.getElementById('chatContainer');
+
+            chatContainer.innerHTML = `
+
+                <div class="chat-message ai">
+
+                    <div class="chat-avatar">AI</div>
+
+                    <div class="chat-bubble">
+
+                        Hello! I'm here to help you create a custom stress testing scenario for RBC. 
+
+                        You can describe your scenario in detail, or upload a document. 
+
+                        I'll ask clarifying questions and then determine the severity impact on each CET1 component. 
+
+                        What scenario would you like to explore?
+
+                    </div>
+
+                </div>
+
+            `;
+
+
+
+            document.getElementById('userInput').value = '';
+
+            document.getElementById('uploadedFileDisplay').innerHTML = '';
+
+            document.getElementById('scenarioResultContainer').innerHTML = '';
+
+            document.getElementById('applyScenarioBtn').style.display = 'none';
+            document.getElementById('saveScenarioBtn').style.display = 'none';
+
+            uploadedFileContent = null;
+
+            customScenarioResult = null;
+
+        }
+
+
+
+        async function requestFinalization() {
+
+            // User clicked the "Finalize This Scenario" button
+
+            await sendMessage("Please finalize this scenario and provide the severity assessments for all 18 CET1 components.");
+
+        }
+
+
+
+        async function handleFileUpload(event) {
+
+            const file = event.target.files[0];
+
+            if (!file) return;
+
+
+
+            const reader = new FileReader();
+
+            reader.onload = async function (e) {
+
+                uploadedFileContent = e.target.result;
+
+
+
+                document.getElementById('uploadedFileDisplay').innerHTML = `
+
+                    <div class="uploaded-file">
+
+                        📄 ${file.name} (${(file.size / 1024).toFixed(1)} KB)
+
+                    </div>
+
+                `;
+
+
+
+                // Automatically send the file content
+
+                await sendMessage(`I've uploaded a document about a stress scenario. Here's the content:\n\n${uploadedFileContent.substring(0, 3000)}`);
+
+            };
+
+
+
+            reader.readAsText(file);
+
+        }
+
+
+
+        async function sendMessage(customMessage = null) {
+
+            const userInput = customMessage || document.getElementById('userInput').value.trim();
+
+            if (!userInput) return;
+
+
+
+            // Add user message to chat
+
+            addMessageToChat('user', userInput);
+
+
+
+            if (!customMessage) {
+
+                document.getElementById('userInput').value = '';
+
+            }
+
+
+
+            // Add to conversation history
+
+            conversationHistory.push({
+
+                role: 'user',
+
+                content: userInput
+
+            });
+
+
+
+            // Show loading
+
+            const loadingId = addMessageToChat('ai', '💭 Thinking...');
+
+
+
+            try {
+
+                // API endpoint - uses Flask backend to avoid CORS issues
+
+                const API_ENDPOINT = '/api/chat';
+
+
+
+                const response = await fetch(API_ENDPOINT, {
+
+                    method: 'POST',
+
+                    headers: {
+
+                        'Content-Type': 'application/json'
+
+                    },
+
+                    body: JSON.stringify({
+                        model: 'gpt-5-2025-08-07-eastus-dz',
+                        messages: conversationHistory,
+                        // temperature omitted - GPT-5 uses default
+                        max_completion_tokens: 32384
+                    })
+
+                });
+
+
+
+                if (!response.ok) {
+
+                    throw new Error(`API Error: ${response.status}`);
+
+                }
+
+
+
+                const data = await response.json();
+
+                const aiResponse = data.choices[0].message.content;
+
+
+
+                // Remove loading message
+
+                removeMessage(loadingId);
+
+
+
+                // Check if response contains finalization JSON
+
+                const finalizeMatch = aiResponse.match(/\{[\s\S]*"FINALIZE"\s*:\s*true[\s\S]*\}/);
+
+
+
+                if (finalizeMatch) {
+
+                    try {
+
+                        const scenarioData = JSON.parse(finalizeMatch[0]);
+
+                        customScenarioResult = scenarioData;
+
+
+
+                        // Extract regular text before JSON
+
+                        const textBeforeJson = aiResponse.substring(0, aiResponse.indexOf(finalizeMatch[0])).trim();
+
+                        if (textBeforeJson) {
+
+                            addMessageToChat('ai', textBeforeJson);
+
+                        }
+
+
+
+                        displayScenarioResult(scenarioData);
+
+                        document.getElementById('applyScenarioBtn').style.display = 'block';
+                        document.getElementById('saveScenarioBtn').style.display = 'block';
+
+
+
+                    } catch (e) {
+
+                        console.error('Failed to parse finalization JSON:', e);
+
+                        addMessageToChat('ai', aiResponse);
+
+                    }
+
+                } else {
+
+                    addMessageToChat('ai', aiResponse);
+
+                    conversationHistory.push({
+
+                        role: 'assistant',
+
+                        content: aiResponse
+
+                    });
+
+                }
+
+
+
+            } catch (error) {
+
+                removeMessage(loadingId);
+
+                addMessageToChat('ai', `Sorry, I encountered an error: ${error.message}. Please try again.`);
+
+                console.error('Chat error:', error);
+
+            }
+
+        }
+
+
+
+        function addMessageToChat(sender, message) {
+
+            const chatContainer = document.getElementById('chatContainer');
+
+            const messageId = 'msg-' + Date.now();
+
+
+
+            const messageDiv = document.createElement('div');
+
+            messageDiv.className = `chat-message ${sender}`;
+
+            messageDiv.id = messageId;
+
+            messageDiv.innerHTML = `
+                <div class="chat-bubble">${message}</div>
+            `;
+
+
+
+            chatContainer.appendChild(messageDiv);
+
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+
+
+            return messageId;
+
+        }
+
+
+
+        function removeMessage(messageId) {
+
+            const message = document.getElementById(messageId);
+
+            if (message) {
+
+                message.remove();
+
+            }
+
+        }
+
+
+
+        function displayScenarioResult(scenarioData) {
+
+            const resultContainer = document.getElementById('scenarioResultContainer');
+
+
+
+            const severityColors = {
+
+                'very_severe': '#991B1B',
+
+                'severe': '#92400E',
+
+                'moderate': '#1E3A8A',
+
+                'benchmark': '#065F46'
+
+            };
+
+
+
+            const componentItems = Object.entries(scenarioData.componentSeverities).map(([comp, sev]) => {
+
+                const reason = scenarioData.componentReasons && scenarioData.componentReasons[comp]
+
+                    ? scenarioData.componentReasons[comp]
+
+                    : 'AI assessment based on scenario analysis.';
+
+
+
+                const compId = comp.replace(/\s+/g, '_');
+
+
+
+                return `
+
+                <div class="severity-item severity-item-interactive" data-component="${comp}">
+
+                    <div class="severity-tooltip">
+
+                        <strong>AI Reasoning:</strong><br/>
+
+                        ${reason}
+
+                    </div>
+
+                    <div class="severity-item-label">${comp}</div>
+
+                    <div class="severity-item-value" style="color: ${severityColors[sev] || '#666'}">
+
+                        ${sev.replace('_', ' ')}
+
+                    </div>
+
+                    <select class="severity-select" id="sev_${compId}" onchange="updateComponentSeverity('${comp}', this.value)">
+
+                        <option value="very_severe" ${sev === 'very_severe' ? 'selected' : ''}>Very Severe</option>
+
+                        <option value="severe" ${sev === 'severe' ? 'selected' : ''}>Severe</option>
+
+                        <option value="moderate" ${sev === 'moderate' ? 'selected' : ''}>Moderate</option>
+
+                        <option value="benchmark" ${sev === 'benchmark' ? 'selected' : ''}>Benchmark</option>
+
+                    </select>
+
+                </div>
+
+                `;
+
+            }).join('');
+
+
+
+            resultContainer.innerHTML = `
+
+                <div class="scenario-result">
+
+                    <h3 style="margin-bottom: 0.5rem; color: var(--dark-blue);">${scenarioData.title}</h3>
+
+                    <p style="margin-bottom: 0.75rem; color: var(--text-medium);">${scenarioData.description}</p>
+
+                    <span class="severity-badge severity-${scenarioData.severity.replace('_', '-')}">
+
+                        Overall: ${scenarioData.severity.replace('_', ' ').toUpperCase()}
+
+                    </span>
+
+                    
+
+                    <h4 style="margin-top: 1rem; margin-bottom: 0.75rem; color: var(--dark-blue);">
+
+                        Component Severities <span style="font-size: 0.75rem; font-weight: 400; color: var(--text-medium);">(Hover to see AI reasoning, change dropdown to adjust)</span>
+
+                    </h4>
+
+                    <div class="severity-grid">
+
+                        ${componentItems}
+
+                    </div>
+
+                    
+
+                    <p style="margin-top: 1rem; font-size: 0.875rem; color: var(--text-medium);">
+
+                        Click "Apply to Stress Test Model" below to use this scenario in your analysis.
+
+                    </p>
+
+                </div>
+
+            `;
+
+        }
+
+
+
+        function updateComponentSeverity(component, newSeverity) {
+
+            if (!customScenarioResult) return;
+
+
+
+            // Update the severity in the result object
+
+            customScenarioResult.componentSeverities[component] = newSeverity;
+
+
+
+            // Update the display color
+
+            const compId = component.replace(/\s+/g, '_');
+
+            const valueElement = document.querySelector(`[data-component="${component}"] .severity-item-value`);
+
+
+
+            const severityColors = {
+
+                'very_severe': '#991B1B',
+
+                'severe': '#92400E',
+
+                'moderate': '#1E3A8A',
+
+                'benchmark': '#065F46'
+
+            };
+
+
+
+            if (valueElement) {
+
+                valueElement.textContent = newSeverity.replace('_', ' ');
+
+                valueElement.style.color = severityColors[newSeverity];
+
+            }
+
+
+
+            // Show feedback
+
+            console.log(`Updated ${component} to ${newSeverity}`);
+
+        }
+
+
+
+        function applyScenario() {
+
+            if (!customScenarioResult) return;
+
+
+
+            // Set the custom scenario name to the AI scenario title
+
+            if (customScenarioResult.title) {
+
+                setCustomScenarioName(customScenarioResult.title);
+
+            }
+
+
+
+            // Apply the custom scenario
+
+            COMPONENTS.forEach(comp => {
+
+                const selectId = `comp_${comp.replace(/\s+/g, '_')}`;
+
+                const selectElement = document.getElementById(selectId);
+
+
+
+                if (customScenarioResult.componentSeverities && customScenarioResult.componentSeverities[comp]) {
+
+                    selectElement.value = customScenarioResult.componentSeverities[comp];
+
+                }
+
+            });
+
+
+
+            // Update the underlying custom scenario data
+
+            updateCustomScenario();
+
+
+
+            // Select custom scenario in the filter
+
+            const options = document.getElementById('scenarioDisplay').options;
+
+            for (let i = 0; i < options.length; i++) {
+
+                options[i].selected = options[i].value === 'custom';
+
+            }
+
+
+
+            // Set the detailed view to show the 'custom' scenario
+
+            selectScenarioForDetails('custom');
+
+            // Explicitly call calculateScenario() AFTER setting the detail view
+
+            calculateScenario();
+
+
+
+            // Close modal
+
+            closeInputScenarioModal();
+
+
+
+            // Show success message
+
+            alert(`✅ Custom scenario "${customScenarioResult.title}" has been applied to the stress test model!`);
+
+        }
+
+
+        // ========================================
+        // SAVED SCENARIOS SYSTEM
+        // ========================================
+
+        let savedAstraScenarios = [];
+
+        // Load saved scenarios from localStorage on init
+        function loadSavedScenarios() {
+            try {
+                const stored = localStorage.getItem('astraSavedScenarios');
+                savedAstraScenarios = stored ? JSON.parse(stored) : [];
+            } catch (e) {
+                console.error('Failed to load saved scenarios:', e);
+                savedAstraScenarios = [];
+            }
+        }
+
+        // Save to localStorage
+        function persistSavedScenarios() {
+            localStorage.setItem('astraSavedScenarios', JSON.stringify(savedAstraScenarios));
+        }
+
+        // Save current custom scenario
+        function saveCurrentScenario() {
+            if (!customScenarioResult) {
+                alert('No custom scenario to save. Generate one first using the AI Assistant.');
+                return;
+            }
+
+            const scenarioToSave = {
+                id: 'astra_' + Date.now(),
+                title: customScenarioResult.title || customScenarioName,
+                description: customScenarioResult.description || '',
+                severity: customScenarioResult.severity || 'moderate',
+                componentSeverities: { ...customScenarioResult.componentSeverities },
+                componentRationale: customScenarioResult.componentRationale || {},
+                savedAt: new Date().toLocaleString(),
+                timestamp: Date.now(),
+                // Store the source if from scenario.html
+                importedFrom: sessionStorage.getItem('astraImportedScenario') ? 'Scenario Narrative Platform' : 'Manual'
+            };
+
+            savedAstraScenarios.push(scenarioToSave);
+            persistSavedScenarios();
+
+            alert(`✅ Scenario "${scenarioToSave.title}" saved successfully!`);
+            renderSavedScenariosList();
+        }
+
+        // Save scenario from the Scenario Builder panel
+        function saveScenarioFromBuilder() {
+            const scenarioName = document.getElementById('customScenarioName').value || 'Custom Scenario';
+
+            // Read the severity selections from the dropdowns (not the data arrays)
+            const componentSeverities = {};
+            let hasAnySelection = false;
+
+            COMPONENTS.forEach(comp => {
+                const selectId = `comp_${comp.replace(/\s+/g, '_')}`;
+                const selectEl = document.getElementById(selectId);
+                if (selectEl) {
+                    componentSeverities[comp] = selectEl.value;
+                    hasAnySelection = true;
+                }
+            });
+
+            if (!hasAnySelection) {
+                alert('Please configure at least one component severity before saving.');
+                return;
+            }
+
+            // Determine overall severity based on most common or most severe
+            const severities = Object.values(componentSeverities);
+            const severityCounts = severities.reduce((acc, s) => {
+                acc[s] = (acc[s] || 0) + 1;
+                return acc;
+            }, {});
+            const overallSeverity = Object.keys(severityCounts).sort((a, b) => {
+                const order = { 'very_severe': 4, 'severe': 3, 'moderate': 2, 'benchmark': 1 };
+                return (severityCounts[b] * 10 + (order[b] || 0)) - (severityCounts[a] * 10 + (order[a] || 0));
+            })[0] || 'moderate';
+
+            const scenarioToSave = {
+                id: 'astra_' + Date.now(),
+                title: scenarioName,
+                description: 'Manually configured scenario from Scenario Builder',
+                severity: overallSeverity,
+                componentSeverities: componentSeverities,  // Now contains severity strings
+                componentRationale: {},
+                savedAt: new Date().toLocaleString(),
+                timestamp: Date.now(),
+                importedFrom: 'Manual'
+            };
+
+            console.log('Saving scenario:', scenarioToSave);
+
+            savedAstraScenarios.push(scenarioToSave);
+            persistSavedScenarios();
+
+            alert(`✅ Scenario "${scenarioName}" saved successfully!`);
+            renderSavedScenariosList();
+        }
+
+        // Render the saved scenarios list
+        function renderSavedScenariosList() {
+            const listEl = document.getElementById('savedScenariosList');
+            const emptyEl = document.getElementById('noSavedScenarios');
+
+            if (savedAstraScenarios.length === 0) {
+                listEl.innerHTML = '';
+                emptyEl.style.display = 'block';
+                return;
+            }
+
+            emptyEl.style.display = 'none';
+
+            listEl.innerHTML = savedAstraScenarios.map(s => {
+                const severityColor = s.severity === 'very_severe' ? '#DC2626' :
+                    s.severity === 'severe' ? '#F59E0B' :
+                        s.severity === 'moderate' ? '#3B82F6' : '#10B981';
+                const severityLabel = s.severity === 'very_severe' ? 'Very Severe' :
+                    s.severity === 'severe' ? 'Severe' :
+                        s.severity === 'moderate' ? 'Moderate' : 'Benchmark';
+
+                // Count severities for breakdown display
+                let counts = { very_severe: 0, severe: 0, moderate: 0, benchmark: 0 };
+                if (s.componentSeverities) {
+                    Object.values(s.componentSeverities).forEach(sev => {
+                        if (counts[sev] !== undefined) counts[sev]++;
+                    });
+                }
+                const breakdownParts = [];
+                if (counts.very_severe > 0) breakdownParts.push(`${counts.very_severe} Very Severe`);
+                if (counts.severe > 0) breakdownParts.push(`${counts.severe} Severe`);
+                if (counts.moderate > 0) breakdownParts.push(`${counts.moderate} Moderate`);
+                if (counts.benchmark > 0) breakdownParts.push(`${counts.benchmark} Benchmark`);
+                const breakdownText = breakdownParts.join(', ');
+
+                return `
+                    <div class="saved-scenario-card" style="
+                        background: white;
+                        border: 1px solid var(--border-subtle);
+                        border-radius: 12px;
+                        padding: 14px;
+                        cursor: pointer;
+                        transition: all 0.2s ease;
+                        margin-bottom: 12px;
+                    " onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)'" 
+                       onmouseout="this.style.boxShadow='none'"
+                       onclick="loadSavedScenario('${s.id}')">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                            <span style="
+                                font-size: 10px;
+                                font-weight: 600;
+                                padding: 3px 8px;
+                                border-radius: 4px;
+                                background: ${severityColor}20;
+                                color: ${severityColor};
+                                text-transform: uppercase;
+                            ">${severityLabel}</span>
+                            <button onclick="event.stopPropagation(); deleteSavedScenario('${s.id}')" 
+                                    style="background: none; border: none; cursor: pointer; opacity: 0.5; font-size: 14px;"
+                                    onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.5'"
+                                    title="Delete">🗑️</button>
+                        </div>
+                        <div style="font-weight: 600; font-size: 14px; color: var(--text-main); margin-bottom: 6px;">${s.title}</div>
+                        <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">${s.description || 'No description'}</div>
+                        
+                        ${breakdownText ? `<div style="font-size: 10px; color: var(--text-medium); margin-bottom: 8px; background: #f1f5f9; padding: 4px 8px; border-radius: 4px;">Outcome: ${breakdownText}</div>` : ''}
+
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: var(--text-muted);">
+                            <span>📅 ${s.savedAt}</span>
+                            <span>${s.importedFrom === 'Scenario Narrative Platform' ? '🔗 from Scenario' : '✏️ Manual'}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Load a saved scenario into the dashboard
+        function loadSavedScenario(scenarioId) {
+            const scenario = savedAstraScenarios.find(s => s.id === scenarioId);
+            if (!scenario) {
+                alert('Scenario not found.');
+                return;
+            }
+
+            console.log('Loading scenario:', scenario);
+            console.log('Component severities to load:', scenario.componentSeverities);
+
+            // 1. Update custom scenario name
+            customScenarioName = scenario.title;
+            document.getElementById('customScenarioName').value = scenario.title;
+
+            // Set the custom scenario label in metric cards
+            const customLabel = document.getElementById('customScenarioLabel');
+            if (customLabel) customLabel.textContent = scenario.title;
+
+            // 2. Apply the component severities to the UI dropdowns
+            for (const [comp, severity] of Object.entries(scenario.componentSeverities)) {
+                const selectId = `comp_${comp.replace(/\s+/g, '_')}`;
+                const selectEl = document.getElementById(selectId);
+                if (selectEl) {
+                    // Validate severity value
+                    const validSeverity = ['very_severe', 'severe', 'moderate', 'benchmark'].includes(severity)
+                        ? severity : 'moderate';
+                    selectEl.value = validSeverity;
+                    console.log(`Set dropdown ${selectId} = ${validSeverity}`);
+                }
+            }
+
+            // 3. Store for reference
+            customScenarioResult = {
+                title: scenario.title,
+                description: scenario.description,
+                severity: scenario.severity,
+                componentSeverities: scenario.componentSeverities,
+                componentRationale: scenario.componentRationale
+            };
+
+            // 4. Enable custom scenario in the scenario display filter
+            const scenarioDisplay = document.getElementById('scenarioDisplay');
+            const customOption = Array.from(scenarioDisplay.options).find(opt => opt.value === 'custom');
+            if (customOption) {
+                customOption.selected = true;
+            }
+
+            // 5. Now explicitly populate customScenarioComponents from the dropdowns
+            // This is what updateCustomScenario does, but we call it explicitly
+            updateCustomScenario(false);
+
+            console.log('After updateCustomScenario, components:', Object.keys(customScenarioComponents).length);
+
+            // 6. Select 'custom' for detailed view
+            selectedDetailScenario = 'custom';
+
+            // Update visual selection on metric cards
+            ['vsevereCard', 'severeCard', 'moderateCard', 'benchmarkCard', 'customCard'].forEach(cardId => {
+                const card = document.getElementById(cardId);
+                if (card) card.classList.remove('selected');
+            });
+            const customCard = document.getElementById('customCard');
+            if (customCard) customCard.classList.add('selected');
+
+            // 7. Recalculate and render all charts
+            calculateScenario();
+
+            // Close the panel
+            closePanel('savedScenariosPanel');
+        }
+
+        // Delete a saved scenario
+        function deleteSavedScenario(scenarioId) {
+            if (!confirm('Delete this saved scenario?')) return;
+
+            savedAstraScenarios = savedAstraScenarios.filter(s => s.id !== scenarioId);
+            persistSavedScenarios();
+            renderSavedScenariosList();
+        }
+
+        // ========================================
+        // SCENARIO IMPORT FROM SCENARIO.HTML
+        // ========================================
+
+        function checkForImportedScenario() {
+            // First check localStorage for new imports from scenario.html
+            let stored = localStorage.getItem('astraScenarioImport');
+
+            // If not in localStorage, check sessionStorage for persisted session
+            if (!stored) {
+                stored = sessionStorage.getItem('astraImportedScenario');
+            }
+
+            if (!stored) return null;
+
+            try {
+                const scenario = JSON.parse(stored);
+                // Only use if less than 1 hour old
+                if (Date.now() - scenario.timestamp > 3600000) {
+                    localStorage.removeItem('astraScenarioImport');
+                    sessionStorage.removeItem('astraImportedScenario');
+                    return null;
+                }
+                return scenario;
+            } catch (e) {
+                console.error('Failed to parse imported scenario:', e);
+                localStorage.removeItem('astraScenarioImport');
+                sessionStorage.removeItem('astraImportedScenario');
+                return null;
+            }
+        }
+
+        function initiateImportedScenarioAnalysis(scenario) {
+            console.log('📊 Importing scenario from scenario.html:', scenario.title);
+
+            // Build enhanced system prompt with scenario context
+            const enhancedSystemPrompt = `You are a financial risk analyst helping to create stress testing scenarios for Royal Bank of Canada (RBC). 
+
+IMPORTANT: A scenario has been imported from the Scenario Narrative Platform. You must analyze this scenario and determine CET1 component severity levels.
+
+IMPORTED SCENARIO CONTEXT:
+${scenario.narrativeSummary}
+
+Your job now is to:
+1. Acknowledge that you've received the imported scenario "${scenario.title}"
+2. Briefly summarize the key risks and their implications for RBC
+3. Ask if the user wants you to proceed with the CET1 component severity assessment
+4. When ready (or if user confirms), provide the severity assessments for all 18 CET1 components
+
+The 18 CET1 components are:
+- PPNR Canada, PPNR US, PPNR International
+- PCL Canada, PCL US, PCL International (Provision for Credit Losses by geography)
+- Dividend
+- Trading PnL
+- AFS Losses
+- Operational Risk Losses
+- Currency Translation Adj
+- Shortfall in Allowance
+- Credit RWA Change Canada, Credit RWA Change US, Credit RWA Change International (Credit Risk-Weighted Assets by geography)
+- Market CCR CVA RWA Change
+- Operational Risk RWA Change
+- Other
+
+When the user asks you to finalize or you believe you have enough information, respond with a JSON object in this EXACT format:
+{
+  "FINALIZE": true,
+  "title": "${scenario.title}",
+  "description": "Brief description based on imported scenario",
+  "severity": "very_severe|severe|moderate|benchmark",
+  "componentSeverities": {
+    "PPNR Canada": "very_severe|severe|moderate|benchmark",
+    "PPNR US": "very_severe|severe|moderate|benchmark",
+    "PPNR International": "very_severe|severe|moderate|benchmark",
+    "PCL Canada": "very_severe|severe|moderate|benchmark",
+    "PCL US": "very_severe|severe|moderate|benchmark",
+    "PCL International": "very_severe|severe|moderate|benchmark",
+    "Dividend": "very_severe|severe|moderate|benchmark",
+    "Trading PnL": "very_severe|severe|moderate|benchmark",
+    "AFS Losses": "very_severe|severe|moderate|benchmark",
+    "Operational Risk Losses": "very_severe|severe|moderate|benchmark",
+    "Currency Translation Adj": "very_severe|severe|moderate|benchmark",
+    "Shortfall in Allowance": "very_severe|severe|moderate|benchmark",
+    "Credit RWA Change Canada": "very_severe|severe|moderate|benchmark",
+    "Credit RWA Change US": "very_severe|severe|moderate|benchmark",
+    "Credit RWA Change International": "very_severe|severe|moderate|benchmark",
+    "Market CCR CVA RWA Change": "very_severe|severe|moderate|benchmark",
+    "Operational Risk RWA Change": "very_severe|severe|moderate|benchmark",
+    "Other": "very_severe|severe|moderate|benchmark"
+  },
+  "componentRationale": {
+    "PPNR Canada": "1-2 sentence explanation",
+    ... (for each component)
+  }
+}
+
+Use the imported scenario details to make informed severity assessments. Consider:
+- Risk driver categories and their assessed likelihood/materiality/velocity
+- Macroeconomic projections (GDP, unemployment, housing, etc.)
+- Geographic concentration of risks (Canada vs US vs International)
+- Speed of impact (velocity) for time-sensitive components`;
+
+            // Set up conversation with imported context
+            conversationHistory = [{
+                role: 'system',
+                content: enhancedSystemPrompt
+            }, {
+                role: 'assistant',
+                content: `📊 **Scenario Imported Successfully!**
+
+I've received the scenario **"${scenario.title}"** from the Scenario Narrative Platform with ${scenario.riskDrivers.length} risk drivers.
+
+**Key Risk Drivers:**
+${scenario.riskDrivers.slice(0, 5).map(d => `• ${d.title} (${d.category})`).join('\n')}
+${scenario.riskDrivers.length > 5 ? `\n...and ${scenario.riskDrivers.length - 5} more` : ''}
+
+Based on this scenario, I'm ready to analyze the impact on RBC's 18 CET1 capital components.
+
+Would you like me to:
+1. **Proceed with assessment** - I'll analyze each component and provide severity ratings
+2. **Review the scenario first** - I can summarize the key points before assessment
+3. **Adjust the scenario** - Tell me if you'd like to modify any aspects
+
+What would you prefer?`
+            }];
+
+            // Open the modal and show the imported state
+            const chatContainer = document.getElementById('chatContainer');
+            chatContainer.innerHTML = `
+                <div class="chat-message ai">
+                    <div class="chat-avatar">AI</div>
+                    <div class="chat-bubble">
+                        📊 <strong>Scenario Imported Successfully!</strong><br><br>
+                        I've received the scenario <strong>"${scenario.title}"</strong> from the Scenario Narrative Platform with ${scenario.riskDrivers.length} risk drivers.<br><br>
+                        <strong>Key Risk Drivers:</strong><br>
+                        ${scenario.riskDrivers.slice(0, 5).map(d => `• ${d.title} (${d.category})`).join('<br>')}
+                        ${scenario.riskDrivers.length > 5 ? `<br>...and ${scenario.riskDrivers.length - 5} more` : ''}<br><br>
+                        Based on this scenario, I'm ready to analyze the impact on RBC's 18 CET1 capital components.<br><br>
+                        Would you like me to:<br>
+                        <ol>
+                            <li><strong>Proceed with assessment</strong> - I'll analyze each component and provide severity ratings</li>
+                            <li><strong>Review the scenario first</strong> - I can summarize the key points before assessment</li>
+                            <li><strong>Adjust the scenario</strong> - Tell me if you'd like to modify any aspects</li>
+                        </ol>
+                        What would you prefer?
+                    </div>
+                </div>
+            `;
+
+            // Move to sessionStorage so it persists for the browser session
+            // This allows user to close/reopen modal or refresh page
+            sessionStorage.setItem('astraImportedScenario', JSON.stringify(scenario));
+            localStorage.removeItem('astraScenarioImport'); // Clear the transfer storage
+
+            // Open the AI modal (use style.display per existing pattern)
+            document.getElementById('inputScenarioModal').style.display = 'block';
+        }
+
+        // Store imported scenario globally for conversation context
+        let importedScenarioContext = null;
+
+
+        async function exportPDF() {
+            const { jsPDF } = window.jspdf;
+            if (!jsPDF) {
+                alert('PDF library not loaded.');
+                return;
+            }
+
+            const btn = document.querySelector('button[onclick="exportPDF()"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = 'Generating PDF...';
+            btn.disabled = true;
+
+            const previousScenario = selectedDetailScenario;
+
+            try {
+                // Force switch to custom scenario for the report
+                if (selectedDetailScenario !== 'custom') {
+                    selectScenarioForDetails('custom');
+                    await new Promise(r => setTimeout(r, 500));
+                }
+
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const pageHeight = pdf.internal.pageSize.getHeight();
+                let yOffset = 15;
+                const margin = 10;
+                const contentWidth = pageWidth - (margin * 2);
+
+                // Title Page
+                pdf.setFontSize(18);
+                pdf.text(`Scenario Report: ${customScenarioName}`, margin, yOffset);
+                yOffset += 10;
+
+                pdf.setFontSize(10);
+                pdf.setTextColor(100);
+                pdf.text(`Generated on: ${new Date().toLocaleString()}`, margin, yOffset);
+                yOffset += 15;
+                pdf.setTextColor(0);
+
+                // Helper to add element to PDF
+                const addContentToPDF = async (elementId, title) => {
+                    const el = document.getElementById(elementId);
+                    if (!el) return;
+
+                    // If title + reasonable image height (approx 80mm) exceeds page, add page
+                    if (yOffset > pageHeight - 100) {
+                        pdf.addPage();
+                        yOffset = 15;
+                    }
+
+                    if (title) {
+                        pdf.setFontSize(14);
+                        pdf.setFont(undefined, 'bold');
+                        pdf.text(title, margin, yOffset);
+                        yOffset += 8;
+                        pdf.setFont(undefined, 'normal');
+                    }
+
+                    const canvas = await html2canvas(el, {
+                        scale: 2,
+                        backgroundColor: '#ffffff'
+                    });
+                    const imgData = canvas.toDataURL('image/png');
+                    const imgHeight = (canvas.height * contentWidth) / canvas.width;
+
+                    // Check validation again with exact height
+                    if (yOffset + imgHeight > pageHeight - margin) {
+                        if (yOffset > 30) { // If not at top of page, break
+                            pdf.addPage();
+                            yOffset = 15;
+                            // Redraw title if moved to new page? 
+                            // Simplification: Just draw image.
+                        }
+                    }
+
+                    pdf.addImage(imgData, 'PNG', margin, yOffset, contentWidth, imgHeight);
+                    yOffset += imgHeight + 10;
+                };
+
+                // 1. Trough Summary
+                await addContentToPDF('cet1TroughCard', 'Projected CET1 Ratios (Trough)');
+
+                // 2. Capital Projection
+                await addContentToPDF('capitalProjectionCard', 'Capital Projection');
+
+                // 3. Detailed Analysis
+                if (yOffset > pageHeight - 50) { pdf.addPage(); yOffset = 15; }
+                else { yOffset += 5; } // spacers
+
+                pdf.setFontSize(16);
+                pdf.text('Detailed Impact Analysis', margin, yOffset);
+                yOffset += 10;
+
+                // Cycle through tabs
+                const views = [
+                    { id: 'waterfall', title: 'Waterfall Chart' },
+                    { id: 'decomposition', title: 'Decomposition Chart' },
+                    { id: 'dollarImpact', title: '$ Impact Table' },
+                    { id: 'bpsImpact', title: 'BPS Impact Table' }
+                ];
+
+                for (const view of views) {
+                    const el = document.getElementById(view.id);
+                    const wasActive = el.classList.contains('active');
+
+                    // Activate
+                    el.classList.add('active');
+
+                    // Resize charts if needed
+                    const chart = el.querySelector('.chart-container');
+                    if (chart && chart.id && Plotly) {
+                        Plotly.Plots.resize(document.getElementById(chart.id));
+                    }
+
+                    await new Promise(r => setTimeout(r, 100)); // Wait for render
+
+                    await addContentToPDF(view.id, view.title);
+
+                    // Restore
+                    if (!wasActive) el.classList.remove('active');
+                }
+
+                pdf.save(`${customScenarioName.replace(/[^a-zA-Z0-9]/g, '_')}_Report.pdf`);
+
+            } catch (err) {
+                console.error('Export error:', err);
+                alert('Failed to generate PDF. Check console for details.');
+            } finally {
+                // Restore state
+                if (previousScenario && previousScenario !== 'custom') {
+                    selectScenarioForDetails(previousScenario);
+                }
+
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                // Restore main chart
+                const wChart = document.getElementById('waterfallChart');
+                if (wChart) Plotly.Plots.resize(wChart);
+            }
+        }
+
+        // Initialize on load
+        initComponentBuilder();
+        initComponentOverrideList();
+        loadSavedScenarios(); // Load saved scenarios from localStorage
+        calculateScenario();
+
+        // Check for imported scenario after initialization
+        setTimeout(() => {
+            const importedScenario = checkForImportedScenario();
+            if (importedScenario) {
+                initiateImportedScenarioAnalysis(importedScenario);
+            }
+        }, 500);
+
+    </script>
+
+</body>
+
+
+
+</html>
