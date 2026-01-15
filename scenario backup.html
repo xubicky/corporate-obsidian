@@ -1404,6 +1404,8 @@
             padding-right: 8px;
             text-align: right;
             min-width: 50px;
+            padding-bottom: 25px;
+            /* Move Low label up to align with X-axis Low */
         }
 
         .heatmap-y-marker {
@@ -1511,41 +1513,6 @@
             transform-origin: top left;
         }
 
-        /* Compact view: Reset card styling to transparent */
-        .heatmap-driver.compact-mode {
-            background: transparent;
-            backdrop-filter: none;
-            border: none;
-            box-shadow: none;
-            padding: 0;
-            width: auto;
-        }
-
-        /* Minimal view: Just the circle */
-        .heatmap-driver.minimal-mode {
-            background: transparent;
-            backdrop-filter: none;
-            border: none;
-            box-shadow: none;
-            padding: 0;
-            width: auto;
-        }
-
-        /* Compact view: Show details on hover */
-        .heatmap-driver.compact-mode:hover .compact-expand {
-            display: block !important;
-        }
-
-
-        .heatmap-driver.compact-mode:hover .compact-pill {
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-        }
-
-        /* Minimal view: Show details on hover */
-        .heatmap-driver.minimal-mode:hover .minimal-expand {
-            display: block !important;
-        }
-
         /* Velocity circle is the anchor - positioned at card's coordinates */
         .heatmap-driver-anchor {
             position: absolute;
@@ -1635,16 +1602,6 @@
             filter: none !important;
         }
 
-        /* Override for Minimal and Compact modes to prevent width jump */
-        .heatmap-driver.minimal-mode:hover,
-        .heatmap-driver.compact-mode:hover {
-            width: auto !important;
-            box-shadow: none !important;
-            border: none !important;
-            background: transparent !important;
-        }
-
-
         /* Expansion content - hidden by default */
         .heatmap-driver-expand {
             max-height: 0;
@@ -1675,7 +1632,6 @@
             opacity: 1;
             margin-top: 8px;
         }
-
 
         .heatmap-driver-expand-desc {
             font-size: 11px;
@@ -2110,149 +2066,6 @@
         .heatmap-help-content strong {
             color: var(--text-main);
         }
-
-        /* Heatmap Tool Buttons Animation */
-        .tools-row {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            width: 100%;
-            margin-bottom: 20px;
-            background: white;
-            border: 1px solid var(--border-subtle);
-            border-radius: 100px;
-            padding: 4px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
-        }
-
-        .tool-btn {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            padding: 10px 4px;
-            background: transparent;
-            border: none;
-            border-radius: 100px;
-            color: var(--text-secondary);
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            white-space: nowrap;
-            overflow: hidden;
-            position: relative;
-            min-width: 0;
-            box-shadow: none;
-        }
-
-        .tool-btn:hover {
-            flex: 2;
-            background: #F1F5F9;
-            color: var(--primary);
-            box-shadow: none;
-            transform: none;
-        }
-
-        .tool-text {
-            display: flex;
-            align-items: center;
-        }
-
-        .tool-extra {
-            max-width: 0;
-            opacity: 0;
-            overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            display: inline-block;
-            white-space: nowrap;
-        }
-
-        .tool-btn:hover .tool-extra {
-            max-width: 120px;
-            opacity: 1;
-            margin-left: 4px;
-        }
-
-        /* View Mode Selector Styles */
-        .view-mode-group {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            width: 100%;
-            background: white;
-            border: 1px solid var(--border-subtle);
-            border-radius: 100px;
-            padding: 4px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
-            margin-top: 8px;
-        }
-
-        .view-mode-btn {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            padding: 10px 4px;
-            background: transparent;
-            border: none;
-            border-radius: 100px;
-            color: var(--text-secondary);
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .view-mode-btn:hover {
-            background: #F1F5F9;
-            color: var(--primary);
-        }
-
-        .view-mode-btn.active {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 2px 6px rgba(37, 99, 235, 0.2);
-        }
-
-        .view-mode-btn.active:hover {
-            background: var(--primary);
-            color: white;
-        }
-
-        .heatmap-legend-items {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .heatmap-legend-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 11px;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.2s;
-            padding: 2px 4px;
-            border-radius: 4px;
-        }
-
-        .heatmap-legend-item:hover {
-            background: rgba(0, 0, 0, 0.03);
-        }
-
-        .heatmap-legend-item.legend-dimmed {
-            opacity: 0.3;
-        }
-
-        .heatmap-legend-velocity {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-        }
     </style>
 </head>
 
@@ -2366,8 +2179,7 @@
             </section>
 
             <!-- CENTER: Heat Map View (Hidden by default) -->
-            <section class="center-panel" id="heatMapPanel"
-                style="display: none; height: calc(100vh - 130px); overflow-y: auto;">
+            <section class="center-panel" id="heatMapPanel" style="display: none;">
                 <div class="panel-header">
                     <span class="panel-title">Risk Heat Map</span>
                     <div class="heatmap-instructions" style="font-size: 12px; color: var(--text-muted);">
@@ -2412,12 +2224,6 @@
                                 <span class="heatmap-x-label">Likelihood of Risk Materializing with Adverse Outcome to
                                     RBC</span>
                             </div>
-                            <!-- Footnote -->
-                            <div
-                                style="text-align: center; font-size: 10px; color: var(--text-muted); margin-top: 12px; font-style: italic; opacity: 0.7;">
-                                Velocity refers to the time elapsed between the materialization of a risk event and the
-                                point of RC's impact.
-                            </div>
                         </div>
                     </div>
                     <!-- Legend -->
@@ -2425,8 +2231,17 @@
                         <div class="heatmap-legend-title">Legend</div>
                         <div class="heatmap-legend-section">
                             <div class="heatmap-legend-subtitle">Velocity</div>
-                            <div id="velocityLegendItems" class="heatmap-legend-items">
-                                <!-- Dynamic Velocity Legend -->
+                            <div class="heatmap-legend-item">
+                                <div class="heatmap-legend-velocity" style="background: #EF4444;"></div>
+                                <span>High (&lt; 2 weeks)</span>
+                            </div>
+                            <div class="heatmap-legend-item">
+                                <div class="heatmap-legend-velocity" style="background: #F59E0B;"></div>
+                                <span>Medium (2 weeks - 3 months)</span>
+                            </div>
+                            <div class="heatmap-legend-item">
+                                <div class="heatmap-legend-velocity" style="background: #10B981;"></div>
+                                <span>Low (&gt; 3 months)</span>
                             </div>
                         </div>
                         <div class="heatmap-legend-section">
@@ -2435,20 +2250,12 @@
                                 <!-- Will be populated dynamically -->
                             </div>
                         </div>
-                        <!-- Driver Legend: Only shown in minimal view -->
-                        <div class="heatmap-legend-section" id="driverLegendSection" style="display: none;">
-                            <div class="heatmap-legend-subtitle">Drivers</div>
-                            <div id="driverLegendItems" style="display: flex; flex-direction: column; gap: 3px;">
-                                <!-- Will be populated dynamically -->
-                            </div>
-                        </div>
                     </div>
                 </div>
             </section>
 
             <!-- RIGHT: Heat Map Basket Panel (Hidden by default) -->
-            <aside class="right-panel heatmap-basket" id="heatmapBasketPanel"
-                style="display: none; height: calc(100vh - 130px); position: relative; padding-bottom: 160px; box-sizing: border-box; overflow: hidden;">
+            <aside class="right-panel heatmap-basket" id="heatmapBasketPanel" style="display: none;">
                 <div class="basket-header">
                     <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
                         <div>
@@ -2475,49 +2282,22 @@
                         <p><strong>⏱️ Velocity:</strong> Colored indicator shows risk timing.</p>
                     </div>
                 </div>
-
-                <!-- View Mode Selector -->
-                <div class="heatmap-view-selector"
-                    style="padding: 12px 16px; border-bottom: 1px solid var(--border-subtle);">
-                    <label
-                        style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 8px;">View
-                        Mode</label>
-                    <div class="view-mode-group">
-                        <button onclick="setHeatMapViewMode('default')" id="viewModeDefault"
-                            class="view-mode-btn active">
-                            📄 Default
-                        </button>
-                        <button onclick="setHeatMapViewMode('compact')" id="viewModeCompact" class="view-mode-btn">
-                            📋 Compact
-                        </button>
-                        <button onclick="setHeatMapViewMode('minimal')" id="viewModeMinimal" class="view-mode-btn">
-                            ⚡ Minimal
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Driver List - Scrollable -->
-                <div class="basket-list" id="heatmapDriverList"
-                    style="flex: 1; overflow-y: auto; min-height: 0; padding: 12px 16px;">
+                <!-- Driver List -->
+                <div class="basket-list" id="heatmapDriverList">
                     <!-- Drivers will be populated here -->
                 </div>
-
-                <div class="basket-footer"
-                    style="flex-direction: column; gap: 12px; padding: 16px; position: absolute; bottom: 0; left: 0; width: 100%; border-radius: 0 0 32px 32px; background: rgba(255,255,255,0.95); backdrop-filter: blur(8px); border-top: 1px solid var(--border-subtle);">
-                    <div class="tools-row">
-                        <button class="tool-btn" onclick="showMarketplace()">
-                            <span>✏️</span>
-                            <span class="tool-text">Edit<span class="tool-extra"> Risk Drivers</span></span>
-                        </button>
-                        <button class="tool-btn" onclick="saveHeatMap()">
-                            <span>💾</span>
-                            <span class="tool-text">Save<span class="tool-extra"> Heat Map</span></span>
-                        </button>
-                        <button class="tool-btn" onclick="openHeatmapExportModal()">
-                            <span>📤</span>
-                            <span class="tool-text">Export<span class="tool-extra"> Heat Map</span></span>
-                        </button>
-                    </div>
+                <div class="basket-footer" style="flex-direction: column; gap: 12px; padding: 16px;">
+                    <button class="heatmap-btn heatmap-btn-secondary" onclick="showMarketplace()">
+                        ✏️ Edit Risk Drivers
+                    </button>
+                    <button class="heatmap-btn" style="background: white; border: 1px solid #d1d5db; color: #374151;"
+                        onclick="saveHeatMap()">
+                        💾 Save Heat Map
+                    </button>
+                    <button class="heatmap-btn" style="background: white; border: 1px solid #d1d5db; color: #374151;"
+                        onclick="openHeatmapExportModal()">
+                        📤 Export Heat Map
+                    </button>
                     <button class="heatmap-btn heatmap-btn-primary" onclick="generateScenarioFromHeatMap()">
                         📄 Generate Scenario Report
                     </button>
@@ -2611,10 +2391,6 @@
                             style="background: white; color: var(--primary);">Save Scenario</button>
                         <button class="btn-secondary" onclick="exportScenarioPdf()" id="exportPdfBtn"
                             style="background: #2563EB; color: white; border: none;">📄 Export PDF</button>
-                        <button class="btn-secondary" onclick="sendToAstra()" id="sendToAstraBtn"
-                            style="background: linear-gradient(135deg, #8B5CF6, #6366F1); color: white; border: none; font-weight: 600;">
-                            🚀 Analyze in Astra
-                        </button>
                     </div>
                 </div>
             </div>
@@ -2865,24 +2641,6 @@
                     <button onclick="clearAllCaches()"
                         style="width: 100%; padding: 12px 16px; background: linear-gradient(135deg, #EF4444, #DC2626); color: white; border: none; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer;">
                         🗑️ Clear All Cached Data
-                    </button>
-                </div>
-
-                <!-- Divider -->
-                <div style="height: 1px; background: #e5e7eb; margin: 24px 0;"></div>
-
-                <!-- AI Configuration -->
-                <div style="margin-bottom: 24px;">
-                    <h3
-                        style="font-size: 14px; font-weight: 700; color: #111827; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 0.5px;">
-                        🤖 AI Configuration
-                    </h3>
-                    <p style="color: #6b7280; font-size: 13px; margin: 0 0 16px 0; line-height: 1.5;">
-                        View and inspect the prompt templates used by the AI.
-                    </p>
-                    <button onclick="closeSettingsModal(); openAiPromptsModal();"
-                        style="width: 100%; padding: 12px 16px; background: linear-gradient(135deg, #8B5CF6, #6D28D9); color: white; border: none; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                        👁️ View AI Prompts
                     </button>
                 </div>
 
@@ -3430,259 +3188,6 @@
         }
 
         // --- 4. AI DRIVER GENERATION ---
-
-        // Deduplication helper: Calculate text similarity between two strings
-        function calculateSimilarity(str1, str2) {
-            // Normalize strings: lowercase, remove punctuation, split into words
-            const normalize = (s) => s.toLowerCase().replace(/[^\w\s]/g, '').split(/\s+/).filter(w => w.length > 2);
-
-            const words1 = new Set(normalize(str1));
-            const words2 = new Set(normalize(str2));
-
-            if (words1.size === 0 || words2.size === 0) return 0;
-
-            // Jaccard similarity: intersection / union
-            const intersection = [...words1].filter(w => words2.has(w)).length;
-            const union = new Set([...words1, ...words2]).size;
-
-            return intersection / union;
-        }
-
-        // Remove duplicate or highly similar drivers
-        function deduplicateDrivers(drivers) {
-            const uniqueDrivers = [];
-            const removedDrivers = [];
-            const SIMILARITY_THRESHOLD = 0.5; // 50% similar words = likely duplicate
-
-            for (const driver of drivers) {
-                let isDuplicate = false;
-                let duplicateOf = null;
-
-                for (const existing of uniqueDrivers) {
-                    // Check title similarity
-                    const titleSimilarity = calculateSimilarity(driver.title, existing.title);
-
-                    // Check description similarity (weighted less)
-                    const descSimilarity = calculateSimilarity(driver.desc || '', existing.desc || '');
-
-                    // Combined similarity score (title is more important)
-                    const combinedSimilarity = (titleSimilarity * 0.7) + (descSimilarity * 0.3);
-
-                    if (combinedSimilarity >= SIMILARITY_THRESHOLD) {
-                        isDuplicate = true;
-                        duplicateOf = existing.title;
-                        break;
-                    }
-                }
-
-                if (isDuplicate) {
-                    removedDrivers.push({ title: driver.title, duplicateOf });
-                } else {
-                    uniqueDrivers.push(driver);
-                }
-            }
-
-            // Log removed duplicates for debugging
-            if (removedDrivers.length > 0) {
-                console.log(`🔄 Deduplication removed ${removedDrivers.length} duplicate drivers:`);
-                removedDrivers.forEach(r => {
-                    console.log(`   - "${r.title}" (duplicate of "${r.duplicateOf}")`);
-                });
-            }
-
-            return uniqueDrivers;
-        }
-
-        const PROMPT_TEMPLATES = {
-            RISK_DRIVERS: `You are an expert financial risk analyst. Based on the following EXTENSIVE market intelligence dossier from {{PERIOD_QUARTER}} {{PERIOD_YEAR}}, generate exactly 55 unique risk drivers that could impact Royal Bank of Canada (RBC) and the Canadian financial system. (We request 55 to allow for deduplication to reach exactly 50.)
-
-{{PERIOD_CONTEXT}}
-
-BASELINE MACROECONOMIC DATA ({{MACRO_PERIOD}}):
-{{MACRO_SUMMARY}}
-
-MARKET INTELLIGENCE DOSSIER:
-{{DOSSIER_SUMMARY}}
-
-Generate 55 risk drivers distributed across these categories:
-- Macroeconomic (inflation, rates, growth): 11 drivers
-- Geopolitical (wars, conflicts): 12 drivers
-- Cyber / Tech (AI, cybersecurity, digital disruption): 7 drivers
-- Financial (credit, liquidity, market stress): 9 drivers
-- Environmental (climate, natural disasters): 6 drivers
-- Regulatory (policy changes, compliance): 5 drivers
-- Social (demographics, political stability): 5 drivers
-
-CRITICAL: AVOID DUPLICATION
-- Each driver MUST be UNIQUE - do not repeat the same risk topic with different wording
-- Before generating each driver, check if a similar risk has already been covered
-- Different aspects of the same event should be consolidated into ONE comprehensive driver, not split into multiple
-
-For each driver, provide:
-1. A concise title (4-8 words) using specific terminology from the search results.
-2. A detailed description (50~100 words) explicitly determining the risk. CITE SPECIFIC DATA, percentages, or entities mentioned in the dossier. Explain HOW and WHY this risk could impact RBC and the Canadian financial system.
-3. A sources array (up to 3 articles) that support this driver. Include the article title and URL from the dossier.
-
-CRITICAL REQUIREMENTS - NEGATIVE RISKS ONLY:
-**ONLY include ADVERSE/NEGATIVE risk drivers.** Do NOT include positive developments (e.g., "easing inflation", "strong earnings", "improved credit quality") disguised as risks.
-
-CRITICAL ANTI-HALLUCINATION RULES:
-1. **ZERO FABRICATION**: DO NOT invent country names, company names, legislation names, people's names or events. ONLY use entities explicitly mentioned in the dossier articles.
-2. **VERIFY EVERY ENTITY**: Before including any proper noun (country, company, law, person), confirm it appears verbatim in the dossier text.
-3. **NO WORD CREATION**: Do not create new words or terms. Use only real English words and proper nouns from the dossier.
-4. **REAL GEOGRAPHY ONLY**: Use only actual country names that exist.
-5. **SOURCE VALIDATION**: Every fact, number, and entity MUST have a corresponding source article.
-6. **DEEP GROUNDING**: Every driver MUST quote or paraphrase actual content from the dossier articles.
-7. **SPECIFICITY**: Include specific numbers, dates, company names, or legislation names.
-8. **TIMING**: Ensure risks are appropriate for {{PERIOD_QUARTER}} {{PERIOD_YEAR}}.
-9. **NO SPECULATION**: If the dossier lacks information on a topic, skip that category.
-
-Format your response as a JSON array:
-[
-  {
-    "id": "d1",
-    "cat": "Macroeconomic",
-    "title": "US-Canada Tariff Escalation",
-    "desc": "Ongoing trade disputes regarding softwood lumber and dairy intensified in Q4, with new 15% tariffs proposed...",
-    "sources": [
-      {"title": "Reuters: US announces new tariffs on Canadian lumber", "url": "https://reuters.com/..."},
-      {"title": "Globe and Mail: Trade tensions escalate", "url": "https://theglobeandmail.com/..."}
-    ]
-  }
-]
-
-Generate exactly 55 risk drivers. Return ONLY the JSON array, no additional text.`,
-
-            RISK_DRIVERS_ADDITIONAL: `You are an expert financial risk analyst. Generate 5 NEW and UNIQUE {{CATEGORY}} risk drivers for Royal Bank of Canada (RBC) based on the market intelligence dossier.
-
-CRITICAL: AVOID DUPLICATES
-The following {{CATEGORY}} risk drivers ALREADY EXIST - do NOT repeat or create similar versions:
-{{EXISTING_TITLES}}
-
-Brief descriptions of existing drivers:
-{{EXISTING_DESCRIPTIONS}}
-
-MARKET INTELLIGENCE DOSSIER:
-{{DOSSIER_SUMMARY}}
-
-Generate 5 NEW {{CATEGORY}} risk drivers that are:
-1. COMPLETELY DIFFERENT from the existing ones listed above
-2. Grounded in the dossier content with specific data/entities
-3. Relevant negative risks for RBC and the Canadian financial system
-
-For each driver, provide:
-1. A concise title (4-8 words)
-2. A detailed description (50~100 words) with specific data from sources
-3. Sources array (up to 2 articles) with title and URL
-
-ANTI-HALLUCINATION: Only use entities, numbers, and facts from the dossier. Do not invent.
-
-Return a JSON array:
-[
-  {
-    "id": "new_{{CATEGORY_SNAKE}}_1",
-    "cat": "{{CATEGORY}}",
-    "title": "Unique Risk Title",
-    "desc": "Detailed description...",
-    "sources": [{"title": "Article Title", "url": "https://..."}]
-  }
-]
-
-Return ONLY the JSON array with exactly 5 drivers.`,
-
-            HEATMAP_ASSESSMENT: `You are an expert risk analyst. For each of the following risk drivers, assess:
-1. LIKELIHOOD (1-10): How likely is this risk to materialize with adverse outcomes for RBC? (1=very unlikely, 10=very likely)
-2. MATERIALITY (1-10): What is the potential impact on RBC if this risk materializes? (1=minimal impact, 10=severe impact)
-3. VELOCITY (1-3): the time elapsed between the materialization of a risk event and the point of RBC's impact (1=more than 3 months, 2=2 weeks to 3 months, 3=less than 2 weeks)
-
-RISK DRIVERS TO ASSESS:
-{{DRIVERS_LIST}}
-
-Return a JSON array with assessments for each driver:
-[
-  {
-    "id": "driver_id",
-    "likelihood": 7,
-    "materiality": 8,
-    "velocity": 2,
-    "likelihoodReasoning": "1-2 sentence justification for the likelihood score, explaining why this risk is likely/unlikely to materialize.",
-    "materialityReasoning": "1-2 sentence justification for the materiality score, explaining the potential impact severity if the risk materializes.",
-    "reasoning": "Brief summary (1-2 sentences) covering velocity and overall assessment for RBC."
-  },
-  ...
-]
-
-Be specific and realistic. Consider current market conditions and the severity described in each driver.
-Provide clear, concise reasoning that explains the rationale behind EACH assessment dimension.
-Return ONLY the JSON array.`,
-
-            SCENARIO_GENERATION: `You are a Senior Chief Risk Officer for Royal Bank of Canada (RBC). Your task is to construct a concise, high-impact stress scenario narrative based on the specific risk drivers provided below.
-
-CONTEXT:
-{{BASELINE_CONTEXT}}
-
-RISK DRIVERS TO MATERIALIZE:
-{{DRIVERS_SUMMARY}}
-
-SCENARIO STRUCTURE GUIDANCE:
-- Overall Scenario Severity: {{SEVERITY}}
-- Highest Priority Risks: {{HIGH_RISKS}}
-- Immediate/Fast-Moving Threats: {{IMMEDIATE_THREATS}}
-- Near-Term Threats: {{NEAR_TERM_THREATS}}
-
-Generate a cohesive scenario narrative that combines these drivers into a plausible stress scenario. Your response must be a valid JSON object with the following structure:
-
-{
-  "scenarioTitle": "A compelling 3-6 word title for the scenario (e.g., 'Perfect Storm 2026' or 'Global Trade Collapse')",
-  "globalConditions": {
-    "summary": "2-3 paragraphs (HTML formatted with <p> tags and <strong> for emphasis) describing global economic and geopolitical conditions. Use severity guidance to calibrate tone. Do NOT mention likelihood/materiality scores.",
-    "keyPoints": ["Point 1", "Point 2", "Point 3"]
-  },
-  "canadianConditions": {
-    "summary": "2-3 paragraphs (HTML formatted) describing how these conditions impact the Canadian economy, housing market, and Bank of Canada policy.",
-    "keyPoints": ["Point 1", "Point 2", "Point 3"]
-  },
-  "rbcImpact": {
-    "summary": "2-3 paragraphs (HTML formatted) describing the direct impact on RBC's business lines including: Personal & Commercial Banking, Capital Markets, Wealth Management, and overall capital/liquidity position.",
-    "keyPoints": ["Point 1", "Point 2", "Point 3"]
-  },
-  "macroProjections": {
-    "canadaGDP": { "value": "-X.X%" },
-    "unemployment": { "value": "X.X%" },
-    "inflation": { "value": "X.X%" },
-    "usdCad": { "value": "1.XX" },
-    "bocRate": { "value": "X.X%" },
-    "housePrice": { "value": "-XX%" },
-    "tsx": { "value": "-XX%" },
-    "creditSpreads": { "value": "XXX" }
-  }
-}
-
-CRITICAL INSTRUCTIONS:
-1. DO NOT mention "likelihood", "materiality", "velocity", or numerical scores (e.g., "7/10") in narrative text
-2. Let severity guidance naturally inform how severe/urgent the narrative sounds
-3. Use priority ordering to determine which risks to emphasize first
-4. Use immediacy cues (immediate = "unfolding rapidly", near-term = "emerging", longer-term = "developing")
-5. Connect risks into coherent narrative rather than listing them
-6. Make scenario severity match guidance (SEVERE = deep recession -4% to -6% GDP, MODERATE = recession -2.5% to -4% GDP, MILD = slowdown -1% to -2% GDP)
-7. Provide ONLY stress projection values. System will calculate deltas from baseline automatically.
-8. Format summaries with proper HTML <p> tags and <strong> for emphasis
-
-IMPORTANT: Only provide the STRESS/PROJECTION values. Do NOT include delta or direction fields. The system will automatically calculate deltas from baseline.
-
-CRITICAL: For usdCad, use format "1.XX" representing CAD per 1 USD (e.g., 1.45 means 1 USD = 1.45 CAD). Higher values = weaker CAD.
-
-Return ONLY the JSON object, no additional text.`
-        };
-
-        function fillPrompt(template, subs) {
-            let result = template;
-            for (const [key, val] of Object.entries(subs)) {
-                result = result.split(`{{${key}}}`).join(val);
-            }
-            return result;
-        }
-
         async function generateRiskDriversFromDossier(dossier, progressCallback, dossierId = 'current', periodInfo = null) {
             // Use dossier-specific cache key
             const dossierCacheKey = `${DRIVERS_CACHE_KEY}_${dossierId}`;
@@ -3720,15 +3225,60 @@ The drivers should reflect the actual risk environment of that time period.
 `;
             }
 
-            const prompt = fillPrompt(PROMPT_TEMPLATES.RISK_DRIVERS, {
-                PERIOD_QUARTER: periodInfo?.quarter || 'current',
-                PERIOD_YEAR: periodInfo?.year || 'period',
-                PERIOD_CONTEXT: periodContext,
-                MACRO_PERIOD: `${periodInfo?.quarter || 'Current'} ${periodInfo?.year || ''}`,
-                MACRO_SUMMARY: macroData ? macroData.summary : 'Not available',
-                DOSSIER_SUMMARY: dossierSummary
-            });
+            const prompt = `You are an expert financial risk analyst. Based on the following EXTENSIVE market intelligence dossier from ${periodInfo?.quarter || 'current'} ${periodInfo?.year || 'period'}, generate exactly 50 unique risk drivers that could impact Royal Bank of Canada (RBC) and the Canadian financial system.
 
+${periodContext}
+
+BASELINE MACROECONOMIC DATA (${periodInfo?.quarter || 'Current'} ${periodInfo?.year || ''}):
+${macroData ? macroData.summary : 'Not available'}
+
+MARKET INTELLIGENCE DOSSIER:
+${dossierSummary}
+
+Generate 50 risk drivers distributed across these categories:
+- Macroeconomic (inflation, rates, growth): 10 drivers
+- Geopolitical (wars, conflicts): 11 drivers
+- Cyber / Tech (AI, cybersecurity, digital disruption): 6 drivers
+- Financial (credit, liquidity, market stress): 8 drivers
+- Environmental (climate, natural disasters): 5 drivers
+- Regulatory (policy changes, compliance): 5 drivers
+- Social (demographics, political stability): 5 drivers
+
+
+For each driver, provide:
+1. A concise title (4-8 words) using specific terminology from the search results.
+2. A detailed description (50~100 words) explicitly determining the risk. CITE SPECIFIC DATA, percentages, or entities mentioned in the dossier. Explain HOW and WHY this risk could impact RBC and the Canadian financial system.
+3. A sources array (up to 3 articles) that support this driver. Include the article title and URL from the dossier.
+
+CRITICAL REQUIREMENTS - NEGATIVE RISKS ONLY:
+**ONLY include ADVERSE/NEGATIVE risk drivers.** Do NOT include positive developments (e.g., "easing inflation", "strong earnings", "improved credit quality") disguised as risks. Each driver must represent a genuine threat, vulnerability, or deteriorating condition. If a news item is neutral or positive, skip it rather than forcing it into a risk narrative.
+
+CRITICAL ANTI-HALLUCINATION RULES:
+1. **ZERO FABRICATION**: DO NOT invent country names, company names, legislation names, people's names or events. ONLY use entities explicitly mentioned in the dossier articles.
+2. **VERIFY EVERY ENTITY**: Before including any proper noun (country, company, law, person), confirm it appears verbatim in the dossier text.
+3. **NO WORD CREATION**: Do not create new words or terms (e.g., "Alessandroxation"). Use only real English words and proper nouns from the dossier.
+4. **REAL GEOGRAPHY ONLY**: Use only actual country names that exist (e.g., USA, Canada, China, Russia, Ukraine). DO NOT invent fictional places like "East Wedbushberg".
+5. **SOURCE VALIDATION**: Every fact, number, and entity MUST have a corresponding source article. If you cannot cite a source, do not include the driver.
+6. **DEEP GROUNDING**: Every driver MUST quote or paraphrase actual content from the dossier articles. No generic industry knowledge.
+7. **SPECIFICITY**: Include specific numbers (e.g., "3.4% inflation"), dates, company names, or legislation names found in the text.
+8. **TIMING**: Ensure risks are appropriate for ${periodInfo?.quarter || 'current'} ${periodInfo?.year || ''}.
+9. **NO SPECULATION**: If the dossier lacks information on a topic, skip that category rather than inventing content.
+
+Format your response as a JSON array:
+[
+  {
+    "id": "d1",
+    "cat": "Macroeconomic",
+    "title": "US-Canada Tariff Escalation",
+    "desc": "Ongoing trade disputes regarding softwood lumber and dairy intensified in Q4, with new 15% tariffs proposed...",
+    "sources": [
+      {"title": "Reuters: US announces new tariffs on Canadian lumber", "url": "https://reuters.com/..."},
+      {"title": "Globe and Mail: Trade tensions escalate", "url": "https://theglobeandmail.com/..."}
+    ]
+  }
+]
+
+Generate exactly 50 risk drivers. Return ONLY the JSON array, no additional text.`;
 
             try {
                 const response = await fetch(AZURE_OPENAI_API_URL, {
@@ -3746,13 +3296,13 @@ The drivers should reflect the actual risk environment of that time period.
 
                 if (!response.ok) {
                     const errorText = await response.text();
-                    console.error(`❌ API error ${response.status}: `, errorText);
-                    throw new Error(`Azure OpenAI API error: ${response.status} `);
+                    console.error(`❌ API error ${response.status}:`, errorText);
+                    throw new Error(`Azure OpenAI API error: ${response.status}`);
                 }
 
                 const data = await response.json();
                 console.log('✓ API response received:', data);
-
+                
                 const aiResponse = data.choices[0].message.content;
                 console.log('📝 AI response content (first 500 chars):', aiResponse.substring(0, 500));
 
@@ -3774,26 +3324,12 @@ The drivers should reflect the actual risk environment of that time period.
                     throw new Error('Failed to parse AI response');
                 }
 
-                // Deduplicate drivers based on title similarity
-                progressCallback && progressCallback('Removing duplicate risk drivers...');
-                drivers = deduplicateDrivers(drivers);
-                console.log(`✓ After deduplication: ${drivers.length} unique drivers`);
-
-                // Ensure exactly 50 drivers (trim if we have more, warn if we have less)
-                const TARGET_DRIVER_COUNT = 50;
-                if (drivers.length > TARGET_DRIVER_COUNT) {
-                    console.log(`✓ Trimming from ${drivers.length} to ${TARGET_DRIVER_COUNT} drivers`);
-                    drivers = drivers.slice(0, TARGET_DRIVER_COUNT);
-                } else if (drivers.length < TARGET_DRIVER_COUNT) {
-                    console.warn(`⚠️ Only ${drivers.length} unique drivers available(target: ${TARGET_DRIVER_COUNT})`);
-                }
-
                 // Add colors, chat history, and preserve sources to each driver
                 drivers = drivers.map((d, idx) => {
                     const colors = CATEGORY_COLORS[d.cat] || { tagColor: '#E5E7EB', textColor: '#374151' };
                     return {
                         ...d,
-                        id: d.id || `ai_${idx + 1} `,
+                        id: d.id || `ai_${idx + 1}`,
                         tagColor: colors.tagColor,
                         textColor: colors.textColor,
                         chatHistory: [],
@@ -3808,131 +3344,6 @@ The drivers should reflect the actual risk environment of that time period.
             } catch (error) {
                 console.error('AI driver generation failed:', error);
                 throw error;
-            }
-        }
-
-        // Add more drivers to a specific category
-        async function addMoreDriversForCategory(category) {
-            const loader = document.getElementById('loader');
-            const loaderText = document.getElementById('loaderText');
-
-            loader.style.display = 'flex';
-            loaderText.innerText = `Generating more ${category} risk drivers...`;
-
-            try {
-                // Get current dossier from cache
-                const dossier = getFromCache(CACHE_KEY);
-                if (!dossier) {
-                    throw new Error('No dossier available. Please generate or load a dossier first.');
-                }
-
-                // Get existing drivers for this category
-                const existingDrivers = INITIAL_DRIVERS.filter(d => d.cat === category);
-                const existingTitles = existingDrivers.map(d => d.title);
-                const existingDescriptions = existingDrivers.map(d => d.desc?.substring(0, 100)).join('\n');
-
-                // Summarize dossier for AI prompt
-                const dossierSummary = Object.entries(dossier).map(([cat, articles]) => {
-                    const summaries = articles.slice(0, 3).map(a => `- ${a.title}: ${a.content?.substring(0, 1500)}...`).join('\n');
-                    return `## ${cat.replace(/_/g, ' ')} \n${summaries} `;
-                }).join('\n\n');
-
-                const prompt = fillPrompt(PROMPT_TEMPLATES.RISK_DRIVERS_ADDITIONAL, {
-                    CATEGORY: category,
-                    EXISTING_TITLES: existingTitles.map((t, i) => `${i + 1}."${t}"`).join('\n'),
-                    EXISTING_DESCRIPTIONS: existingDescriptions,
-                    DOSSIER_SUMMARY: dossierSummary,
-                    CATEGORY_SNAKE: category.toLowerCase().replace(/\s+/g, '_')
-                });
-
-
-                loaderText.innerText = `AI is analyzing dossier for new ${category} risks...`;
-
-                const response = await fetch(AZURE_OPENAI_API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        model: 'gpt-5-2025-08-07-eastus-dz',
-                        messages: [{ role: 'user', content: prompt }],
-                        max_tokens: 8000
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error(`API error: ${response.status}`);
-                }
-
-                const data = await response.json();
-                const aiResponse = data.choices[0].message.content;
-
-                // Parse JSON from response
-                let newDrivers = [];
-                const jsonMatch = aiResponse.match(/\[[\s\S]*\]/);
-                if (jsonMatch) {
-                    newDrivers = JSON.parse(jsonMatch[0]);
-                } else {
-                    newDrivers = JSON.parse(aiResponse);
-                }
-
-                loaderText.innerText = 'Checking for duplicates...';
-
-                // Deduplicate against ALL existing drivers (not just this category)
-                const allExistingDrivers = INITIAL_DRIVERS;
-                newDrivers = newDrivers.filter(newDriver => {
-                    for (const existing of allExistingDrivers) {
-                        const similarity = calculateSimilarity(newDriver.title, existing.title);
-                        if (similarity >= 0.4) { // Slightly stricter threshold for new additions
-                            console.log(`🔄 Filtered duplicate: "${newDriver.title}" similar to "${existing.title}"`);
-                            return false;
-                        }
-                    }
-                    return true;
-                });
-
-                if (newDrivers.length === 0) {
-                    loader.style.display = 'none';
-                    alert(`All generated drivers were too similar to existing ones. Try again or the category may be saturated.`);
-                    return;
-                }
-
-                // Add colors and metadata to new drivers
-                const colors = CATEGORY_COLORS[category] || { tagColor: '#E5E7EB', textColor: '#374151' };
-                const timestamp = Date.now();
-                newDrivers = newDrivers.map((d, idx) => ({
-                    ...d,
-                    id: `add_${category.toLowerCase().replace(/\s+/g, '_')}_${timestamp}_${idx}`,
-                    cat: category,
-                    tagColor: colors.tagColor,
-                    textColor: colors.textColor,
-                    chatHistory: [],
-                    sources: d.sources || []
-                }));
-
-                // Add to INITIAL_DRIVERS
-                INITIAL_DRIVERS.push(...newDrivers);
-
-                // Update cache
-                const dossierCacheKey = `${DRIVERS_CACHE_KEY}_${currentDossierId}`;
-                saveToCache(dossierCacheKey, INITIAL_DRIVERS);
-
-                loader.style.display = 'none';
-
-                // Re-render marketplace
-                renderMarketplace();
-
-                // Show success message
-                const successMsg = `✅ Added ${newDrivers.length} new ${category} risk driver${newDrivers.length > 1 ? 's' : ''}!`;
-                console.log(successMsg);
-
-                // Optional: Show a toast or brief notification
-                alert(successMsg);
-
-            } catch (error) {
-                console.error('Error adding more drivers:', error);
-                loader.style.display = 'none';
-                alert(`Failed to generate more drivers: ${error.message}`);
             }
         }
 
@@ -5180,31 +4591,9 @@ The drivers should reflect the actual risk environment of that time period.
             // Get unique categories for regular drivers only
             const regularCategories = [...new Set(regularDrivers.map(d => d.cat))];
 
-            // Render regular categories with "Add More" button
+            // Render regular categories
             let html = regularCategories.map(cat => `
-                <div class="category-header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-                    <div class="category-label" style="margin-bottom: 0;">${cat}</div>
-                    <button class="add-more-btn" onclick="event.stopPropagation(); addMoreDriversForCategory('${cat}')" 
-                        title="Add more ${cat} risk drivers"
-                        style="
-                            background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(79, 70, 229, 0.1));
-                            border: 1px solid rgba(37, 99, 235, 0.3);
-                            color: var(--primary);
-                            padding: 4px 10px;
-                            border-radius: 100px;
-                            font-size: 11px;
-                            font-weight: 600;
-                            cursor: pointer;
-                            transition: all 0.2s ease;
-                            display: flex;
-                            align-items: center;
-                            gap: 4px;
-                        "
-                        onmouseover="this.style.background='linear-gradient(135deg, var(--primary), #4F46E5)'; this.style.color='white'; this.style.transform='scale(1.05)';"
-                        onmouseout="this.style.background='linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(79, 70, 229, 0.1))'; this.style.color='var(--primary)'; this.style.transform='scale(1)';">
-                        <span>+</span> Add More
-                    </button>
-                </div>
+                <div class="category-label">${cat}</div>
                 <div class="drivers-grid">
                     ${regularDrivers.filter(d => d.cat === cat).map(d => {
                 const sourcesHtml = (d.sources && d.sources.length > 0) ? `
@@ -5278,32 +4667,20 @@ The drivers should reflect the actual risk environment of that time period.
             if (!driver) return;
 
             document.getElementById('modalTitle').innerText = driver.title;
-
+            
             // Build description with heat map assessment if available
             const hmData = heatMapData[id];
             let descContent = driver.desc;
-
-            if (hmData && (hmData.likelihoodReasoning || hmData.materialityReasoning || hmData.reasoning)) {
-                // Add heat map assessment section with separate justifications
+            
+            if (hmData && hmData.reasoning) {
+                // Add heat map assessment section
                 const likelihoodLevel = getLevelLabel(hmData.likelihood);
                 const materialityLevel = getLevelLabel(hmData.materiality);
                 const velocityLabel = hmData.velocity === 3 ? 'High' : hmData.velocity === 2 ? 'Medium' : 'Low';
-
-                descContent += `\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n📊 HEAT MAP ASSESSMENT:\n`;
-                descContent += `\n📈 Likelihood: ${likelihoodLevel} (${hmData.likelihood}/10)`;
-                if (hmData.likelihoodReasoning) {
-                    descContent += `\n   → ${hmData.likelihoodReasoning}`;
-                }
-                descContent += `\n\n💥 Materiality: ${materialityLevel} (${hmData.materiality}/10)`;
-                if (hmData.materialityReasoning) {
-                    descContent += `\n   → ${hmData.materialityReasoning}`;
-                }
-                descContent += `\n\n⚡ Velocity: ${velocityLabel}`;
-                if (hmData.reasoning) {
-                    descContent += `\n   → ${hmData.reasoning}`;
-                }
+                
+                descContent += `\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n📊 HEAT MAP ASSESSMENT:\n\n• Likelihood: ${likelihoodLevel} (${hmData.likelihood}/10)\n• Materiality: ${materialityLevel} (${hmData.materiality}/10)\n• Velocity: ${velocityLabel}\n\n${hmData.reasoning}`;
             }
-
+            
             document.getElementById('modalDesc').innerText = descContent;
             const tag = document.getElementById('modalTag');
             tag.innerText = driver.cat;
@@ -5531,16 +4908,17 @@ The drivers should reflect the actual risk environment of that time period.
 
                 // Get heat map data if available
                 const hmData = heatMapData[driver.id];
-                const hasHeatMapData = hmData && (hmData.likelihoodReasoning || hmData.materialityReasoning || hmData.reasoning);
-
+                const hasHeatMapData = hmData && hmData.reasoning;
+                
                 let heatMapContext = '';
                 if (hasHeatMapData) {
                     heatMapContext = `
 
 HEAT MAP ASSESSMENT:
-- Likelihood: ${hmData.likelihood}/10${hmData.likelihoodReasoning ? ` (${hmData.likelihoodReasoning})` : ''}
-- Materiality (Impact to RBC): ${hmData.materiality}/10${hmData.materialityReasoning ? ` (${hmData.materialityReasoning})` : ''}
-- Velocity: ${hmData.velocity} (1=slow, 2=medium, 3=fast)${hmData.reasoning ? ` (${hmData.reasoning})` : ''}`;
+- Likelihood: ${hmData.likelihood}/10
+- Materiality (Impact to RBC): ${hmData.materiality}/10
+- Velocity: ${hmData.velocity} (1=slow, 2=medium, 3=fast)
+- Reasoning: ${hmData.reasoning}`;
                 }
 
                 // Create AI prompt with dual mode: Q&A vs Editing
@@ -5578,9 +4956,7 @@ When making changes, respond with:
   "likelihood": 7,  // 1-10, only if heat map exists and user requests change
   "materiality": 8,  // 1-10, only if heat map exists and user requests change
   "velocity": 2,     // 1-3, only if heat map exists and user requests change
-  "likelihoodReasoning": "Brief justification for the likelihood score",
-  "materialityReasoning": "Brief justification for the materiality score",
-  "reasoning": "Brief explanation for velocity and overall assessment"
+  "reasoning": "Brief explanation of why these ratings make sense"
 }
 \`\`\`
 
@@ -5660,7 +5036,7 @@ KEY PHRASES THAT INDICATE Q&A:
 
                     // Update heat map assessment if provided
                     const currentHmData = heatMapData[driver.id];
-                    if (currentHmData && (updates.likelihood || updates.materiality || updates.velocity || updates.reasoning || updates.likelihoodReasoning || updates.materialityReasoning)) {
+                    if (currentHmData && (updates.likelihood || updates.materiality || updates.velocity || updates.reasoning)) {
                         if (updates.likelihood) {
                             currentHmData.likelihood = Math.max(1, Math.min(10, updates.likelihood));
                             needsHeatMapUpdate = true;
@@ -5673,16 +5049,10 @@ KEY PHRASES THAT INDICATE Q&A:
                             currentHmData.velocity = Math.max(1, Math.min(3, updates.velocity));
                             needsHeatMapUpdate = true;
                         }
-                        if (updates.likelihoodReasoning) {
-                            currentHmData.likelihoodReasoning = updates.likelihoodReasoning;
-                        }
-                        if (updates.materialityReasoning) {
-                            currentHmData.materialityReasoning = updates.materialityReasoning;
-                        }
                         if (updates.reasoning) {
                             currentHmData.reasoning = updates.reasoning;
                         }
-
+                        
                         console.log('✓ Heat map assessment updated:', currentHmData);
                     }
 
@@ -5690,27 +5060,15 @@ KEY PHRASES THAT INDICATE Q&A:
                     if (updates.desc || needsHeatMapUpdate) {
                         const updatedHmData = heatMapData[driver.id];
                         let descContent = driver.desc;
-
-                        if (updatedHmData && (updatedHmData.likelihoodReasoning || updatedHmData.materialityReasoning || updatedHmData.reasoning)) {
+                        
+                        if (updatedHmData && updatedHmData.reasoning) {
                             const likelihoodLevel = getLevelLabel(updatedHmData.likelihood);
                             const materialityLevel = getLevelLabel(updatedHmData.materiality);
                             const velocityLabel = updatedHmData.velocity === 3 ? 'High' : updatedHmData.velocity === 2 ? 'Medium' : 'Low';
-
-                            descContent += `\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n📊 HEAT MAP ASSESSMENT:\n`;
-                            descContent += `\n📈 Likelihood: ${likelihoodLevel} (${updatedHmData.likelihood}/10)`;
-                            if (updatedHmData.likelihoodReasoning) {
-                                descContent += `\n   → ${updatedHmData.likelihoodReasoning}`;
-                            }
-                            descContent += `\n\n💥 Materiality: ${materialityLevel} (${updatedHmData.materiality}/10)`;
-                            if (updatedHmData.materialityReasoning) {
-                                descContent += `\n   → ${updatedHmData.materialityReasoning}`;
-                            }
-                            descContent += `\n\n⚡ Velocity: ${velocityLabel}`;
-                            if (updatedHmData.reasoning) {
-                                descContent += `\n   → ${updatedHmData.reasoning}`;
-                            }
+                            
+                            descContent += `\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n📊 HEAT MAP ASSESSMENT:\n\n• Likelihood: ${likelihoodLevel} (${updatedHmData.likelihood}/10)\n• Materiality: ${materialityLevel} (${updatedHmData.materiality}/10)\n• Velocity: ${velocityLabel}\n\n${updatedHmData.reasoning}`;
                         }
-
+                        
                         document.getElementById('modalDesc').innerText = descContent;
                     }
 
@@ -5826,7 +5184,7 @@ KEY PHRASES THAT INDICATE Q&A:
                 // Step 1: Search Tavily API for relevant information (skip for hypothetical scenarios)
                 let tavilyResults = [];
                 let usingTavily = false;
-
+                
                 if (!isHypothetical) {
                     input.placeholder = "🔍 Searching market intelligence...";
                     try {
@@ -5843,7 +5201,7 @@ KEY PHRASES THAT INDICATE Q&A:
                 // Step 2: Prepare context for AI
                 input.placeholder = "🤖 AI is analyzing your request...";
                 let sourcesSummary = '';
-
+                
                 if (tavilyResults && tavilyResults.length > 0) {
                     sourcesSummary = tavilyResults.slice(0, 5).map((r, idx) =>
                         `${idx + 1}. "${r.title}": ${r.content?.substring(0, 300) || 'No content available'}...`
@@ -5852,8 +5210,8 @@ KEY PHRASES THAT INDICATE Q&A:
 
                 // Step 3: Use AI to generate a structured risk driver
                 console.log('🤖 Calling Azure OpenAI to generate risk driver...');
-
-                const prompt = usingTavily && tavilyResults.length > 0
+                
+                const prompt = usingTavily && tavilyResults.length > 0 
                     ? `You are an expert financial risk analyst at Royal Bank of Canada (RBC) specializing in FORWARD-LOOKING risk assessment for stress testing.
 
 USER SEARCH QUERY: "${query}"
@@ -5978,7 +5336,7 @@ Return ONLY the JSON object.`;
 
 Or tell me to adjust severity, time horizon, or transmission assumptions (e.g., "make it more severe", "focus on 3-month horizon", "quantify credit spread impact").`
                     : isHypothetical
-                        ? `I've created a <strong>HYPOTHETICAL FORWARD-LOOKING</strong> risk driver: "${query}".
+                    ? `I've created a <strong>HYPOTHETICAL FORWARD-LOOKING</strong> risk driver: "${query}".
 
 ⚠️ <strong>Note:</strong> This is a scenario-based driver for stress testing (no real-world sources required).
 
@@ -5987,7 +5345,7 @@ Or tell me to adjust severity, time horizon, or transmission assumptions (e.g., 
 <strong>You can refine this scenario by asking me to:</strong><br>${refinementsHtml}
 
 Or tell me to adjust severity, time horizon, or quantify specific impacts (e.g., "increase to 18-month scenario", "add credit spread widening +200 bps").`
-                        : `I've created a <strong>FORWARD-LOOKING</strong> risk driver based on your request: "${query}".
+                    : `I've created a <strong>FORWARD-LOOKING</strong> risk driver based on your request: "${query}".
 
 <strong>⚠️ Note:</strong> This driver was created without live market intelligence (Tavily unavailable).
 
@@ -6017,9 +5375,9 @@ Or tell me to adjust severity, time horizon, or transmission channels.`;
                 const successMessage = usingTavily && tavilyResults.length > 0
                     ? "✓ Driver created with market intelligence!"
                     : isHypothetical
-                        ? "✓ Hypothetical scenario created!"
-                        : "✓ Driver created (without Tavily data)";
-
+                    ? "✓ Hypothetical scenario created!"
+                    : "✓ Driver created (without Tavily data)";
+                
                 input.placeholder = successMessage;
                 setTimeout(() => { input.placeholder = originalPlaceholder; }, 3000);
 
@@ -6134,15 +5492,15 @@ Generate a cohesive scenario narrative that combines these drivers into a plausi
 {
   "scenarioTitle": "A compelling 3-6 word title for the scenario (e.g., 'Perfect Storm 2026' or 'Global Trade Collapse')",
   "globalConditions": {
-    "summary": "3-4 paragraphs (HTML formatted with <p> tags and <strong> for emphasis) describing global economic and geopolitical conditions that set the stage for this scenario. Reference specific drivers where relevant.",
+    "summary": "2-3 paragraphs (HTML formatted with <p> tags and <strong> for emphasis) describing global economic and geopolitical conditions that set the stage for this scenario. Reference specific drivers where relevant.",
     "keyPoints": ["Point 1", "Point 2", "Point 3"]
   },
   "canadianConditions": {
-    "summary": "3-4 paragraphs (HTML formatted) describing how these global conditions specifically impact the Canadian economy, housing market, energy sector, and Bank of Canada policy.",
+    "summary": "2-3 paragraphs (HTML formatted) describing how these global conditions specifically impact the Canadian economy, housing market, energy sector, and Bank of Canada policy.",
     "keyPoints": ["Point 1", "Point 2", "Point 3"]
   },
   "rbcImpact": {
-    "summary": "3-4 paragraphs (HTML formatted) describing the direct impact on RBC's business lines including: Personal & Commercial Banking (mortgages, credit cards), Capital Markets (trading, underwriting), Wealth Management (AUM), and overall capital/liquidity position.",
+    "summary": "2-3 paragraphs (HTML formatted) describing the direct impact on RBC's business lines including: Personal & Commercial Banking (mortgages, credit cards), Capital Markets (trading, underwriting), Wealth Management (AUM), and overall capital/liquidity position.",
     "keyPoints": ["Point 1", "Point 2", "Point 3"]
   },
   "macroProjections": {
@@ -6189,6 +5547,7 @@ IMPORTANT GUIDELINES:
 - For a severe scenario: GDP -3% to -6%, unemployment 8-10%
 - For a very severe scenario: GDP -7% or worse, unemployment 10%+
 - Ensure the narrative logically connects the selected drivers
+- Use current date context: December 2025, projecting into 2026
 - Reference actual Canadian/RBC context (Big 6 banks, OSFI regulations, BoC policy)
 
 CRITICAL ANTI-HALLUCINATION RULES FOR SCENARIO NARRATIVE:
@@ -6467,7 +5826,7 @@ Return ONLY the JSON object, no additional text or markdown formatting.`;
             // Clear conversation history for new scenario generation
             reportChatHistory = [];
             currentScenarioId = null; // Reset scenario ID for new scenario
-
+            
             const contextualReportSuggestions = getReportContextualSuggestions(selectedDrivers, scenario, macro);
 
             const initialMessage = `
@@ -6480,7 +5839,7 @@ Return ONLY the JSON object, no additional text or markdown formatting.`;
                     </ul>
                 </div>
             `;
-
+            
             document.getElementById('reportChatHistory').innerHTML = initialMessage;
 
             document.getElementById('reportOverlay').style.display = 'flex';
@@ -7251,124 +6610,10 @@ If the user just wants clarification or discussion without changes, don't includ
             showSavedScenarios(); // Switch to saved view
         }
 
-        // ========================================
-        // SEND TO ASTRA INTEGRATION
-        // ========================================
-        function sendToAstra() {
-            const currentTitle = document.getElementById('reportTitle').innerText || 'Untitled Scenario';
-
-            // Gather all scenario data for Astra
-            const astraPayload = {
-                // Metadata
-                id: 'astra_' + Date.now(),
-                title: currentTitle,
-                timestamp: Date.now(),
-                source: 'scenario.html',
-
-                // Narrative content (HTML)
-                globalConditions: document.getElementById('globalConditions').innerHTML,
-                canadianConditions: document.getElementById('canadianConditions').innerHTML,
-                rbcImpact: document.getElementById('rbcImpact').innerHTML,
-
-                // Macro projections (for reference)
-                macroProjectionsHtml: document.getElementById('macroProjections').innerHTML,
-
-                // Structured risk drivers with heat map data
-                riskDrivers: selectedDrivers.map(d => ({
-                    id: d.id,
-                    title: d.title,
-                    category: d.cat,
-                    description: d.desc,
-                    heatMapData: heatMapData[d.id] || null
-                })),
-
-                // Plain text summary for AI context
-                narrativeSummary: buildNarrativeSummary()
-            };
-
-            // Save to localStorage for Astra to pick up
-            localStorage.setItem('astraScenarioImport', JSON.stringify(astraPayload));
-
-            // Visual feedback
-            const btn = document.getElementById('sendToAstraBtn');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '✓ Sent!';
-            btn.style.background = '#10B981';
-
-            setTimeout(() => {
-                // Get the base path from current location and append Astra.html
-                const currentPath = window.location.pathname;
-                const basePath = currentPath.substring(0, currentPath.lastIndexOf('/') + 1);
-                window.open(basePath + 'astra.html', '_blank');
-
-                // Reset button after short delay
-                setTimeout(() => {
-                    btn.innerHTML = originalText;
-                    btn.style.background = 'linear-gradient(135deg, #8B5CF6, #6366F1)';
-                }, 1000);
-            }, 500);
-        }
-
-        function buildNarrativeSummary() {
-            // Extract text content from HTML for AI consumption
-            const globalEl = document.getElementById('globalConditions');
-            const canadianEl = document.getElementById('canadianConditions');
-            const rbcEl = document.getElementById('rbcImpact');
-            const macroEl = document.getElementById('macroProjections');
-
-            const globalText = globalEl ? globalEl.innerText : '';
-            const canadianText = canadianEl ? canadianEl.innerText : '';
-            const rbcText = rbcEl ? rbcEl.innerText : '';
-
-            // Extract macro projections values
-            let macroSummary = '';
-            if (macroEl) {
-                const macroCards = macroEl.querySelectorAll('.macro-card');
-                const macroValues = [];
-                macroCards.forEach(card => {
-                    const label = card.querySelector('.macro-label')?.innerText || '';
-                    const value = card.querySelector('.macro-value')?.innerText || '';
-                    const delta = card.querySelector('.macro-delta')?.innerText || '';
-                    if (label && value) {
-                        macroValues.push(`- ${label}: ${value}${delta ? ' (' + delta + ')' : ''}`);
-                    }
-                });
-                macroSummary = macroValues.join('\n');
-            }
-
-            // Build driver summary
-            const driverSummary = selectedDrivers.map(d => {
-                const hm = heatMapData[d.id];
-                if (hm) {
-                    return `- ${d.title} (${d.cat}): Likelihood ${hm.likelihood}/10, Materiality ${hm.materiality}/10, Velocity ${hm.velocity === 3 ? 'High' : hm.velocity === 2 ? 'Medium' : 'Low'}`;
-                }
-                return `- ${d.title} (${d.cat})`;
-            }).join('\n');
-
-            return `
-SCENARIO: ${document.getElementById('reportTitle').innerText}
-
-MACROECONOMIC PROJECTIONS:
-${macroSummary || 'Not available'}
-
-GLOBAL CONDITIONS:
-${globalText}
-
-CANADIAN CONDITIONS:
-${canadianText}
-
-RBC IMPACT:
-${rbcText}
-
-RISK DRIVERS:
-${driverSummary}
-            `.trim();
-        }
-
         function renderSavedScenarios() {
             console.log('Rendering saved scenarios. Total count:', savedScenarios.length);
             console.log('Scenarios to render:', savedScenarios);
-
+            
             const grid = document.getElementById('savedScenariosGrid');
 
             if (savedScenarios.length === 0) {
@@ -7440,15 +6685,15 @@ ${driverSummary}
 
             console.log('Saving heat map:', heatmap);
             console.log('Current savedScenarios before save:', savedScenarios);
-
+            
             savedScenarios.unshift(heatmap);
-
+            
             console.log('Current savedScenarios after unshift:', savedScenarios);
-
+            
             saveScenariosToStorage();
-
+            
             console.log('Heat map saved to localStorage');
-
+            
             alert('Heat Map saved to Folder.');
             updateInventory();
             showSavedScenarios(); // Go to folder to show it
@@ -7560,82 +6805,6 @@ ${driverSummary}
         // Store heat map data for each driver
         let heatMapData = {};
 
-        // Heat map view mode: 'default', 'compact', or 'minimal'
-        let heatMapViewMode = 'default';
-
-        // Set heat map view mode
-        function setHeatMapViewMode(mode) {
-            heatMapViewMode = mode;
-
-            // Update button styles
-            // Update button styles
-            ['default', 'compact', 'minimal'].forEach(m => {
-                const btn = document.getElementById(`viewMode${m.charAt(0).toUpperCase() + m.slice(1)}`);
-                if (btn) {
-                    if (m === mode) {
-                        btn.classList.add('active');
-                    } else {
-                        btn.classList.remove('active');
-                    }
-                    // Remove inline styles to allow CSS to take over
-                    btn.style.background = '';
-                    btn.style.color = '';
-                    btn.style.borderColor = '';
-                }
-            });
-
-            // Show/hide driver legend in heat map legend and driver list in controls panel
-            const driverList = document.getElementById('heatmapDriverList');
-            const driverLegendSection = document.getElementById('driverLegendSection');
-
-            if (mode === 'minimal') {
-                if (driverList) driverList.style.display = 'none';
-                if (driverLegendSection) driverLegendSection.style.display = 'block';
-                renderDriverLegendInHeatMap();
-            } else {
-                if (driverList) driverList.style.display = 'block';
-                if (driverLegendSection) driverLegendSection.style.display = 'none';
-            }
-
-            // Re-render heat map with new mode
-            renderHeatMap();
-        }
-
-        // Render driver legend inside the heat map legend panel (for minimal view)
-        function renderDriverLegendInHeatMap() {
-            const container = document.getElementById('driverLegendItems');
-            if (!container) return;
-
-            const driversToRender = getFilteredDrivers();
-            container.innerHTML = driversToRender.map((d, idx) => {
-                const hmData = heatMapData[d.id] || { velocity: 2 };
-                const velocityColor = hmData.velocity === 3 ? '#EF4444' : hmData.velocity === 2 ? '#F59E0B' : '#22C55E';
-
-                return `
-                    <div class="heatmap-legend-item" style="cursor: pointer; padding: 2px 0;" 
-                        onclick="openDriverDetails('${d.id}')"
-                        onmouseenter="highlightHeatMapDriver('${d.id}', true)"
-                        onmouseleave="highlightHeatMapDriver('${d.id}', false)">
-                        <div style="
-                            width: 16px;
-                            height: 16px;
-                            border-radius: 50%;
-                            background: ${velocityColor};
-                            color: white;
-                            font-size: 9px;
-                            font-weight: 700;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            flex-shrink: 0;
-                        ">${idx + 1}</div>
-                        <span style="font-size: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${d.title}</span>
-                    </div>
-                `;
-            }).join('');
-        }
-
-
         function showHeatMap() {
             document.getElementById('marketplacePanel').style.display = 'none';
             document.getElementById('savedScenariosPanel').style.display = 'none';
@@ -7683,49 +6852,13 @@ ${driverSummary}
                 driverCard.style.transition = 'all 0.2s ease';
                 // Expand the card to show description
                 driverCard.classList.add('expanded');
-
-                // For compact view, also show the expand section
-                const compactExpand = driverCard.querySelector('.compact-expand');
-                if (compactExpand) {
-                    compactExpand.style.display = 'block';
-                }
-
-                // For compact pill, add shadow
-                const compactPill = driverCard.querySelector('.compact-pill');
-                if (compactPill) {
-                    compactPill.style.boxShadow = '0 4px 16px rgba(0,0,0,0.15)';
-                }
-
-                // For minimal view, show the expand section
-                const minimalExpand = driverCard.querySelector('.minimal-expand');
-                if (minimalExpand) {
-                    minimalExpand.style.display = 'block';
-                }
             } else {
                 // Reset to original state
-                const yPercent = parseFloat(driverCard.style.top) || 0;
+                const yPercent = parseFloat(driverCard.style.top) / driverCard.parentElement.offsetHeight * 100;
                 driverCard.style.zIndex = Math.floor(10 + yPercent);
                 driverCard.style.boxShadow = '';
                 // Collapse the card
                 driverCard.classList.remove('expanded');
-
-                // For compact view, hide the expand section
-                const compactExpand = driverCard.querySelector('.compact-expand');
-                if (compactExpand) {
-                    compactExpand.style.display = 'none';
-                }
-
-                // For compact pill, reset shadow
-                const compactPill = driverCard.querySelector('.compact-pill');
-                if (compactPill) {
-                    compactPill.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
-                }
-
-                // For minimal view, hide the expand section
-                const minimalExpand = driverCard.querySelector('.minimal-expand');
-                if (minimalExpand) {
-                    minimalExpand.style.display = 'none';
-                }
             }
         }
 
@@ -7733,7 +6866,6 @@ ${driverSummary}
             const list = document.getElementById('heatmapDriverList');
             if (!list) return;
 
-            // Start with global empty check
             if (selectedDrivers.length === 0) {
                 list.innerHTML = `
                     <div class="basket-empty">
@@ -7744,22 +6876,10 @@ ${driverSummary}
                 return;
             }
 
-            const filteredDrivers = getFilteredDrivers();
-
-            if (filteredDrivers.length === 0) {
-                list.innerHTML = `
-                    <div class="basket-empty">
-                        <div class="basket-empty-icon" style="font-size: 32px; opacity: 0.3;">🔍</div>
-                        <p style="font-size: 13px;">No drivers match filter.</p>
-                    </div>
-                 `;
-                return;
-            }
-
-            list.innerHTML = filteredDrivers.map(d => {
+            list.innerHTML = selectedDrivers.map(d => {
                 const hmData = heatMapData[d.id] || { likelihood: '?', materiality: '?', velocity: 2 };
                 const velocityLabel = hmData.velocity === 3 ? '🔴' : hmData.velocity === 2 ? '🟡' : '🟢';
-
+                
                 // Get L/M/H labels for likelihood and materiality
                 const getLevelAbbr = (value) => {
                     if (value === '?') return '?';
@@ -7768,10 +6888,10 @@ ${driverSummary}
                     if (num >= 4) return 'M';
                     return 'L';
                 };
-
+                
                 const likelihoodAbbr = getLevelAbbr(hmData.likelihood);
                 const materialityAbbr = getLevelAbbr(hmData.materiality);
-
+                
                 return `
                     <div class="basket-item" 
                          onclick="openDriverDetails('${d.id}')" 
@@ -7824,9 +6944,7 @@ ${driverSummary}
                         likelihood: assessment.likelihood, // 1-10
                         materiality: assessment.materiality, // 1-10
                         velocity: assessment.velocity, // 1-3 (1=low, 2=medium, 3=high)
-                        likelihoodReasoning: assessment.likelihoodReasoning || '', // Justification for likelihood score
-                        materialityReasoning: assessment.materialityReasoning || '', // Justification for materiality score
-                        reasoning: assessment.reasoning || '', // Velocity and overall summary
+                        reasoning: assessment.reasoning || '', // AI reasoning for the assessment
                         aiGenerated: true
                     };
                 });
@@ -7868,14 +6986,32 @@ ${driverSummary}
         }
 
         async function getAIHeatMapAssessments(drivers) {
-            const driversList = drivers.map((d, i) => `${i + 1}. ID: "${d.id}"
+            const prompt = `You are an expert risk analyst. For each of the following risk drivers, assess:
+1. LIKELIHOOD (1-10): How likely is this risk to materialize with adverse outcomes for RBC? (1=very unlikely, 10=very likely)
+2. MATERIALITY (1-10): What is the potential impact on RBC if this risk materializes? (1=minimal impact, 10=severe impact)
+3. VELOCITY (1-3): the time elapsed between the materialization of a risk event and the point of RBC's impact (1=more than 3 months, 2=2 weeks to 3 months, 3=less than 2 weeks)
+
+RISK DRIVERS TO ASSESS:
+${drivers.map((d, i) => `${i + 1}. ID: "${d.id}"
    Title: "${d.title}"
    Category: ${d.category}
-   Description: ${d.description}`).join('\n\n');
+   Description: ${d.description}`).join('\n\n')}
 
-            const prompt = fillPrompt(PROMPT_TEMPLATES.HEATMAP_ASSESSMENT, {
-                DRIVERS_LIST: driversList
-            });
+Return a JSON array with assessments for each driver:
+[
+  {
+    "id": "driver_id",
+    "likelihood": 7,
+    "materiality": 8,
+    "velocity": 2,
+    "reasoning": "Brief explanation (2-3 sentences) of why these ratings were assigned, covering likelihood, materiality, and velocity considerations for RBC."
+  },
+  ...
+]
+
+Be specific and realistic. Consider current market conditions and the severity described in each driver.
+Provide clear, concise reasoning that explains the rationale behind each assessment.
+Return ONLY the JSON array.`;
 
             const response = await fetch(AZURE_OPENAI_API_URL, {
                 method: 'POST',
@@ -7891,7 +7027,7 @@ ${driverSummary}
             });
 
             if (!response.ok) {
-                throw new Error(`AI API error: ${response.status} `);
+                throw new Error(`AI API error: ${response.status}`);
             }
 
             const data = await response.json();
@@ -7905,63 +7041,6 @@ ${driverSummary}
             throw new Error('Failed to parse AI response');
         }
 
-        // --- Heatmap Filtering Logic ---
-        let activeVelocityFilters = new Set();
-        let activeCategoryFilters = new Set();
-        const VELOCITY_CONFIG = {
-            3: { label: 'High (< 2 weeks)', color: '#EF4444', value: 3 },
-            2: { label: 'Medium (2 wks - 3 mos)', color: '#F59E0B', value: 2 },
-            1: { label: 'Low (> 3 months)', color: '#10B981', value: 1 }
-        };
-
-        function renderVelocityLegend() {
-            const container = document.getElementById('velocityLegendItems');
-            if (!container) return;
-            container.innerHTML = [3, 2, 1].map(v => {
-                const config = VELOCITY_CONFIG[v];
-                const isActive = activeVelocityFilters.size === 0 || activeVelocityFilters.has(config.value);
-                const dimClass = isActive ? '' : 'legend-dimmed';
-                return `<div class="heatmap-legend-item ${dimClass}" onclick="toggleVelocityFilter(${config.value})">
-                         <div class="heatmap-legend-velocity" style="background: ${config.color};"></div>
-                         <span>${config.label}</span>
-                    </div>`;
-            }).join('');
-        }
-
-        function toggleVelocityFilter(val) {
-            if (activeVelocityFilters.has(val)) activeVelocityFilters.delete(val);
-            else activeVelocityFilters.add(val);
-            renderVelocityLegend();
-            renderHeatMap();
-            renderHeatMapDriverList();
-        }
-
-        function toggleCategoryFilter(cat) {
-            if (activeCategoryFilters.has(cat)) activeCategoryFilters.delete(cat);
-            else activeCategoryFilters.add(cat);
-            renderCategoryLegend();
-            renderHeatMap();
-            renderHeatMapDriverList();
-        }
-
-        function getFilteredDrivers() {
-            // Remove window. prefix as let/const globals aren't always on window
-            if (!selectedDrivers) {
-                console.warn("getFilteredDrivers: selectedDrivers is missing");
-                return [];
-            }
-            return selectedDrivers.filter(driver => {
-                const data = heatMapData[driver.id];
-                if (!data) {
-                    console.warn("getFilteredDrivers: No heatMapData for driver", driver.id, driver);
-                    return false;
-                }
-                if (activeVelocityFilters.size > 0 && !activeVelocityFilters.has(data.velocity)) return false;
-                if (activeCategoryFilters.size > 0 && !activeCategoryFilters.has(driver.cat)) return false;
-                return true;
-            });
-        }
-
         function renderHeatMap() {
             const grid = document.getElementById('heatmapGrid');
             const gridRect = grid.getBoundingClientRect();
@@ -7970,19 +7049,10 @@ ${driverSummary}
 
             grid.innerHTML = '';
 
-            renderVelocityLegend();
-            renderCategoryLegend();
-
-            const filteredDrivers = getFilteredDrivers();
-
-            // Update plotting count
-            const countEl = document.getElementById('heatmapCount');
-            if (countEl) countEl.innerText = filteredDrivers.length;
-
             // Detect overlapping drivers and apply smart offsets
             const positionMap = new Map(); // Key: "likelihood,materiality", Value: array of driver IDs
 
-            filteredDrivers.forEach(driver => {
+            selectedDrivers.forEach(driver => {
                 const data = heatMapData[driver.id];
                 if (!data) return;
 
@@ -7993,7 +7063,7 @@ ${driverSummary}
                 positionMap.get(posKey).push(driver.id);
             });
 
-            filteredDrivers.forEach((driver, index) => {
+            selectedDrivers.forEach(driver => {
                 const data = heatMapData[driver.id];
                 if (!data) return;
 
@@ -8010,17 +7080,10 @@ ${driverSummary}
                     const index = driversAtPosition.indexOf(driver.id);
                     const totalAtPos = driversAtPosition.length;
 
-                    // Calculate offset based on view mode
-                    // Compact/minimal views need more spread since cards are smaller
-                    let spreadFactor = heatMapViewMode === 'default' ? 2.5 :
-                        heatMapViewMode === 'compact' ? 4 : 3;
-
-                    // Spread in a radial pattern to minimize overlap
-                    const angle = (index / totalAtPos) * 2 * Math.PI;
-                    const radius = Math.min(index + 1, 3) * spreadFactor;
-
-                    const offsetX = Math.cos(angle) * radius;
-                    const offsetY = Math.sin(angle) * radius;
+                    // Calculate offset in a diagonal cascade pattern
+                    // Offset range: 0 to 3% in both X and Y directions
+                    const offsetX = (index * 2.5) % 8; // Max 8% horizontal spread
+                    const offsetY = (index * 2.5) % 8; // Max 8% vertical spread
 
                     xPercent += offsetX;
                     yPercent += offsetY;
@@ -8058,10 +7121,7 @@ ${driverSummary}
 
                 // Create driver card
                 const card = document.createElement('div');
-                // Add view mode class to apply correct styling
-                const viewModeClass = heatMapViewMode === 'compact' ? 'compact-mode' :
-                    heatMapViewMode === 'minimal' ? 'minimal-mode' : '';
-                card.className = `heatmap-driver ${viewModeClass}`.trim();
+                card.className = 'heatmap-driver';
                 card.id = `heatmap-${driver.id}`;
                 card.style.left = `${xPercent}%`;
                 card.style.top = `${yPercent}%`;
@@ -8074,180 +7134,29 @@ ${driverSummary}
                 if (yPercent > 60) card.classList.add('expand-up');
 
                 // Card HTML with anchor circle and expandable content
-                const likelihoodReasoning = data.likelihoodReasoning || '';
-                const materialityReasoning = data.materialityReasoning || '';
-                const velocityReasoning = data.reasoning || '';
-
-                // Get driver index for minimal view numbering
-                const driverIndex = selectedDrivers.findIndex(d => d.id === driver.id) + 1;
-
-                // Generate HTML based on view mode
-                if (heatMapViewMode === 'minimal') {
-                    // Minimal view: Velocity circle with number + fully expanded white card on hover
-                    const velocityColor = data.velocity === 3 ? '#EF4444' : data.velocity === 2 ? '#F59E0B' : '#22C55E';
-
-                    card.innerHTML = `
-                <!-- Number circle - always visible -->
-                <!--Z-index higher than expand card to sit on top-->
-                        <!--Removed position:relative to keep anchor absolutely positioned(-10, -10) like default view-->
-                        <div class="heatmap-driver-anchor ${velocityClass}" title="${driver.title}" style="width: 28px; height: 28px; cursor: pointer; z-index: 101;">
-                            <span style="font-size: 12px; font-weight: 700; color: white;">${driverIndex}</span>
+                card.innerHTML = `
+                    <!-- Velocity circle is the anchor point at the card's position -->
+                    <div class="heatmap-driver-anchor ${velocityClass}" title="Click to change velocity">
+                        <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                    </div>
+                    
+                    <!-- Card body - collapses during drag -->
+                    <div class="heatmap-driver-body">
+                        <div class="heatmap-driver-header">
+                            <div class="heatmap-driver-title">${driver.title}</div>
                         </div>
+                        <span class="heatmap-driver-category" style="background: ${driver.tagColor}; color: ${driver.textColor};">${driver.cat}</span>
                         
-                        <!--Expandable details - Full White Card mimicking Default View-->
-                        <!--Anchored Top-Right(Expanded Left) to match user preference-->
-                <div class="minimal-expand" style="
-                            display: none;
-                            position: absolute;
-                            top: -10px;
-                            right: -10px; /* Align Right edge with anchor */
-                            left: auto;
-                            width: 260px;
-                            background: rgba(255, 255, 255, 0.98);
-                            backdrop-filter: blur(12px);
-                            border: 1px solid rgba(0, 0, 0, 0.1);
-                            border-radius: 12px;
-                            padding: 16px; /* Standard padding */
-                            box-shadow: 0 16px 40px rgba(0,0,0,0.25);
-                            z-index: 100;
-                            color: #1F2937;
-                        ">
-                    <!-- Header -->
-                    <div class="heatmap-driver-header" style="margin-bottom: 2px; padding-right: 20px;"> <!-- Padding right to avoid anchor overlap -->
-                        <div class="heatmap-driver-title" style="color: #1F2937; font-size: 13px;">${driver.title}</div>
-                    </div>
-
-                    <!-- Category -->
-                    <span class="heatmap-driver-category" style="background: ${driver.tagColor}; color: ${driver.textColor}; font-size: 9px; padding: 2px 8px; margin-bottom: 10px;">${driver.cat}</span>
-
-                    <!-- Description -->
-                    <div style="font-size: 11px; color: #4B5563; line-height: 1.4; margin-bottom: 12px;">${driver.desc}</div>
-
-                    <!-- Assessment Justifications -->
-                    <div style="padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.08);">
-                        ${likelihoodReasoning ? `
-                                    <div style="margin-bottom: 10px;">
-                                        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
-                                            <span style="font-size: 11px; font-weight: 600; color: #2563EB;">📊 Likelihood: ${likelihoodLevel} (${data.likelihood}/10)</span>
-                                        </div>
-                                        <div style="font-size: 11px; color: #4B5563; line-height: 1.4; padding-left: 2px;">${likelihoodReasoning}</div>
-                                    </div>
-                                    ` : ''}
-
-                        ${materialityReasoning ? `
-                                    <div style="margin-bottom: 10px;">
-                                        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
-                                            <span style="font-size: 11px; font-weight: 600; color: #DC2626;">💥 Materiality: ${materialityLevel} (${data.materiality}/10)</span>
-                                        </div>
-                                        <div style="font-size: 11px; color: #4B5563; line-height: 1.4; padding-left: 2px;">${materialityReasoning}</div>
-                                    </div>
-                                    ` : ''}
-
-                        ${velocityReasoning ? `
-                                    <div style="margin-bottom: 10px;">
-                                        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
-                                            <span style="font-size: 11px; font-weight: 600; color: #F59E0B;">⚡ Velocity: ${velocityLabel}</span>
-                                        </div>
-                                        <div style="font-size: 11px; color: #4B5563; line-height: 1.4; padding-left: 2px;">${velocityReasoning}</div>
-                                    </div>
-                                    ` : ''}
-                    </div>
-
-                    <!-- Meta -->
-                    <div style="display: flex; gap: 8px; flex-wrap: wrap; font-size: 10px; color: #6B7280; padding-top: 8px; border-top: 1px solid rgba(0,0,0,0.06);">
-                        <span>Likelihood: <strong style="color: #1F2937;">${likelihoodAbbr}</strong></span>
-                        <span>Materiality: <strong style="color: #1F2937;">${materialityAbbr}</strong></span>
-                        <span>Velocity: <strong style="color: #1F2937;">${velocityAbbr}</strong></span>
-                    </div>
-                </div>
-            `;
-                    card.style.cursor = 'pointer';
-                } else if (heatMapViewMode === 'compact') {
-                    // Compact view: Small pill with velocity dot and title only, expands on hover
-                    const velocityColor = data.velocity === 3 ? '#EF4444' : data.velocity === 2 ? '#F59E0B' : '#22C55E';
-
-                    card.innerHTML = `
-                        <div class="compact-pill" style="
-                            display: inline-flex;
-                            flex-direction: column;
-                            background: rgba(255, 255, 255, 0.98);
-                            border: 1px solid rgba(0, 0, 0, 0.1);
-                            border-radius: 12px;
-                            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-                            cursor: pointer;
-                            overflow: visible;
-                        ">
-                            <!-- Header: always visible (white pill with just title) -->
-                            <div style="
-                                display: flex;
-                                align-items: center;
-                                gap: 6px;
-                                padding: 6px 10px;
-                            ">
-                                <span style="
-                                    width: 8px;
-                                    height: 8px;
-                                    border-radius: 50%;
-                                    background: ${velocityColor};
-                                    flex-shrink: 0;
-                                "></span>
-                                <span style="
-                                    font-size: 11px;
-                                    font-weight: 600;
-                                    color: #1F2937;
-                                ">${driver.title}</span>
-                            </div>
-                            
-                            <!-- Expandable details: hidden by default, shown on hover -->
-                            <div class="compact-expand" style="display: none;">
-                                <div style="
-                                    background: rgba(255, 255, 255, 0.98);
-                                    border-radius: 0 0 12px 12px;
-                                    padding: 12px;
-                                    color: #1F2937;
-                                    min-width: 260px;
-                                    max-width: 320px;
-                                    border-top: 1px solid rgba(0,0,0,0.06);
-                                ">
-                                    <span style="display: inline-block; font-size: 10px; background: ${driver.tagColor}; color: ${driver.textColor}; padding: 3px 10px; border-radius: 6px; margin-bottom: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px;">${driver.cat}</span>
-                                    <div style="font-size: 11px; color: #4B5563; line-height: 1.5; margin-bottom: 12px;">
-                                        ${driver.desc}
-                                    </div>
-
-                                    <!-- Summary Meta -->
-                                    <div style="display: flex; gap: 8px; flex-wrap: wrap; font-size: 10px; color: #6B7280; padding-top: 8px; border-top: 1px solid rgba(0,0,0,0.06);">
-                                        <span>Likelihood: <strong style="color: #1F2937;">${likelihoodAbbr}</strong></span>
-                                        <span>Materiality: <strong style="color: #1F2937;">${materialityAbbr}</strong></span>
-                                        <span>Velocity: <strong style="color: #1F2937;">${velocityAbbr}</strong></span>
-                                    </div>
-                                </div>
+                        <div class="heatmap-driver-expand">
+                            <div class="heatmap-driver-expand-desc">${driver.desc}</div>
+                            <div class="heatmap-driver-expand-meta">
+                                <span>Likelihood: <strong>${likelihoodAbbr}</strong></span>
+                                <span>Materiality: <strong>${materialityAbbr}</strong></span>
+                                <span>Velocity: <strong>${velocityAbbr}</strong></span>
                             </div>
                         </div>
-                    `;
-                    card.style.cursor = 'pointer';
-                } else {
-                    // Default view: Card with title, category, description, and compact L/M/V row visible
-                    // Detailed reasoning only shows on click/expansion
-                    card.innerHTML = `
-                        <div class="heatmap-driver-anchor ${velocityClass}" title="Click to change velocity">
-                            <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" /></svg>
-                        </div>
-                        <div class="heatmap-driver-body">
-                            <div class="heatmap-driver-header">
-                                <div class="heatmap-driver-title">${driver.title}</div>
-                            </div>
-                            <span class="heatmap-driver-category" style="background: ${driver.tagColor}; color: ${driver.textColor};">${driver.cat}</span>
-                            <div class="heatmap-driver-expand">
-                                <div class="heatmap-driver-expand-desc">${driver.desc}</div>
-                                <div class="heatmap-driver-expand-meta">
-                                    <div style="flex: 1;">Likelihood: <strong style="color: white;">${likelihoodAbbr}</strong></div>
-                                    <div style="flex: 1;">Materiality: <strong style="color: white;">${materialityAbbr}</strong></div>
-                                    <div style="flex: 1;">Velocity: <strong style="color: white;">${velocityAbbr}</strong></div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }
+                    </div>
+                `;
 
                 // Track if drag occurred to prevent click
                 let hasDragged = false;
@@ -8271,39 +7180,23 @@ ${driverSummary}
 
                 // Unified click handler
                 card.addEventListener('click', (e) => {
+                    const isAnchor = e.target.closest('.heatmap-driver-anchor');
+
                     if (hasDragged) {
                         hasDragged = false; // Reset for next interaction
                         return; // Ignore click after drag
                     }
 
-                    // For compact/minimal views, just open details on click
-                    if (heatMapViewMode === 'compact' || heatMapViewMode === 'minimal') {
-                        openDriverDetails(driver.id);
-                        return;
-                    }
-
-                    // For default view
-                    const isAnchor = e.target.closest('.heatmap-driver-anchor');
                     if (isAnchor) {
                         e.stopPropagation();
                         cycleVelocity(driver.id);
-                        return;
+                    } else {
+                        openDriverDetails(driver.id);
                     }
-
-                    // Otherwise open details
-                    openDriverDetails(driver.id);
                 });
 
                 // Add drag handlers with threshold to distinguish from clicks
                 card.addEventListener('mousedown', (e) => {
-                    // Prevent drag side-effects if interacting with expanded text content in minimal/compact views
-                    // This allows text selection to work naturally without triggering a drag/update
-                    if (heatMapViewMode === 'minimal' || heatMapViewMode === 'compact') {
-                        if (e.target.closest('.minimal-expand') || e.target.closest('.compact-expand')) {
-                            return;
-                        }
-                    }
-
                     hasDragged = false;
                     dragStartX = e.clientX;
                     dragStartY = e.clientY;
@@ -8312,7 +7205,7 @@ ${driverSummary}
                     const onMouseMove = (moveE) => {
                         const dx = Math.abs(moveE.clientX - dragStartX);
                         const dy = Math.abs(moveE.clientY - dragStartY);
-
+                        
                         // Only start drag if moved more than 5 pixels
                         if (!dragInitiated && (dx > 5 || dy > 5)) {
                             hasDragged = true;
@@ -8439,16 +7332,37 @@ ${driverSummary}
             heatMapData[driverId].materiality = Math.max(1, Math.min(10, newMateriality));
             heatMapData[driverId].aiGenerated = false; // Mark as user-modified
 
-            // Clean up drag state
+            // Update expand-meta with new values
+            const expandMeta = currentDragCard.querySelector('.heatmap-driver-expand-meta');
+            if (expandMeta) {
+                const velocityLabel = heatMapData[driverId].velocity === 3 ? 'High' :
+                    heatMapData[driverId].velocity === 2 ? 'Medium' : 'Low';
+                const likelihoodAbbr = getLevelLabel(heatMapData[driverId].likelihood)[0];
+                const materialityAbbr = getLevelLabel(heatMapData[driverId].materiality)[0];
+                expandMeta.innerHTML = `
+                    <span>Likelihood: <strong>${likelihoodAbbr}</strong></span>
+                    <span>Materiality: <strong>${materialityAbbr}</strong></span>
+                    <span>Velocity: <strong>${velocityLabel[0]}</strong></span>
+                `;
+            }
+
+            // Update expansion classes based on new position
+            const newXPercent = (circleCenterX / usableWidth) * 100;
+            const newYPercent = (circleCenterY / gridRect.height) * 100;
+
+            currentDragCard.classList.remove('expand-left', 'expand-up');
+            if (newXPercent > 35) currentDragCard.classList.add('expand-left');
+            if (newYPercent > 60) currentDragCard.classList.add('expand-up');
+
             currentDragCard.classList.remove('dragging');
+
             document.removeEventListener('mousemove', handleHeatmapDrag);
             document.removeEventListener('mouseup', endHeatmapDrag);
 
             isDraggingHeatmap = false;
             currentDragCard = null;
 
-            // Full Re-render to ensure all views (Compact/Minimal) reflect updated data
-            renderHeatMap();
+            // Update driver list to reflect changes
             renderHeatMapDriverList();
         }
 
@@ -8457,16 +7371,14 @@ ${driverSummary}
             const legendContainer = document.getElementById('categoryLegendItems');
             if (!legendContainer) return;
 
-            // Get unique categories from ALL drivers to keep legend stable
+            // Get unique categories from selected drivers
             const categories = [...new Set(selectedDrivers.map(d => d.cat))];
 
             legendContainer.innerHTML = categories.map(cat => {
                 const driver = selectedDrivers.find(d => d.cat === cat);
-                const isActive = activeCategoryFilters.size === 0 || activeCategoryFilters.has(cat);
-                const dimClass = isActive ? '' : 'legend-dimmed';
                 return `
-                <div class="heatmap-legend-item ${dimClass}" onclick="toggleCategoryFilter('${cat}')">
-                        <div class="heatmap-legend-color" style="background: ${driver.tagColor}; border: 1px solid ${driver.textColor}; width: 12px; height: 12px; border-radius: 3px;"></div>
+                    <div class="heatmap-legend-item">
+                        <div class="heatmap-legend-color" style="background: ${driver.tagColor}; border: 1px solid ${driver.textColor};"></div>
                         <span>${cat}</span>
                     </div>
                 `;
@@ -8490,15 +7402,15 @@ ${driverSummary}
                     heatMapLikelihood: hmData.likelihood,
                     heatMapMateriality: hmData.materiality,
                     heatMapVelocity: velocityLabel,
-                    heatMapVelocityVal: hmData.velocity,
-                    heatMapContext: `This risk has a materiality of ${hmData.materiality}/10 with ${velocityLabel.toLowerCase()} velocity.`
+                    heatMapContext: `This risk has a likelihood of ${hmData.likelihood}/10 and materiality of ${hmData.materiality}/10 with ${velocityLabel.toLowerCase()} velocity.`
                 };
             });
 
-            // Sort by Materiality (Likelihood ignored as event is assumed to happen)
+            // Sort by combined risk score (likelihood * materiality)
             enhancedDrivers.sort((a, b) => {
-                if (b.heatMapMateriality !== a.heatMapMateriality) return b.heatMapMateriality - a.heatMapMateriality;
-                return b.heatMapVelocityVal - a.heatMapVelocityVal; // Secondary sort: Velocity
+                const scoreA = a.heatMapLikelihood * a.heatMapMateriality;
+                const scoreB = b.heatMapLikelihood * b.heatMapMateriality;
+                return scoreB - scoreA; // Highest risk first
             });
 
             // Call existing generateScenario but with enhanced context
@@ -8514,7 +7426,7 @@ ${driverSummary}
             try {
                 // Determine current period info for baseline data
                 const currentPeriodInfo = {
-                    quarter: `Q${Math.ceil((new Date().getMonth() + 1) / 3)} `,
+                    quarter: `Q${Math.ceil((new Date().getMonth() + 1) / 3)}`,
                     year: new Date().getFullYear()
                 };
 
@@ -8560,19 +7472,19 @@ ${driverSummary}
                     console.log('📊 Extracted baseline numeric values:', baselineNumericValues);
 
                     baselineContext = `
-BASELINE MACROECONOMIC DATA(${currentPeriodInfo.quarter} ${currentPeriodInfo.year}):
-            - Canada GDP Growth(QoQ): ${extractQoQ(vals['Canada GDP']) || 'N/A'}
-            - Unemployment Rate: ${vals['Unemployment Rate'] || 'N/A'}
-            - CPI Inflation: ${vals['CPI Inflation'] || 'N/A'}
-            - USD / CAD Exchange Rate: ${vals['CAD/USD'] || 'N/A'} (CAD per 1 USD - higher = weaker CAD)
-            - Bank of Canada Policy Rate: ${vals['BoC Rate'] || 'N/A'}
-            - House Price Index(QoQ): ${extractQoQ(vals['House Price Index']) || 'N/A'}
-            - TSX Composite(QoQ): ${extractQoQ(vals['TSX Composite']) || 'N/A'}
-            - Credit Spreads(10Y BBB): ${vals['Credit Spreads'] || 'N/A'}
+BASELINE MACROECONOMIC DATA (${currentPeriodInfo.quarter} ${currentPeriodInfo.year}):
+- Canada GDP Growth (QoQ): ${extractQoQ(vals['Canada GDP']) || 'N/A'}
+- Unemployment Rate: ${vals['Unemployment Rate'] || 'N/A'}
+- CPI Inflation: ${vals['CPI Inflation'] || 'N/A'}
+- USD/CAD Exchange Rate: ${vals['CAD/USD'] || 'N/A'} (CAD per 1 USD - higher = weaker CAD)
+- Bank of Canada Policy Rate: ${vals['BoC Rate'] || 'N/A'}
+- House Price Index (QoQ): ${extractQoQ(vals['House Price Index']) || 'N/A'}
+- TSX Composite (QoQ): ${extractQoQ(vals['TSX Composite']) || 'N/A'}
+- Credit Spreads (10Y BBB): ${vals['Credit Spreads'] || 'N/A'}
 
-These are reference values for context only.Generate stress projections as absolute values; the system will calculate deltas automatically.
+These are reference values for context only. Generate stress projections as absolute values; the system will calculate deltas automatically.
 
-                CRITICAL: For USD / CAD, use the format "1.XX"(CAD per 1 USD).For example, 1.45 means 1 USD = 1.45 CAD.Higher values = weaker CAD, lower values = stronger CAD.
+CRITICAL: For USD/CAD, use the format "1.XX" (CAD per 1 USD). For example, 1.45 means 1 USD = 1.45 CAD. Higher values = weaker CAD, lower values = stronger CAD.
 `;
                 }
 
@@ -8581,12 +7493,13 @@ These are reference values for context only.Generate stress projections as absol
 
                 loaderText.innerText = 'Generating scenario narrative with heat map insights...';
 
-                // Categorize drivers by Materiality only (Likelihood ignored)
+                // Categorize drivers by risk severity (for AI guidance, not for explicit mention in narrative)
                 const highRiskDrivers = enhancedDrivers.filter(d =>
-                    d.heatMapMateriality >= 7
+                    d.heatMapLikelihood >= 7 && d.heatMapMateriality >= 7
                 );
                 const moderateRiskDrivers = enhancedDrivers.filter(d =>
-                    d.heatMapMateriality >= 5 && d.heatMapMateriality < 7
+                    (d.heatMapLikelihood >= 5 || d.heatMapMateriality >= 5) &&
+                    !(d.heatMapLikelihood >= 7 && d.heatMapMateriality >= 7)
                 );
                 const immediateThreats = enhancedDrivers.filter(d =>
                     d.heatMapVelocity.includes('High')
@@ -8597,23 +7510,71 @@ These are reference values for context only.Generate stress projections as absol
 
                 // Build driver list (without mentioning scores in the description for AI)
                 const driversSummary = enhancedDrivers.map((d, idx) =>
-                    `${idx + 1}.[${d.cat}] ${d.title}: ${d.desc} `
+                    `${idx + 1}. [${d.cat}] ${d.title}: ${d.desc}`
                 ).join('\n');
 
-                // Calculate overall severity guidance (Materiality only)
+                // Calculate overall severity guidance
+                const avgLikelihood = enhancedDrivers.reduce((sum, d) => sum + d.heatMapLikelihood, 0) / enhancedDrivers.length;
                 const avgMateriality = enhancedDrivers.reduce((sum, d) => sum + d.heatMapMateriality, 0) / enhancedDrivers.length;
-                const severityGuidance = avgMateriality >= 7 ? 'SEVERE' :
-                    avgMateriality >= 5 ? 'MODERATE' : 'MILD';
+                const severityGuidance = avgLikelihood >= 7 && avgMateriality >= 7 ? 'SEVERE' :
+                    avgLikelihood >= 5 && avgMateriality >= 5 ? 'MODERATE' : 'MILD';
 
-                const prompt = fillPrompt(PROMPT_TEMPLATES.SCENARIO_GENERATION, {
-                    BASELINE_CONTEXT: baselineContext,
-                    DRIVERS_SUMMARY: driversSummary,
-                    SEVERITY: severityGuidance,
-                    HIGH_RISKS: highRiskDrivers.map(d => d.title).join(', ') || 'None in high-risk category',
-                    IMMEDIATE_THREATS: immediateThreats.map(d => d.title).join(', ') || 'None identified',
-                    NEAR_TERM_THREATS: nearTermThreats.map(d => d.title).join(', ') || 'None identified'
-                });
+                const prompt = `You are an expert financial risk analyst at Royal Bank of Canada (RBC). Generate a comprehensive stress testing scenario report based on the following risk drivers from heat map analysis.
 
+${baselineContext}
+
+SELECTED RISK DRIVERS:
+${driversSummary}
+
+INTERNAL SEVERITY GUIDANCE (DO NOT mention these scores/ratings explicitly in your narrative):
+- Overall Scenario Severity: ${severityGuidance}
+- Highest Priority Risks: ${highRiskDrivers.map(d => d.title).join(', ') || 'None in high-risk category'}
+- Immediate/Fast-Moving Threats: ${immediateThreats.map(d => d.title).join(', ') || 'None identified'}
+- Near-Term Threats: ${nearTermThreats.map(d => d.title).join(', ') || 'None identified'}
+
+Generate a cohesive scenario narrative that combines these drivers into a plausible stress scenario. Your response must be a valid JSON object with the following structure:
+
+{
+  "scenarioTitle": "A compelling 3-6 word title for the scenario (e.g., 'Perfect Storm 2026' or 'Global Trade Collapse')",
+  "globalConditions": {
+    "summary": "2-3 paragraphs (HTML formatted with <p> tags and <strong> for emphasis) describing global economic and geopolitical conditions. Use severity guidance to calibrate tone. Do NOT mention likelihood/materiality scores.",
+    "keyPoints": ["Point 1", "Point 2", "Point 3"]
+  },
+  "canadianConditions": {
+    "summary": "2-3 paragraphs (HTML formatted) describing how these conditions impact the Canadian economy, housing market, and Bank of Canada policy.",
+    "keyPoints": ["Point 1", "Point 2", "Point 3"]
+  },
+  "rbcImpact": {
+    "summary": "2-3 paragraphs (HTML formatted) describing the direct impact on RBC's business lines including: Personal & Commercial Banking, Capital Markets, Wealth Management, and overall capital/liquidity position.",
+    "keyPoints": ["Point 1", "Point 2", "Point 3"]
+  },
+  "macroProjections": {
+    "canadaGDP": { "value": "-X.X%" },
+    "unemployment": { "value": "X.X%" },
+    "inflation": { "value": "X.X%" },
+    "usdCad": { "value": "1.XX" },
+    "bocRate": { "value": "X.X%" },
+    "housePrice": { "value": "-XX%" },
+    "tsx": { "value": "-XX%" },
+    "creditSpreads": { "value": "XXX" }
+  }
+}
+
+CRITICAL INSTRUCTIONS:
+1. DO NOT mention "likelihood", "materiality", "velocity", or numerical scores (e.g., "7/10") in narrative text
+2. Let severity guidance naturally inform how severe/urgent the narrative sounds
+3. Use priority ordering to determine which risks to emphasize first
+4. Use immediacy cues (immediate = "unfolding rapidly", near-term = "emerging", longer-term = "developing")
+5. Connect risks into coherent narrative rather than listing them
+6. Make scenario severity match guidance (SEVERE = deep recession -4% to -6% GDP, MODERATE = recession -2.5% to -4% GDP, MILD = slowdown -1% to -2% GDP)
+7. Provide ONLY stress projection values. System will calculate deltas from baseline automatically.
+8. Format summaries with proper HTML <p> tags and <strong> for emphasis
+
+IMPORTANT: Only provide the STRESS/PROJECTION values. Do NOT include delta or direction fields. The system will automatically calculate deltas from baseline.
+
+CRITICAL: For usdCad, use format "1.XX" representing CAD per 1 USD (e.g., 1.45 means 1 USD = 1.45 CAD). Higher values = weaker CAD.
+
+Return ONLY the JSON object, no additional text.`;
 
                 loaderText.innerText = 'AI is generating scenario narrative...';
 
@@ -8662,7 +7623,7 @@ These are reference values for context only.Generate stress projections as absol
 
                 // POST-PROCESS: Calculate macro deltas and directions from baseline values
                 console.log('📊 Post-processing heat map scenario with baselines:', baselineNumericValues);
-
+                
                 if (scenario.macroProjections && baselineNumericValues && Object.keys(baselineNumericValues).length > 0) {
                     const macro = scenario.macroProjections;
 
@@ -8781,7 +7742,7 @@ These are reference values for context only.Generate stress projections as absol
                 // Use the same rendering function as regular scenario generation
                 // Store enhanced drivers as selectedDrivers for rendering
                 selectedDrivers = enhancedDrivers;
-
+                
                 // Render using the standard format
                 renderAIReport(scenario);
 
@@ -9157,94 +8118,6 @@ These are reference values for context only.Generate stress projections as absol
             const sidebar = document.getElementById('reportSidebar');
             if (sidebar) {
                 sidebar.classList.toggle('collapsed');
-            }
-        }
-
-    </script>
-    <!-- Settings Modal -->
-    <div id="aiPromptsModal" class="modal"
-        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(31, 41, 55, 0.4); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); align-items: center; justify-content: center; z-index: 2000;">
-        <div class="modal-content"
-            style="width: 900px; height: 80vh; background: #ffffff; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); display: flex; flex-direction: column; overflow: hidden; padding: 0;">
-            <div class="modal-header"
-                style="padding: 20px; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <h2 style="margin: 0; font-size: 18px;">System Settings</h2>
-                    <p style="margin: 4px 0 0; font-size: 13px; color: var(--text-muted);">View AI instruction templates
-                    </p>
-                </div>
-                <button class="icon-btn" onclick="closeAiPromptsModal()" style="font-size: 20px;">&times;</button>
-            </div>
-
-            <div style="display: flex; flex: 1; overflow: hidden;">
-                <!-- Sidebar -->
-                <div
-                    style="width: 240px; background: #F9FAFB; border-right: 1px solid var(--border-subtle); padding: 16px; overflow-y: auto;">
-                    <div
-                        style="font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">
-                        AI Prompts</div>
-                    <button id="btn-RISK_DRIVERS" class="settings-nav-btn active" onclick="showPrompt('RISK_DRIVERS')"
-                        style="width: 100%; text-align: left; padding: 10px; border: none; background: transparent; border-radius: 8px; font-size: 13px; color: var(--text-main); cursor: pointer; margin-bottom: 4px;">Risk
-                        Generation</button>
-                    <button id="btn-RISK_DRIVERS_ADDITIONAL" class="settings-nav-btn"
-                        onclick="showPrompt('RISK_DRIVERS_ADDITIONAL')"
-                        style="width: 100%; text-align: left; padding: 10px; border: none; background: transparent; border-radius: 8px; font-size: 13px; color: var(--text-main); cursor: pointer; margin-bottom: 4px;">Additional
-                        Drivers</button>
-                    <button id="btn-HEATMAP_ASSESSMENT" class="settings-nav-btn"
-                        onclick="showPrompt('HEATMAP_ASSESSMENT')"
-                        style="width: 100%; text-align: left; padding: 10px; border: none; background: transparent; border-radius: 8px; font-size: 13px; color: var(--text-main); cursor: pointer; margin-bottom: 4px;">Heat
-                        Map Assmnt.</button>
-                    <button id="btn-SCENARIO_GENERATION" class="settings-nav-btn"
-                        onclick="showPrompt('SCENARIO_GENERATION')"
-                        style="width: 100%; text-align: left; padding: 10px; border: none; background: transparent; border-radius: 8px; font-size: 13px; color: var(--text-main); cursor: pointer; margin-bottom: 4px;">Scenario
-                        Narrative</button>
-                </div>
-
-                <!-- Content -->
-                <div id="promptContent"
-                    style="flex: 1; padding: 24px; overflow-y: auto; white-space: pre-wrap; font-family: 'Menlo', 'Monaco', 'Courier New', monospace; font-size: 12px; line-height: 1.5; color: #374151; background: white;">
-                    Select a prompt to view...
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Styles for Settings Nav -->
-    <style>
-        .settings-nav-btn:hover {
-            background: #F3F4F6 !important;
-        }
-
-        .settings-nav-btn.active {
-            background: #E0E7FF !important;
-            color: #4F46E5 !important;
-            font-weight: 500;
-        }
-    </style>
-
-    <script>
-        function openAiPromptsModal() {
-            const modal = document.getElementById('aiPromptsModal');
-            if (modal) {
-                modal.style.display = 'flex';
-                showPrompt('RISK_DRIVERS');
-            }
-        }
-
-        function closeAiPromptsModal() {
-            const modal = document.getElementById('aiPromptsModal');
-            if (modal) modal.style.display = 'none';
-        }
-
-        function showPrompt(key) {
-            const content = document.getElementById('promptContent');
-            const template = PROMPT_TEMPLATES[key];
-            if (content && template) {
-                content.textContent = template;
-
-                document.querySelectorAll('.settings-nav-btn').forEach(btn => btn.classList.remove('active'));
-                const btn = document.getElementById(`btn-${key}`);
-                if (btn) btn.classList.add('active');
             }
         }
     </script>
