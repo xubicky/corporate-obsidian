@@ -2920,12 +2920,13 @@
                 allPaths[customScenarioName] = calculateCET1Path(customData, overlayType, quarterlyOverlayValues, scenarioToOverride === 'custom');
 
                 // Determine severity based on closest match to standard scenarios
+                // We calculate CLEAN paths (no override) for comparison benchmarks to ensure we compare against the original standards
                 const customTrough = Math.min(...allPaths[customScenarioName]);
                 const benchmarks = {
-                    'very_severe': Math.min(...allPaths['Very Severe']),
-                    'severe': Math.min(...allPaths['Severe']),
-                    'moderate': Math.min(...allPaths['Moderate']),
-                    'benchmark': Math.min(...allPaths['Benchmark'])
+                    'very_severe': Math.min(...calculateCET1Path(scenarioData.very_severe, overlayType, quarterlyOverlayValues, false)),
+                    'severe': Math.min(...calculateCET1Path(scenarioData.severe, overlayType, quarterlyOverlayValues, false)),
+                    'moderate': Math.min(...calculateCET1Path(scenarioData.moderate, overlayType, quarterlyOverlayValues, false)),
+                    'benchmark': Math.min(...calculateCET1Path(scenarioData.benchmark, overlayType, quarterlyOverlayValues, false))
                 };
 
                 let closestSeverity = 'moderate';
