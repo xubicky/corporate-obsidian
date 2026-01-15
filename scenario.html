@@ -2439,7 +2439,7 @@
 
             <!-- RIGHT: Heat Map Basket Panel (Hidden by default) -->
             <aside class="right-panel heatmap-basket" id="heatmapBasketPanel"
-                style="display: none; height: calc(100vh - 130px); flex-direction: column; position: relative; padding-bottom: 160px; box-sizing: border-box;">
+                style="display: none; height: calc(100vh - 130px); position: relative; padding-bottom: 160px; box-sizing: border-box; overflow: hidden;">
                 <div class="basket-header">
                     <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
                         <div>
@@ -2485,31 +2485,34 @@
                             ⚡ Minimal
                         </button>
                     </div>
+                </div>
 
-                    <!-- Driver List -->
-                    <div class="basket-list" id="heatmapDriverList" style="flex: 1; overflow-y: auto; min-height: 0;">
-                        <!-- Drivers will be populated here -->
-                    </div>
-                    <div class="basket-footer"
-                        style="flex-direction: column; gap: 12px; padding: 16px; position: absolute; bottom: 0; left: 0; width: 100%; border-radius: 0 0 32px 32px;">
-                        <div class="tools-row">
-                            <button class="tool-btn" onclick="showMarketplace()">
-                                <span>✏️</span>
-                                <span class="tool-text">Edit<span class="tool-extra"> Risk Drivers</span></span>
-                            </button>
-                            <button class="tool-btn" onclick="saveHeatMap()">
-                                <span>💾</span>
-                                <span class="tool-text">Save<span class="tool-extra"> Heat Map</span></span>
-                            </button>
-                            <button class="tool-btn" onclick="openHeatmapExportModal()">
-                                <span>📤</span>
-                                <span class="tool-text">Export<span class="tool-extra"> Heat Map</span></span>
-                            </button>
-                        </div>
-                        <button class="heatmap-btn heatmap-btn-primary" onclick="generateScenarioFromHeatMap()">
-                            📄 Generate Scenario Report
+                <!-- Driver List - Scrollable -->
+                <div class="basket-list" id="heatmapDriverList"
+                    style="flex: 1; overflow-y: auto; min-height: 0; padding: 12px 16px;">
+                    <!-- Drivers will be populated here -->
+                </div>
+
+                <div class="basket-footer"
+                    style="flex-direction: column; gap: 12px; padding: 16px; position: absolute; bottom: 0; left: 0; width: 100%; border-radius: 0 0 32px 32px; background: rgba(255,255,255,0.95); backdrop-filter: blur(8px); border-top: 1px solid var(--border-subtle);">
+                    <div class="tools-row">
+                        <button class="tool-btn" onclick="showMarketplace()">
+                            <span>✏️</span>
+                            <span class="tool-text">Edit<span class="tool-extra"> Risk Drivers</span></span>
+                        </button>
+                        <button class="tool-btn" onclick="saveHeatMap()">
+                            <span>💾</span>
+                            <span class="tool-text">Save<span class="tool-extra"> Heat Map</span></span>
+                        </button>
+                        <button class="tool-btn" onclick="openHeatmapExportModal()">
+                            <span>📤</span>
+                            <span class="tool-text">Export<span class="tool-extra"> Heat Map</span></span>
                         </button>
                     </div>
+                    <button class="heatmap-btn heatmap-btn-primary" onclick="generateScenarioFromHeatMap()">
+                        📄 Generate Scenario Report
+                    </button>
+                </div>
             </aside>
 
 
