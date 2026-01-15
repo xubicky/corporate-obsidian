@@ -718,6 +718,12 @@
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
         }
 
+        .chat-bubble ol,
+        .chat-bubble ul {
+            padding-left: 24px;
+            margin: 8px 0;
+        }
+
         .chat-message.user .chat-bubble {
             background: var(--primary);
             color: white;
@@ -1610,14 +1616,16 @@
                             style="height:60px; resize:none; margin-bottom: 10px;"
                             onkeypress="if(event.key==='Enter' && !event.shiftKey) {event.preventDefault(); sendMessage();}"></textarea>
                         <div style="display:flex; gap:8px; align-items: center;">
-                            <label class="btn btn-secondary" style="padding: 8px 12px; font-size: 12px;">
+                            <label class="btn btn-secondary"
+                                style="flex:1; text-align:center; padding: 10px 12px; font-size: 13px;">
                                 📎 Upload
                                 <input type="file" id="fileUpload" style="display:none" accept=".txt,.pdf,.doc,.docx"
                                     onchange="handleFileUpload(event)">
                             </label>
                             <button class="btn btn-secondary" onclick="requestFinalization()" id="requestFinalizeBtn"
-                                style="font-size: 12px;">Finalize</button>
-                            <button class="btn btn-primary" style="flex:1;" onclick="sendMessage()">Send</button>
+                                style="flex:1; padding: 10px 12px; font-size: 13px;">Finalize</button>
+                            <button class="btn btn-primary" style="flex:1; padding: 10px 12px; font-size: 13px;"
+                                onclick="sendMessage()">Send</button>
                         </div>
                     </div>
                 </div>
