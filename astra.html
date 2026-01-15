@@ -2919,9 +2919,48 @@
 
                 allPaths[customScenarioName] = calculateCET1Path(customData, overlayType, quarterlyOverlayValues, scenarioToOverride === 'custom');
 
+                // Determine severity based on closest match to standard scenarios
+                const customTrough = Math.min(...allPaths[customScenarioName]);
+                const benchmarks = {
+                    'very_severe': Math.min(...allPaths['Very Severe']),
+                    'severe': Math.min(...allPaths['Severe']),
+                    'moderate': Math.min(...allPaths['Moderate']),
+                    'benchmark': Math.min(...allPaths['Benchmark'])
+                };
+
+                let closestSeverity = 'moderate';
+                let minDiff = Infinity;
+
+                for (const [sev, val] of Object.entries(benchmarks)) {
+                    const diff = Math.abs(customTrough - val);
+                    if (diff < minDiff) {
+                        minDiff = diff;
+                        closestSeverity = sev;
+                    }
+                }
+
+                // Update custom scenario result if it exists so saving uses the correct severity
+                if (customScenarioResult) {
+                    customScenarioResult.severity = closestSeverity;
+                }
+
+                // Update the visible label to reflect the calculated severity
+                const severitiesLabel = {
+                    'very_severe': 'Very Severe',
+                    'severe': 'Severe',
+                    'moderate': 'Moderate',
+                    'benchmark': 'Benchmark'
+                };
+
+                const customLabel = document.getElementById('customScenarioLabel');
+                if (customLabel) {
+                    // split to keep title if possible
+                    // logic: if textContent contains "OVERALL:", replace after it, otherwise append
+                    const currentTitle = customLabel.textContent.split('OVERALL:')[0].trim();
+                    const severityColors = { 'very_severe': '#991B1B', 'severe': '#92400E', 'moderate': '#1E3A8A', 'benchmark': '#065F46' };
+                    customLabel.innerHTML = `${currentTitle} <span class="severity-badge severity-${closestSeverity}" style="margin-left: 10px; font-size: 0.8em; padding: 4px 8px; border-radius: 4px; color: white; background-color: ${severityColors[closestSeverity]};">OVERALL: ${severitiesLabel[closestSeverity].toUpperCase()}</span>`;
+                }
             }
-
-
 
             // 2. Create a filtered list of paths for the line chart
 
