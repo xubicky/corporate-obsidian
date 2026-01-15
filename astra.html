@@ -1537,13 +1537,7 @@
                         </div>
                     </div>
 
-                    <!-- Custom Scenario Narrative Display -->
-                    <div id="customScenarioDescription"
-                        style="margin-top: 20px; padding: 16px; background: white; border-radius: 12px; border: 1px solid var(--border-subtle); display: none; margin-bottom: 20px;">
-                        <!-- Content populated via JS -->
-                    </div>
-
-                    <div class="temperature-bar-container" id="tempBar" style="margin-top: 10px;"></div>
+                    <div class="temperature-bar-container" id="tempBar" style="margin-top: 30px;"></div>
                     <div class="temp-bar-labels">
                         <span>0% (Min)</span>
                         <span>4.5% (CCB)</span>
@@ -2974,19 +2968,6 @@
                     // We calculate the correct severity but DO NOT display the badge on the dashboard as requested
                     // customLabel.innerHTML = ... (REMOVED)
                     customLabel.textContent = currentTitle;
-                }
-
-                const descContainer = document.getElementById('customScenarioDescription');
-                if (descContainer) {
-                    if (customScenarioResult && customScenarioResult.description) {
-                        descContainer.innerHTML = `
-                            <h4 style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Scenario Narrative</h4>
-                            <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">${customScenarioResult.description}</p>
-                         `;
-                        descContainer.style.display = 'block';
-                    } else {
-                        descContainer.style.display = 'none';
-                    }
                 }
             }
 
@@ -4657,10 +4638,16 @@ Be conversational, ask thoughtful questions, and help the user think through all
                                 color: ${severityColor};
                                 text-transform: uppercase;
                             ">${severityLabel}</span>
-                                    <button onclick="event.stopPropagation(); deleteSavedScenario('${s.id}')"
-                                        style="background: none; border: none; cursor: pointer; opacity: 0.5; font-size: 14px;"
-                                        onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.5'"
-                                        title="Delete">🗑️</button>
+                                    <div style="display: flex; gap: 8px;">
+                                        <button onclick="event.stopPropagation(); exportSavedScenario('${s.id}')" 
+                                            style="background: none; border: none; cursor: pointer; opacity: 0.5; font-size: 14px;" 
+                                            onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.5'"
+                                            title="Export JSON">📥</button>
+                                        <button onclick="event.stopPropagation(); deleteSavedScenario('${s.id}')"
+                                            style="background: none; border: none; cursor: pointer; opacity: 0.5; font-size: 14px;"
+                                            onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.5'"
+                                            title="Delete">🗑️</button>
+                                    </div>
                                 </div>
                                 <div style="font-weight: 600; font-size: 14px; color: var(--text-main); margin-bottom: 6px;">${s.title}</div>
                                 <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">${s.description || 'No description'}</div>
@@ -4674,6 +4661,20 @@ Be conversational, ask thoughtful questions, and help the user think through all
                             </div >
                             `;
             }).join('');
+        }
+
+        // Export a saved scenario as JSON
+        function exportSavedScenario(id) {
+            const scenario = savedAstraScenarios.find(s => s.id === id);
+            if (!scenario) return;
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(scenario, null, 2));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", `${(scenario.title || 'scenario').replace(/[^a-z0-9]/gi, '_').toLowerCase()}.json`);
+            document.body.appendChild(downloadAnchorNode); // required for firefox
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
         }
 
         // Load a saved scenario into the dashboard
