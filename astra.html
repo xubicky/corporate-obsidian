@@ -1585,6 +1585,12 @@
                         <div class="chart-container" id="waterfallChart"></div>
                     </div>
                     <div id="decomposition" class="view-content">
+                        <div style="display: flex; justify-content: flex-end; padding: 0 10px 5px 0;">
+                            <button id="decompToggleBtn" onclick="toggleDecompositionMode()"
+                                style="background: none; border: 1px solid var(--border-subtle); padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; color: var(--text-secondary);">
+                                Show Cumulative
+                            </button>
+                        </div>
                         <div class="chart-container" id="decompositionChart"></div>
                     </div>
                     <div id="dollarImpact" class="view-content">
@@ -3319,7 +3325,8 @@
             let currentRWA = JUMP_OFF_RWA;
 
             // Iterate quarter by quarter
-            for (let q = 0; q < troughIndex; q++) {
+            // Modified: Always calculate for 20 quarters regardless of (unused) troughIndex
+            for (let q = 0; q < 20; q++) {
                 const prevCapital = currentCapital;
                 const prevRWA = currentRWA;
 
@@ -3478,48 +3485,96 @@
 
 
         // Update decomposition chart
+        // Decomposition chart state
+        let decompositionIsCumulative = false;
+        let lastDecompArgs = null;
+
+        function toggleDecompositionMode() {
+            decompositionIsCumulative = !decompositionIsCumulative;
+            const btn = document.getElementById('decompToggleBtn');
+            if (btn) btn.textContent = decompositionIsCumulative ? 'Show Quarterly' : 'Show Cumulative';
+
+            if (lastDecompArgs) {
+                updateDecompositionChart(...lastDecompArgs);
+            }
+        }
+
         function updateDecompositionChart(scenario, overlayType, overlayAmount) {
+            // Save args for toggle re-render
+            lastDecompArgs = [scenario, overlayType, overlayAmount];
+
             const data = scenario === 'custom' ? customScenarioComponents : scenarioData[scenario];
             if (!data || (scenario === 'custom' && Object.keys(customScenarioComponents).length === 0)) {
                 Plotly.purge('decompositionChart');
                 return;
             }
 
-            const cet1Path = calculateCET1Path(data, overlayType, overlayAmount);
-            const troughIndex = cet1Path.indexOf(Math.min(...cet1Path));
+            // Always calculate for 20 quarters (calculateAttributedBps now ignores troughIndex)
+            const quarterImpacts = calculateAttributedBps(data, 20);
 
-            // Use the new precise BPS calculation
-            const quarterImpacts = calculateAttributedBps(data, troughIndex);
+            // Always show 20 quarters
+            const quarters = Array.from({ length: 20 }, (_, i) => `Q${i + 1}`);
 
-            const quarters = Array.from({ length: troughIndex }, (_, i) => `Q${i + 1}`);
+            // Transform data if cumulative mode or exporting PDF
+            const chartData = {};
+            const components = Object.keys(quarterImpacts);
 
-            // Palette
+            if (decompositionIsCumulative || window.isExportingPDF) {
+                // Calculate running sums for cumulative view
+                components.forEach(comp => {
+                    chartData[comp] = [];
+                    let sum = 0;
+                    quarterImpacts[comp].forEach(val => {
+                        sum += val;
+                        chartData[comp].push(sum);
+                    });
+                });
+            } else {
+                // Quarterly (marginal) view
+                components.forEach(comp => {
+                    chartData[comp] = quarterImpacts[comp];
+                });
+            }
+
+            // Expanded Palette with distinct colors for all components
             const palette = {
-                'PPNR': '#10B981', 'PCL': '#EF4444', 'Dividend': '#F59E0B',
-                'Trading PnL': '#8B5CF6', 'Credit RWA Change': '#3B82F6', 'Other': '#64748B'
+                'PPNR': '#10B981',           // Emerald
+                'PCL': '#EF4444',            // Red
+                'Dividend': '#F59E0B',       // Amber
+                'Trading PnL': '#8B5CF6',    // Violet
+                'Credit RWA Change': '#3B82F6', // Blue
+                'AFS Losses': '#EC4899',     // Pink
+                'Operational Risk Losses': '#6366F1', // Indigo
+                'Currency Translation Adj': '#14B8A6', // Teal
+                'Shortfall in Allowance': '#F97316', // Orange
+                'Market CCR CVA RWA Change': '#A855F7', // Purple
+                'Operational Risk RWA Change': '#22C55E', // Green
+                'Other': '#6B7280'           // Gray
             };
             const getColor = (name) => palette[name] || palette['Other'];
 
             const traces = [];
 
             // PPNR
-            traces.push({ x: quarters, y: quarterImpacts['PPNR'], name: 'PPNR', type: 'bar', marker: { color: getColor('PPNR') } });
+            traces.push({ x: quarters, y: chartData['PPNR'], name: 'PPNR', type: 'bar', marker: { color: getColor('PPNR') } });
 
             // PCL
-            traces.push({ x: quarters, y: quarterImpacts['PCL'], name: 'PCL', type: 'bar', marker: { color: getColor('PCL') } });
+            traces.push({ x: quarters, y: chartData['PCL'], name: 'PCL', type: 'bar', marker: { color: getColor('PCL') } });
 
             // Credit RWA
-            traces.push({ x: quarters, y: quarterImpacts['Credit RWA Change'], name: 'Credit RWA', type: 'bar', marker: { color: getColor('Credit RWA Change') } });
+            traces.push({ x: quarters, y: chartData['Credit RWA Change'], name: 'Credit RWA', type: 'bar', marker: { color: getColor('Credit RWA Change') } });
 
-            // Others
+            // Other capital components
             ['Dividend', 'Trading PnL', 'AFS Losses', 'Operational Risk Losses', 'Currency Translation Adj', 'Shortfall in Allowance', 'Other'].forEach(comp => {
-                traces.push({ x: quarters, y: quarterImpacts[comp], name: comp, type: 'bar', marker: { color: getColor(comp) } });
+                traces.push({ x: quarters, y: chartData[comp], name: comp, type: 'bar', marker: { color: getColor(comp) } });
             });
 
-            // RWA Others
+            // RWA components
             ['Market CCR CVA RWA Change', 'Operational Risk RWA Change'].forEach(comp => {
-                traces.push({ x: quarters, y: quarterImpacts[comp], name: comp, type: 'bar', marker: { color: '#94A3B8' } });
+                traces.push({ x: quarters, y: chartData[comp], name: comp, type: 'bar', marker: { color: getColor(comp) } });
             });
+
+            const yAxisTitle = decompositionIsCumulative || window.isExportingPDF ? 'Cumulative Impact (bps)' : 'Quarterly Impact (bps)';
 
             const layout = {
                 barmode: 'relative',
@@ -3531,14 +3586,14 @@
                     gridcolor: 'transparent'
                 },
                 yaxis: {
-                    title: 'Quarterly Impact (bps)',
+                    title: yAxisTitle,
                     gridcolor: '#F1F5F9',
                     zerolinecolor: '#475569'
                 },
-                margin: { t: 30, b: 100, l: 60, r: 20 }, // Increased bottom margin
+                margin: { t: 30, b: 100, l: 60, r: 20 },
                 legend: {
                     orientation: 'h',
-                    y: -0.25, // Moved legend down
+                    y: -0.25,
                     x: 0.5,
                     xanchor: 'center'
                 },
@@ -5009,6 +5064,9 @@ Be conversational, ask thoughtful questions, and help the user think through all
             const previousScenario = selectedDetailScenario;
 
             try {
+                // Set flag to force cumulative mode for decomposition chart
+                window.isExportingPDF = true;
+
                 // Force switch to custom scenario for the report
                 if (selectedDetailScenario !== 'custom') {
                     selectScenarioForDetails('custom');
@@ -5105,6 +5163,11 @@ Be conversational, ask thoughtful questions, and help the user think through all
                     // Resize charts if needed
                     const chart = el.querySelector('.chart-container');
                     if (chart && chart.id && Plotly) {
+                        // For decomposition chart, re-render to apply cumulative mode
+                        if (view.id === 'decomposition' && lastDecompArgs) {
+                            updateDecompositionChart(...lastDecompArgs);
+                            await new Promise(r => setTimeout(r, 200)); // Extra time for re-render
+                        }
                         Plotly.Plots.resize(document.getElementById(chart.id));
                     }
 
@@ -5122,6 +5185,9 @@ Be conversational, ask thoughtful questions, and help the user think through all
                 console.error('Export error:', err);
                 alert('Failed to generate PDF. Check console for details.');
             } finally {
+                // Clear export flag
+                window.isExportingPDF = false;
+
                 // Restore state
                 if (previousScenario && previousScenario !== 'custom') {
                     selectScenarioForDetails(previousScenario);
