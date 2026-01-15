@@ -683,7 +683,8 @@
         .modal-body {
             flex: 1;
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
+            /* Side-by-side layout */
             overflow: hidden;
         }
 
@@ -692,8 +693,6 @@
             padding: 20px;
             overflow-y: auto;
             background: white;
-            min-height: 150px;
-            max-height: 250px;
         }
 
         .chat-message {
@@ -3846,25 +3845,14 @@ Be conversational, ask thoughtful questions, and help the user think through all
             const chatContainer = document.getElementById('chatContainer');
 
             chatContainer.innerHTML = `
-
                 <div class="chat-message ai">
-
-                    <div class="chat-avatar">AI</div>
-
                     <div class="chat-bubble">
-
                         Hello! I'm here to help you create a custom stress testing scenario for RBC. 
-
                         You can describe your scenario in detail, or upload a document. 
-
                         I'll ask clarifying questions and then determine the severity impact on each CET1 component. 
-
                         What scenario would you like to explore?
-
                     </div>
-
                 </div>
-
             `;
 
 
