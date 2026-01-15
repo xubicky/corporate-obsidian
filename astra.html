@@ -4016,10 +4016,46 @@ Be conversational, ask thoughtful questions, and help the user think through all
 
 
             reader.readAsText(file);
-
+            ```
         }
 
 
+
+        // Helper to determine mathematical severity based on component mix
+        function determineSeverityFromComponents(componentSeverities) {
+             // 1. Build hybrid data from component severities map
+             const hybridData = {};
+             COMPONENTS.forEach(comp => {
+                 const severity = componentSeverities[comp] || 'moderate';
+                 let key = severity.toLowerCase().replace(' ', '_');
+                 if (!scenarioData[key]) key = 'moderate';
+                 hybridData[comp] = scenarioData[key][comp];
+             });
+             
+             // 2. Calculate path (raw, no overlays)
+             const path = calculateCET1Path(hybridData, 'none', {}, false);
+             const trough = Math.min(...path);
+             
+             // 3. Benchmarks (raw)
+             const benchmarks = {
+                'very_severe': Math.min(...calculateCET1Path(scenarioData.very_severe, 'none', {}, false)),
+                'severe': Math.min(...calculateCET1Path(scenarioData.severe, 'none', {}, false)),
+                'moderate': Math.min(...calculateCET1Path(scenarioData.moderate, 'none', {}, false)),
+                'benchmark': Math.min(...calculateCET1Path(scenarioData.benchmark, 'none', {}, false))
+             };
+             
+             // 4. Find closest
+             let closest = 'moderate';
+             let minDiff = Infinity;
+             for (const [sev, val] of Object.entries(benchmarks)) {
+                 const diff = Math.abs(trough - val);
+                 if (diff < minDiff) {
+                     minDiff = diff;
+                     closest = sev;
+                 }
+             }
+             return closest;
+        }
 
         async function sendMessage(customMessage = null) {
 
@@ -4067,7 +4103,7 @@ Be conversational, ask thoughtful questions, and help the user think through all
 
                 // Determine API base URL - handle file protocol for local testing
                 const API_BASE = window.location.protocol === 'file:' ? 'http://localhost:5001' : '';
-                const API_ENDPOINT = `${API_BASE}/api/chat`;
+                const API_ENDPOINT = `${ API_BASE } /api/chat`;
 
 
 
@@ -4094,7 +4130,7 @@ Be conversational, ask thoughtful questions, and help the user think through all
 
                 if (!response.ok) {
 
-                    throw new Error(`API Error: ${response.status}`);
+                    throw new Error(`API Error: ${ response.status } `);
 
                 }
 
@@ -4140,6 +4176,11 @@ Be conversational, ask thoughtful questions, and help the user think through all
                 if (finalizeMatch) {
                     try {
                         const scenarioData = JSON.parse(finalizeMatch[0]);
+                        
+                        // Overwrite AI qualitative severity with mathematical severity
+                        const mathSeverity = determineSeverityFromComponents(scenarioData.componentSeverities);
+                        scenarioData.severity = mathSeverity;
+
                         customScenarioResult = scenarioData;
 
                         // Extract regular text before JSON
@@ -4184,78 +4225,78 @@ Be conversational, ask thoughtful questions, and help the user think through all
                 console.error('Chat error:', error);
 
                 // Offer to use default severities when AI is unavailable
-                addMessageToChat('ai', `⚠️ AI service unavailable (${error.message}). 
-                    <br><br>You can still use this tool with default "Severe" severity for all components. 
+                addMessageToChat('ai', `⚠️ AI service unavailable(${ error.message }). 
+                    < br > <br>You can still use this tool with default "Severe" severity for all components.
                     <br><br><button class="btn btn-primary" onclick="applyDefaultScenario()" style="margin-top: 10px;">Use Default Severities</button>`);
             }
 
         }
 
-        // Apply default scenario when AI is unavailable
-        function applyDefaultScenario() {
+                        // Apply default scenario when AI is unavailable
+                        function applyDefaultScenario() {
             // Create a default scenario object with all components set to 'severe'
-            const defaultSeverities = {};
-            const defaultReasons = {};
+            const defaultSeverities = { };
+                        const defaultReasons = { };
 
             COMPONENTS.forEach(comp => {
-                defaultSeverities[comp] = 'severe';
-                defaultReasons[comp] = 'Default severity applied (AI unavailable). Manually adjust as needed.';
+                            defaultSeverities[comp] = 'severe';
+                        defaultReasons[comp] = 'Default severity applied (AI unavailable). Manually adjust as needed.';
             });
 
-            customScenarioResult = {
-                title: 'Custom Scenario (Default)',
-                description: 'Custom scenario created with default severity levels. All components are set to "Severe" by default. You can manually adjust individual component severities using the dropdowns.',
-                severity: 'severe',
-                componentSeverities: defaultSeverities,
-                componentReasons: defaultReasons
+                        customScenarioResult = {
+                            title: 'Custom Scenario (Default)',
+                        description: 'Custom scenario created with default severity levels. All components are set to "Severe" by default. You can manually adjust individual component severities using the dropdowns.',
+                        severity: 'severe',
+                        componentSeverities: defaultSeverities,
+                        componentReasons: defaultReasons
             };
 
-            // Display the result
-            displayScenarioResult(customScenarioResult);
+                        // Display the result
+                        displayScenarioResult(customScenarioResult);
 
-            // Add confirmation message
-            addMessageToChat('ai', '✅ Default severities applied! All 18 components are set to "Severe". You can now:<br><br>• Adjust individual component severities using the dropdowns on the left<br>• Click "Calculate & Apply to Dashboard" when ready');
+                        // Add confirmation message
+                        addMessageToChat('ai', '✅ Default severities applied! All 18 components are set to "Severe". You can now:<br><br>• Adjust individual component severities using the dropdowns on the left<br>• Click "Calculate & Apply to Dashboard" when ready');
         }
 
-        function addMessageToChat(sender, message) {
+                            function addMessageToChat(sender, message) {
 
             const chatContainer = document.getElementById('chatContainer');
 
-            const messageId = 'msg-' + Date.now();
+                            const messageId = 'msg-' + Date.now();
 
 
 
-            const messageDiv = document.createElement('div');
+                            const messageDiv = document.createElement('div');
 
-            messageDiv.className = `chat-message ${sender}`;
+                            messageDiv.className = `chat-message ${sender}`;
 
-            messageDiv.id = messageId;
+                            messageDiv.id = messageId;
 
-            messageDiv.innerHTML = `
-                <div class="chat-bubble">${message}</div>
-            `;
-
-
-
-            chatContainer.appendChild(messageDiv);
-
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+                            messageDiv.innerHTML = `
+                            <div class="chat-bubble">${message}</div>
+                            `;
 
 
 
-            return messageId;
+                            chatContainer.appendChild(messageDiv);
+
+                            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+
+
+                            return messageId;
 
         }
 
 
 
-        function removeMessage(messageId) {
+                            function removeMessage(messageId) {
 
             const message = document.getElementById(messageId);
 
-            if (message) {
+                            if (message) {
 
-                message.remove();
+                                message.remove();
 
             }
 
@@ -4263,21 +4304,21 @@ Be conversational, ask thoughtful questions, and help the user think through all
 
 
 
-        function displayScenarioResult(scenarioData) {
+                            function displayScenarioResult(scenarioData) {
 
             const resultContainer = document.getElementById('scenarioConfigPanel');
 
 
 
-            const severityColors = {
+                            const severityColors = {
 
-                'very_severe': '#991B1B',
+                                'very_severe': '#991B1B',
 
-                'severe': '#92400E',
+                            'severe': '#92400E',
 
-                'moderate': '#1E3A8A',
+                            'moderate': '#1E3A8A',
 
-                'benchmark': '#065F46'
+                            'benchmark': '#065F46'
 
             };
 
@@ -4285,130 +4326,113 @@ Be conversational, ask thoughtful questions, and help the user think through all
 
             const componentItems = Object.entries(scenarioData.componentSeverities).map(([comp, sev]) => {
                 const reason = (scenarioData.componentRationale && scenarioData.componentRationale[comp]) ||
-                    (scenarioData.componentReasons && scenarioData.componentReasons[comp]) ||
-                    'AI assessment based on scenario analysis.';
+                            (scenarioData.componentReasons && scenarioData.componentReasons[comp]) ||
+                            'AI assessment based on scenario analysis.';
 
-                const compId = comp.replace(/\s+/g, '_');
+                            const compId = comp.replace(/\s+/g, '_');
 
-                return `
-                <div class="severity-item" data-component="${comp}">
-                    <div class="severity-reasoning">🤖 ${reason}</div>
-                    <div class="severity-header">
-                        <span class="severity-label">${comp}</span>
-                        <select class="severity-select" id="sev_${compId}" onchange="updateComponentSeverity('${comp}', this.value)">
-                            <option value="very_severe" ${sev === 'very_severe' ? 'selected' : ''}>Very Severe</option>
-                            <option value="severe" ${sev === 'severe' ? 'selected' : ''}>Severe</option>
-                            <option value="moderate" ${sev === 'moderate' ? 'selected' : ''}>Moderate</option>
-                            <option value="benchmark" ${sev === 'benchmark' ? 'selected' : ''}>Benchmark</option>
-                        </select>
-                    </div>
-                </div>
-                `;
+                            return `
+                            <div class="severity-item" data-component="${comp}">
+                                <div class="severity-reasoning">🤖 ${reason}</div>
+                                <div class="severity-header">
+                                    <span class="severity-label">${comp}</span>
+                                    <select class="severity-select" id="sev_${compId}" onchange="updateComponentSeverity('${comp}', this.value)">
+                                        <option value="very_severe" ${sev === 'very_severe' ? 'selected' : ''}>Very Severe</option>
+                                        <option value="severe" ${sev === 'severe' ? 'selected' : ''}>Severe</option>
+                                        <option value="moderate" ${sev === 'moderate' ? 'selected' : ''}>Moderate</option>
+                                        <option value="benchmark" ${sev === 'benchmark' ? 'selected' : ''}>Benchmark</option>
+                                    </select>
+                                </div>
+                            </div>
+                            `;
             }).join('');
 
 
 
-            resultContainer.innerHTML = `
-                <div class="scenario-result">
-                    <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom: 12px;">
-                        <div>
-                             <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: var(--text-main);">${scenarioData.title}</h3>
-                             <div style="margin-top: 8px;">
-                                <span class="severity-badge severity-${scenarioData.severity}">
-                                    Overall: ${scenarioData.severity.replace('_', ' ')}
-                                </span>
-                             </div>
-                        </div>
-                    </div>
-                    
-                    <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 20px;">${scenarioData.description}</p>
+                            resultContainer.innerHTML = `
+                            <div class="scenario-result">
+                                <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom: 12px;">
+                                    <div>
+                                        <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: var(--text-main);">${scenarioData.title}</h3>
+                                        <div style="margin-top: 8px;">
+                                            <span class="severity-badge severity-${scenarioData.severity}">
+                                                Overall: ${scenarioData.severity.replace('_', ' ')}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
 
-                    <h4 style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px; margin-bottom: 12px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px;">
-                        Component Severities <span style="font-weight: 400; color: var(--text-muted);">(hover for AI reasoning)</span>
-                    </h4>
-                    
-                    <div class="severity-list">
-                        ${componentItems}
-                    </div>
-                </div>
-                
-                <div class="calculate-sticky-footer">
-                    <button class="btn btn-primary" onclick="applyScenario()" style="width: 100%; padding: 14px 20px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);">
-                        📊 Calculate & Apply to Dashboard
-                    </button>
-                    <p style="text-align: center; margin-top: 10px; font-size: 11px; color: var(--text-muted);">
-                        This will override the current dashboard values with the AI-generated stress scenario.
-                    </p>
-                </div>
-            `;
+                                <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 20px;">${scenarioData.description}</p>
+
+                                <h4 style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px; margin-bottom: 12px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px;">
+                                    Component Severities <span style="font-weight: 400; color: var(--text-muted);">(hover for AI reasoning)</span>
+                                </h4>
+
+                                <div class="severity-list">
+                                    ${componentItems}
+                                </div>
+                            </div>
+
+                            <div class="calculate-sticky-footer">
+                                <button class="btn btn-primary" onclick="applyScenario()" style="width: 100%; padding: 14px 20px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);">
+                                    📊 Calculate & Apply to Dashboard
+                                </button>
+                                <p style="text-align: center; margin-top: 10px; font-size: 11px; color: var(--text-muted);">
+                                    This will override the current dashboard values with the AI-generated stress scenario.
+                                </p>
+                            </div>
+                            `;
 
         }
 
 
 
-        function updateComponentSeverity(component, newSeverity) {
-
+                            function updateComponentSeverity(component, newSeverity) {
             if (!customScenarioResult) return;
 
+                            // Update the severity in the result object
+                            customScenarioResult.componentSeverities[component] = newSeverity;
 
+                            // Recalculate Overall Severity based on math
+                            const newOverall = determineSeverityFromComponents(customScenarioResult.componentSeverities);
+                            customScenarioResult.severity = newOverall;
 
-            // Update the severity in the result object
+                            // Update the badge in the UI
+                            const badge = document.querySelector('.severity-badge');
+                            if (badge) {
+                                // Update styling class
+                                // Ensure we remove old severity classes first? regex replace simpler
+                                badge.className = badge.className.replace(/severity-[a-z_]+/, '') + ` severity-${newOverall}`;
 
-            customScenarioResult.componentSeverities[component] = newSeverity;
-
-
-
-            // Update the display color
-
-            const compId = component.replace(/\s+/g, '_');
-
-            const valueElement = document.querySelector(`[data - component="${component}"] .severity - item - value`);
-
-
-
-            const severityColors = {
-
-                'very_severe': '#991B1B',
-
-                'severe': '#92400E',
-
-                'moderate': '#1E3A8A',
-
-                'benchmark': '#065F46'
-
-            };
-
-
-
-            if (valueElement) {
-
-                valueElement.textContent = newSeverity.replace('_', ' ');
-
-                valueElement.style.color = severityColors[newSeverity];
-
+                // Update text
+                // Check format from displayScenarioResult: Overall: Severe
+                // Handle formatting
+                const label = newOverall.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase()); // Title Case
+                            badge.textContent = `Overall: ${label}`;
             }
+        }
 
 
 
-            // Show feedback
+                            // Show feedback
 
-            console.log(`Updated ${component} to ${newSeverity} `);
+                            console.log(`Updated ${component} to ${newSeverity} `);
 
         }
 
 
 
-        function applyScenario() {
+                            function applyScenario() {
 
             if (!customScenarioResult) return;
 
 
 
-            // Set the custom scenario name to the AI scenario title
+                            // Set the custom scenario name to the AI scenario title
 
-            if (customScenarioResult.title) {
+                            if (customScenarioResult.title) {
 
-                setCustomScenarioName(customScenarioResult.title);
+                                setCustomScenarioName(customScenarioResult.title);
 
             }
 
@@ -4420,13 +4444,13 @@ Be conversational, ask thoughtful questions, and help the user think through all
 
                 const selectId = `comp_${comp.replace(/\s+/g, '_')}`;
 
-                const selectElement = document.getElementById(selectId);
+                            const selectElement = document.getElementById(selectId);
 
 
 
-                if (customScenarioResult.componentSeverities && customScenarioResult.componentSeverities[comp]) {
+                            if (customScenarioResult.componentSeverities && customScenarioResult.componentSeverities[comp]) {
 
-                    selectElement.value = customScenarioResult.componentSeverities[comp];
+                                selectElement.value = customScenarioResult.componentSeverities[comp];
 
                 }
 
@@ -4434,189 +4458,189 @@ Be conversational, ask thoughtful questions, and help the user think through all
 
 
 
-            // Update the underlying custom scenario data
+                            // Update the underlying custom scenario data
 
-            updateCustomScenario();
+                            updateCustomScenario();
 
 
 
-            // Select custom scenario in the filter
+                            // Select custom scenario in the filter
 
-            // Ensure the overriden scenario is selected in the filter so it appears
-            const options = document.getElementById('scenarioDisplay').options;
-            const overrideVal = document.getElementById('scenarioToOverride')?.value || 'severe';
+                            // Ensure the overriden scenario is selected in the filter so it appears
+                            const options = document.getElementById('scenarioDisplay').options;
+                            const overrideVal = document.getElementById('scenarioToOverride')?.value || 'severe';
 
-            for (let i = 0; i < options.length; i++) {
+                            for (let i = 0; i < options.length; i++) {
                 if (options[i].value === overrideVal) {
-                    options[i].selected = true;
+                                options[i].selected = true;
                 }
             }
 
 
 
-            // Set the detailed view to show the 'custom' scenario
+                            // Set the detailed view to show the 'custom' scenario
 
-            selectScenarioForDetails('custom');
+                            selectScenarioForDetails('custom');
 
-            // Explicitly call calculateScenario() AFTER setting the detail view
+                            // Explicitly call calculateScenario() AFTER setting the detail view
 
-            calculateScenario();
-
-
-
-            // Close modal
-
-            closeInputScenarioModal();
+                            calculateScenario();
 
 
 
-            // Show success message
+                            // Close modal
 
-            alert(`✅ Custom scenario "${customScenarioResult.title}" has been applied to the stress test model!`);
+                            closeInputScenarioModal();
+
+
+
+                            // Show success message
+
+                            alert(`✅ Custom scenario "${customScenarioResult.title}" has been applied to the stress test model!`);
 
         }
 
 
-        // ========================================
-        // SAVED SCENARIOS SYSTEM
-        // ========================================
+                            // ========================================
+                            // SAVED SCENARIOS SYSTEM
+                            // ========================================
 
-        let savedAstraScenarios = [];
+                            let savedAstraScenarios = [];
 
-        // Load saved scenarios from localStorage on init
-        function loadSavedScenarios() {
+                            // Load saved scenarios from localStorage on init
+                            function loadSavedScenarios() {
             try {
                 const stored = localStorage.getItem('astraSavedScenarios');
-                savedAstraScenarios = stored ? JSON.parse(stored) : [];
+                            savedAstraScenarios = stored ? JSON.parse(stored) : [];
             } catch (e) {
-                console.error('Failed to load saved scenarios:', e);
-                savedAstraScenarios = [];
+                                console.error('Failed to load saved scenarios:', e);
+                            savedAstraScenarios = [];
             }
         }
 
-        // Save to localStorage
-        function persistSavedScenarios() {
-            localStorage.setItem('astraSavedScenarios', JSON.stringify(savedAstraScenarios));
+                            // Save to localStorage
+                            function persistSavedScenarios() {
+                                localStorage.setItem('astraSavedScenarios', JSON.stringify(savedAstraScenarios));
         }
 
-        // Save current custom scenario
-        function saveCurrentScenario() {
+                            // Save current custom scenario
+                            function saveCurrentScenario() {
             if (!customScenarioResult) {
-                alert('No custom scenario to save. Generate one first using the AI Assistant.');
-                return;
+                                alert('No custom scenario to save. Generate one first using the AI Assistant.');
+                            return;
             }
 
-            const scenarioToSave = {
-                id: 'astra_' + Date.now(),
-                title: customScenarioResult.title || customScenarioName,
-                description: customScenarioResult.description || '',
-                severity: customScenarioResult.severity || 'moderate',
-                componentSeverities: { ...customScenarioResult.componentSeverities },
-                componentRationale: customScenarioResult.componentRationale || {},
-                savedAt: new Date().toLocaleString(),
-                timestamp: Date.now(),
-                // Store the source if from scenario.html
-                importedFrom: sessionStorage.getItem('astraImportedScenario') ? 'Scenario Narrative Platform' : 'Manual'
+                            const scenarioToSave = {
+                                id: 'astra_' + Date.now(),
+                            title: customScenarioResult.title || customScenarioName,
+                            description: customScenarioResult.description || '',
+                            severity: customScenarioResult.severity || 'moderate',
+                            componentSeverities: {...customScenarioResult.componentSeverities},
+                            componentRationale: customScenarioResult.componentRationale || { },
+                            savedAt: new Date().toLocaleString(),
+                            timestamp: Date.now(),
+                            // Store the source if from scenario.html
+                            importedFrom: sessionStorage.getItem('astraImportedScenario') ? 'Scenario Narrative Platform' : 'Manual'
             };
 
-            savedAstraScenarios.push(scenarioToSave);
-            persistSavedScenarios();
+                            savedAstraScenarios.push(scenarioToSave);
+                            persistSavedScenarios();
 
-            alert(`✅ Scenario "${scenarioToSave.title}" saved successfully!`);
-            renderSavedScenariosList();
+                            alert(`✅ Scenario "${scenarioToSave.title}" saved successfully!`);
+                            renderSavedScenariosList();
         }
 
-        // Save scenario from the Scenario Builder panel
-        function saveScenarioFromBuilder() {
+                            // Save scenario from the Scenario Builder panel
+                            function saveScenarioFromBuilder() {
             const scenarioName = document.getElementById('customScenarioName').value || 'Custom Scenario';
 
-            // Read the severity selections from the dropdowns (not the data arrays)
-            const componentSeverities = {};
-            let hasAnySelection = false;
+                            // Read the severity selections from the dropdowns (not the data arrays)
+                            const componentSeverities = { };
+                            let hasAnySelection = false;
 
             COMPONENTS.forEach(comp => {
                 const selectId = `comp_${comp.replace(/\s+/g, '_')}`;
-                const selectEl = document.getElementById(selectId);
-                if (selectEl) {
-                    componentSeverities[comp] = selectEl.value;
-                    hasAnySelection = true;
+                            const selectEl = document.getElementById(selectId);
+                            if (selectEl) {
+                                componentSeverities[comp] = selectEl.value;
+                            hasAnySelection = true;
                 }
             });
 
-            if (!hasAnySelection) {
-                alert('Please configure at least one component severity before saving.');
-                return;
+                            if (!hasAnySelection) {
+                                alert('Please configure at least one component severity before saving.');
+                            return;
             }
 
-            // Determine overall severity based on most common or most severe
-            const severities = Object.values(componentSeverities);
+                            // Determine overall severity based on most common or most severe
+                            const severities = Object.values(componentSeverities);
             const severityCounts = severities.reduce((acc, s) => {
-                acc[s] = (acc[s] || 0) + 1;
-                return acc;
-            }, {});
+                                acc[s] = (acc[s] || 0) + 1;
+                            return acc;
+            }, { });
             const overallSeverity = Object.keys(severityCounts).sort((a, b) => {
-                const order = { 'very_severe': 4, 'severe': 3, 'moderate': 2, 'benchmark': 1 };
-                return (severityCounts[b] * 10 + (order[b] || 0)) - (severityCounts[a] * 10 + (order[a] || 0));
+                const order = {'very_severe': 4, 'severe': 3, 'moderate': 2, 'benchmark': 1 };
+                            return (severityCounts[b] * 10 + (order[b] || 0)) - (severityCounts[a] * 10 + (order[a] || 0));
             })[0] || 'moderate';
 
-            const scenarioToSave = {
-                id: 'astra_' + Date.now(),
-                title: scenarioName,
-                description: 'Manually configured scenario from Scenario Builder',
-                severity: overallSeverity,
-                componentSeverities: componentSeverities,  // Now contains severity strings
-                componentRationale: {},
-                savedAt: new Date().toLocaleString(),
-                timestamp: Date.now(),
-                importedFrom: 'Manual'
+                            const scenarioToSave = {
+                                id: 'astra_' + Date.now(),
+                            title: scenarioName,
+                            description: 'Manually configured scenario from Scenario Builder',
+                            severity: overallSeverity,
+                            componentSeverities: componentSeverities,  // Now contains severity strings
+                            componentRationale: { },
+                            savedAt: new Date().toLocaleString(),
+                            timestamp: Date.now(),
+                            importedFrom: 'Manual'
             };
 
-            console.log('Saving scenario:', scenarioToSave);
+                            console.log('Saving scenario:', scenarioToSave);
 
-            savedAstraScenarios.push(scenarioToSave);
-            persistSavedScenarios();
+                            savedAstraScenarios.push(scenarioToSave);
+                            persistSavedScenarios();
 
-            alert(`✅ Scenario "${scenarioName}" saved successfully!`);
-            renderSavedScenariosList();
+                            alert(`✅ Scenario "${scenarioName}" saved successfully!`);
+                            renderSavedScenariosList();
         }
 
-        // Render the saved scenarios list
-        function renderSavedScenariosList() {
+                            // Render the saved scenarios list
+                            function renderSavedScenariosList() {
             const listEl = document.getElementById('savedScenariosList');
-            const emptyEl = document.getElementById('noSavedScenarios');
+                            const emptyEl = document.getElementById('noSavedScenarios');
 
-            if (savedAstraScenarios.length === 0) {
-                listEl.innerHTML = '';
-                emptyEl.style.display = 'block';
-                return;
+                            if (savedAstraScenarios.length === 0) {
+                                listEl.innerHTML = '';
+                            emptyEl.style.display = 'block';
+                            return;
             }
 
-            emptyEl.style.display = 'none';
+                            emptyEl.style.display = 'none';
 
             listEl.innerHTML = savedAstraScenarios.map(s => {
                 const severityColor = s.severity === 'very_severe' ? '#DC2626' :
-                    s.severity === 'severe' ? '#F59E0B' :
-                        s.severity === 'moderate' ? '#3B82F6' : '#10B981';
-                const severityLabel = s.severity === 'very_severe' ? 'Very Severe' :
-                    s.severity === 'severe' ? 'Severe' :
-                        s.severity === 'moderate' ? 'Moderate' : 'Benchmark';
+                            s.severity === 'severe' ? '#F59E0B' :
+                            s.severity === 'moderate' ? '#3B82F6' : '#10B981';
+                            const severityLabel = s.severity === 'very_severe' ? 'Very Severe' :
+                            s.severity === 'severe' ? 'Severe' :
+                            s.severity === 'moderate' ? 'Moderate' : 'Benchmark';
 
-                // Count severities for breakdown display
-                let counts = { very_severe: 0, severe: 0, moderate: 0, benchmark: 0 };
-                if (s.componentSeverities) {
-                    Object.values(s.componentSeverities).forEach(sev => {
-                        if (counts[sev] !== undefined) counts[sev]++;
-                    });
+                            // Count severities for breakdown display
+                            let counts = {very_severe: 0, severe: 0, moderate: 0, benchmark: 0 };
+                            if (s.componentSeverities) {
+                                Object.values(s.componentSeverities).forEach(sev => {
+                                    if (counts[sev] !== undefined) counts[sev]++;
+                                });
                 }
-                const breakdownParts = [];
+                            const breakdownParts = [];
                 if (counts.very_severe > 0) breakdownParts.push(`${counts.very_severe} Very Severe`);
                 if (counts.severe > 0) breakdownParts.push(`${counts.severe} Severe`);
                 if (counts.moderate > 0) breakdownParts.push(`${counts.moderate} Moderate`);
                 if (counts.benchmark > 0) breakdownParts.push(`${counts.benchmark} Benchmark`);
-                const breakdownText = breakdownParts.join(', ');
+                            const breakdownText = breakdownParts.join(', ');
 
-                return `
-                <div class="saved-scenario-card" style="
+                            return `
+                            <div class="saved-scenario-card" style="
                     background: white;
                     border: 1px solid var(--border-subtle);
                     border-radius: 12px;
@@ -4624,11 +4648,11 @@ Be conversational, ask thoughtful questions, and help the user think through all
                     cursor: pointer;
                     transition: all 0.2s ease;
                     margin-bottom: 12px;"
-                onmouseover="this.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)'" 
-                onmouseout="this.style.boxShadow='none'"
-                onclick="loadSavedScenario('${s.id}')">
-                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
-                            <span style="
+                                onmouseover="this.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)'"
+                                onmouseout="this.style.boxShadow='none'"
+                                onclick="loadSavedScenario('${s.id}')">
+                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                                    <span style="
                                 font-size: 10px;
                                 font-weight: 600;
                                 padding: 3px 8px;
@@ -4637,422 +4661,422 @@ Be conversational, ask thoughtful questions, and help the user think through all
                                 color: ${severityColor};
                                 text-transform: uppercase;
                             ">${severityLabel}</span>
-                            <button onclick="event.stopPropagation(); deleteSavedScenario('${s.id}')" 
-                                    style="background: none; border: none; cursor: pointer; opacity: 0.5; font-size: 14px;"
-                                    onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.5'"
-                                    title="Delete">🗑️</button>
-                        </div>
-                        <div style="font-weight: 600; font-size: 14px; color: var(--text-main); margin-bottom: 6px;">${s.title}</div>
-                        <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">${s.description || 'No description'}</div>
-                        
-                        ${breakdownText ? `<div style="font-size: 10px; color: var(--text-medium); margin-bottom: 8px; background: #f1f5f9; padding: 4px 8px; border-radius: 4px;">Outcome: ${breakdownText}</div>` : ''}
+                                    <button onclick="event.stopPropagation(); deleteSavedScenario('${s.id}')"
+                                        style="background: none; border: none; cursor: pointer; opacity: 0.5; font-size: 14px;"
+                                        onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.5'"
+                                        title="Delete">🗑️</button>
+                                </div>
+                                <div style="font-weight: 600; font-size: 14px; color: var(--text-main); margin-bottom: 6px;">${s.title}</div>
+                                <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">${s.description || 'No description'}</div>
 
-            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: var(--text-muted);">
-                <span>📅 ${s.savedAt}</span>
-                <span>${s.importedFrom === 'Scenario Narrative Platform' ? '🔗 from Scenario' : '✏️ Manual'}</span>
-            </div>
-                    </div >
-                `;
+                                ${breakdownText ? `<div style="font-size: 10px; color: var(--text-medium); margin-bottom: 8px; background: #f1f5f9; padding: 4px 8px; border-radius: 4px;">Outcome: ${breakdownText}</div>` : ''}
+
+                                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: var(--text-muted);">
+                                    <span>📅 ${s.savedAt}</span>
+                                    <span>${s.importedFrom === 'Scenario Narrative Platform' ? '🔗 from Scenario' : '✏️ Manual'}</span>
+                                </div>
+                            </div >
+                            `;
             }).join('');
         }
 
-        // Load a saved scenario into the dashboard
-        function loadSavedScenario(scenarioId) {
+                            // Load a saved scenario into the dashboard
+                            function loadSavedScenario(scenarioId) {
             const scenario = savedAstraScenarios.find(s => s.id === scenarioId);
-            if (!scenario) {
-                alert('Scenario not found.');
-                return;
+                            if (!scenario) {
+                                alert('Scenario not found.');
+                            return;
             }
 
-            console.log('Loading scenario:', scenario);
-            console.log('Component severities to load:', scenario.componentSeverities);
+                            console.log('Loading scenario:', scenario);
+                            console.log('Component severities to load:', scenario.componentSeverities);
 
-            // 1. Update custom scenario name
-            customScenarioName = scenario.title;
-            document.getElementById('customScenarioName').value = scenario.title;
+                            // 1. Update custom scenario name
+                            customScenarioName = scenario.title;
+                            document.getElementById('customScenarioName').value = scenario.title;
 
-            // Set the custom scenario label in metric cards
-            const customLabel = document.getElementById('customScenarioLabel');
-            if (customLabel) customLabel.textContent = scenario.title;
+                            // Set the custom scenario label in metric cards
+                            const customLabel = document.getElementById('customScenarioLabel');
+                            if (customLabel) customLabel.textContent = scenario.title;
 
-            // Restore global result object so description is available
-            customScenarioResult = scenario;
+                            // Restore global result object so description is available
+                            customScenarioResult = scenario;
 
-            // 2. Apply the component severities to the UI dropdowns
-            for (const [comp, severity] of Object.entries(scenario.componentSeverities)) {
+                            // 2. Apply the component severities to the UI dropdowns
+                            for (const [comp, severity] of Object.entries(scenario.componentSeverities)) {
                 const selectId = `comp_${comp.replace(/\s+/g, '_')}`;
-                const selectEl = document.getElementById(selectId);
-                if (selectEl) {
+                            const selectEl = document.getElementById(selectId);
+                            if (selectEl) {
                     // Validate severity value
                     const validSeverity = ['very_severe', 'severe', 'moderate', 'benchmark'].includes(severity)
-                        ? severity : 'moderate';
-                    selectEl.value = validSeverity;
-                    console.log(`Set dropdown ${selectId} = ${validSeverity} `);
+                            ? severity : 'moderate';
+                            selectEl.value = validSeverity;
+                            console.log(`Set dropdown ${selectId} = ${validSeverity} `);
                 }
             }
 
-            // 3. Store for reference
-            customScenarioResult = {
-                title: scenario.title,
-                description: scenario.description,
-                severity: scenario.severity,
-                componentSeverities: scenario.componentSeverities,
-                componentRationale: scenario.componentRationale
+                            // 3. Store for reference
+                            customScenarioResult = {
+                                title: scenario.title,
+                            description: scenario.description,
+                            severity: scenario.severity,
+                            componentSeverities: scenario.componentSeverities,
+                            componentRationale: scenario.componentRationale
             };
 
-            // 4. Enable custom scenario in the scenario display filter
-            const scenarioDisplay = document.getElementById('scenarioDisplay');
+                            // 4. Enable custom scenario in the scenario display filter
+                            const scenarioDisplay = document.getElementById('scenarioDisplay');
             const customOption = Array.from(scenarioDisplay.options).find(opt => opt.value === 'custom');
-            if (customOption) {
-                customOption.selected = true;
+                            if (customOption) {
+                                customOption.selected = true;
             }
 
-            // 5. Now explicitly populate customScenarioComponents from the dropdowns
-            // This is what updateCustomScenario does, but we call it explicitly
-            updateCustomScenario(false);
+                            // 5. Now explicitly populate customScenarioComponents from the dropdowns
+                            // This is what updateCustomScenario does, but we call it explicitly
+                            updateCustomScenario(false);
 
-            console.log('After updateCustomScenario, components:', Object.keys(customScenarioComponents).length);
+                            console.log('After updateCustomScenario, components:', Object.keys(customScenarioComponents).length);
 
-            // 6. Select 'custom' for detailed view
-            selectedDetailScenario = 'custom';
+                            // 6. Select 'custom' for detailed view
+                            selectedDetailScenario = 'custom';
 
             // Update visual selection on metric cards
             ['vsevereCard', 'severeCard', 'moderateCard', 'benchmarkCard', 'customCard'].forEach(cardId => {
                 const card = document.getElementById(cardId);
-                if (card) card.classList.remove('selected');
+                            if (card) card.classList.remove('selected');
             });
-            const customCard = document.getElementById('customCard');
-            if (customCard) customCard.classList.add('selected');
+                            const customCard = document.getElementById('customCard');
+                            if (customCard) customCard.classList.add('selected');
 
-            // 7. Recalculate and render all charts
-            calculateScenario();
+                            // 7. Recalculate and render all charts
+                            calculateScenario();
 
-            // Close the panel
-            closePanel('savedScenariosPanel');
+                            // Close the panel
+                            closePanel('savedScenariosPanel');
         }
 
-        // Delete a saved scenario
-        function deleteSavedScenario(scenarioId) {
+                            // Delete a saved scenario
+                            function deleteSavedScenario(scenarioId) {
             if (!confirm('Delete this saved scenario?')) return;
 
             savedAstraScenarios = savedAstraScenarios.filter(s => s.id !== scenarioId);
-            persistSavedScenarios();
-            renderSavedScenariosList();
+                            persistSavedScenarios();
+                            renderSavedScenariosList();
         }
 
-        // ========================================
-        // SCENARIO IMPORT FROM SCENARIO.HTML
-        // ========================================
+                            // ========================================
+                            // SCENARIO IMPORT FROM SCENARIO.HTML
+                            // ========================================
 
-        function checkForImportedScenario() {
-            // First check localStorage for new imports from scenario.html
-            let stored = localStorage.getItem('astraScenarioImport');
+                            function checkForImportedScenario() {
+                                // First check localStorage for new imports from scenario.html
+                                let stored = localStorage.getItem('astraScenarioImport');
 
-            // If not in localStorage, check sessionStorage for persisted session
-            if (!stored) {
-                stored = sessionStorage.getItem('astraImportedScenario');
+                            // If not in localStorage, check sessionStorage for persisted session
+                            if (!stored) {
+                                stored = sessionStorage.getItem('astraImportedScenario');
             }
 
-            if (!stored) return null;
+                            if (!stored) return null;
 
-            try {
+                            try {
                 const scenario = JSON.parse(stored);
                 // Only use if less than 1 hour old
                 if (Date.now() - scenario.timestamp > 3600000) {
-                    localStorage.removeItem('astraScenarioImport');
-                    sessionStorage.removeItem('astraImportedScenario');
-                    return null;
+                                localStorage.removeItem('astraScenarioImport');
+                            sessionStorage.removeItem('astraImportedScenario');
+                            return null;
                 }
-                return scenario;
+                            return scenario;
             } catch (e) {
-                console.error('Failed to parse imported scenario:', e);
-                localStorage.removeItem('astraScenarioImport');
-                sessionStorage.removeItem('astraImportedScenario');
-                return null;
+                                console.error('Failed to parse imported scenario:', e);
+                            localStorage.removeItem('astraScenarioImport');
+                            sessionStorage.removeItem('astraImportedScenario');
+                            return null;
             }
         }
 
-        function initiateImportedScenarioAnalysis(scenario) {
-            console.log('📊 Importing scenario from scenario.html:', scenario.title);
+                            function initiateImportedScenarioAnalysis(scenario) {
+                                console.log('📊 Importing scenario from scenario.html:', scenario.title);
 
-            // Build enhanced system prompt with scenario context
-            const enhancedSystemPrompt = `You are a financial risk analyst helping to create stress testing scenarios for Royal Bank of Canada(RBC).
+                            // Build enhanced system prompt with scenario context
+                            const enhancedSystemPrompt = `You are a financial risk analyst helping to create stress testing scenarios for Royal Bank of Canada(RBC).
 
-                IMPORTANT: A scenario has been imported from the Scenario Narrative Platform.You must analyze this scenario and determine CET1 component severity levels.
+                            IMPORTANT: A scenario has been imported from the Scenario Narrative Platform.You must analyze this scenario and determine CET1 component severity levels.
 
-IMPORTED SCENARIO CONTEXT:
-${scenario.narrativeSummary}
+                            IMPORTED SCENARIO CONTEXT:
+                            ${scenario.narrativeSummary}
 
-Your job now is to:
-            1. Acknowledge that you've received the imported scenario "${scenario.title}"
-            2. Briefly summarize the key risks and their implications for RBC
-3. Ask if the user wants you to proceed with the CET1 component severity assessment
-            4. When ready(or if user confirms), provide the severity assessments for all 18 CET1 components
+                            Your job now is to:
+                            1. Acknowledge that you've received the imported scenario "${scenario.title}"
+                            2. Briefly summarize the key risks and their implications for RBC
+                            3. Ask if the user wants you to proceed with the CET1 component severity assessment
+                            4. When ready(or if user confirms), provide the severity assessments for all 18 CET1 components
 
-The 18 CET1 components are:
-            - PPNR Canada, PPNR US, PPNR International
-                - PCL Canada, PCL US, PCL International(Provision for Credit Losses by geography)
-            - Dividend
-                - Trading PnL
-                    - AFS Losses
-                        - Operational Risk Losses
+                            The 18 CET1 components are:
+                            - PPNR Canada, PPNR US, PPNR International
+                            - PCL Canada, PCL US, PCL International(Provision for Credit Losses by geography)
+                            - Dividend
+                            - Trading PnL
+                            - AFS Losses
+                            - Operational Risk Losses
                             - Currency Translation Adj
-                                - Shortfall in Allowance
-                                - Credit RWA Change Canada, Credit RWA Change US, Credit RWA Change International(Credit Risk - Weighted Assets by geography)
-                                    - Market CCR CVA RWA Change
-                                        - Operational Risk RWA Change
-                                            - Other
+                            - Shortfall in Allowance
+                            - Credit RWA Change Canada, Credit RWA Change US, Credit RWA Change International(Credit Risk - Weighted Assets by geography)
+                            - Market CCR CVA RWA Change
+                            - Operational Risk RWA Change
+                            - Other
 
-When the user asks you to finalize or you believe you have enough information, respond with a JSON object in this EXACT format:
-            {
-                "FINALIZE": true,
-                    "title": "${scenario.title}",
-                        "description": "Brief description based on imported scenario",
+                            When the user asks you to finalize or you believe you have enough information, respond with a JSON object in this EXACT format:
+                            {
+                                "FINALIZE": true,
+                            "title": "${scenario.title}",
+                            "description": "Brief description based on imported scenario",
                             "severity": "very_severe|severe|moderate|benchmark",
-                                "componentSeverities": {
-                    "PPNR Canada": "very_severe|severe|moderate|benchmark",
-                        "PPNR US": "very_severe|severe|moderate|benchmark",
+                            "componentSeverities": {
+                                "PPNR Canada": "very_severe|severe|moderate|benchmark",
+                            "PPNR US": "very_severe|severe|moderate|benchmark",
                             "PPNR International": "very_severe|severe|moderate|benchmark",
-                                "PCL Canada": "very_severe|severe|moderate|benchmark",
-                                    "PCL US": "very_severe|severe|moderate|benchmark",
-                                        "PCL International": "very_severe|severe|moderate|benchmark",
-                                            "Dividend": "very_severe|severe|moderate|benchmark",
-                                                "Trading PnL": "very_severe|severe|moderate|benchmark",
-                                                    "AFS Losses": "very_severe|severe|moderate|benchmark",
-                                                        "Operational Risk Losses": "very_severe|severe|moderate|benchmark",
-                                                            "Currency Translation Adj": "very_severe|severe|moderate|benchmark",
-                                                                "Shortfall in Allowance": "very_severe|severe|moderate|benchmark",
-                                                                    "Credit RWA Change Canada": "very_severe|severe|moderate|benchmark",
-                                                                        "Credit RWA Change US": "very_severe|severe|moderate|benchmark",
-                                                                            "Credit RWA Change International": "very_severe|severe|moderate|benchmark",
-                                                                                "Market CCR CVA RWA Change": "very_severe|severe|moderate|benchmark",
-                                                                                    "Operational Risk RWA Change": "very_severe|severe|moderate|benchmark",
-                                                                                        "Other": "very_severe|severe|moderate|benchmark"
+                            "PCL Canada": "very_severe|severe|moderate|benchmark",
+                            "PCL US": "very_severe|severe|moderate|benchmark",
+                            "PCL International": "very_severe|severe|moderate|benchmark",
+                            "Dividend": "very_severe|severe|moderate|benchmark",
+                            "Trading PnL": "very_severe|severe|moderate|benchmark",
+                            "AFS Losses": "very_severe|severe|moderate|benchmark",
+                            "Operational Risk Losses": "very_severe|severe|moderate|benchmark",
+                            "Currency Translation Adj": "very_severe|severe|moderate|benchmark",
+                            "Shortfall in Allowance": "very_severe|severe|moderate|benchmark",
+                            "Credit RWA Change Canada": "very_severe|severe|moderate|benchmark",
+                            "Credit RWA Change US": "very_severe|severe|moderate|benchmark",
+                            "Credit RWA Change International": "very_severe|severe|moderate|benchmark",
+                            "Market CCR CVA RWA Change": "very_severe|severe|moderate|benchmark",
+                            "Operational Risk RWA Change": "very_severe|severe|moderate|benchmark",
+                            "Other": "very_severe|severe|moderate|benchmark"
                 },
-                "componentRationale": {
-                    "PPNR Canada": "1-2 sentence explanation",
-    ... (for each component)
+                            "componentRationale": {
+                                "PPNR Canada": "1-2 sentence explanation",
+                            ... (for each component)
   }
             }
 
-Use the imported scenario details to make informed severity assessments.Consider:
-            - Risk driver categories and their assessed likelihood / materiality / velocity
-                - Macroeconomic projections(GDP, unemployment, housing, etc.)
-                    - Geographic concentration of risks(Canada vs US vs International)
-                        - Speed of impact(velocity) for time - sensitive components`;
+                            Use the imported scenario details to make informed severity assessments.Consider:
+                            - Risk driver categories and their assessed likelihood / materiality / velocity
+                            - Macroeconomic projections(GDP, unemployment, housing, etc.)
+                            - Geographic concentration of risks(Canada vs US vs International)
+                            - Speed of impact(velocity) for time - sensitive components`;
 
-            // Set up conversation with imported context
-            conversationHistory = [{
-                role: 'system',
-                content: enhancedSystemPrompt
+                            // Set up conversation with imported context
+                            conversationHistory = [{
+                                role: 'system',
+                            content: enhancedSystemPrompt
             }, {
-                role: 'assistant',
-                content: `📊 ** Scenario Imported Successfully! **
+                                role: 'assistant',
+                            content: `📊 ** Scenario Imported Successfully! **
 
-                I've received the scenario **"${scenario.title}"** from the Scenario Narrative Platform with ${scenario.riskDrivers.length} risk drivers.
+                            I've received the scenario **"${scenario.title}"** from the Scenario Narrative Platform with ${scenario.riskDrivers.length} risk drivers.
 
-                    ** Key Risk Drivers:**
-                        ${scenario.riskDrivers.slice(0, 5).map(d => `• ${d.title} (${d.category})`).join('\n')}
-${scenario.riskDrivers.length > 5 ? `\n...and ${scenario.riskDrivers.length - 5} more` : ''}
+                            ** Key Risk Drivers:**
+                            ${scenario.riskDrivers.slice(0, 5).map(d => `• ${d.title} (${d.category})`).join('\n')}
+                            ${scenario.riskDrivers.length > 5 ? `\n...and ${scenario.riskDrivers.length - 5} more` : ''}
 
-Based on this scenario, I'm ready to analyze the impact on RBC's 18 CET1 capital components.
+                            Based on this scenario, I'm ready to analyze the impact on RBC's 18 CET1 capital components.
 
-Would you like me to:
-            1. ** Proceed with assessment ** - I'll analyze each component and provide severity ratings
-            2. ** Review the scenario first ** - I can summarize the key points before assessment
-            3. ** Adjust the scenario ** - Tell me if you'd like to modify any aspects
+                            Would you like me to:
+                            1. ** Proceed with assessment ** - I'll analyze each component and provide severity ratings
+                            2. ** Review the scenario first ** - I can summarize the key points before assessment
+                            3. ** Adjust the scenario ** - Tell me if you'd like to modify any aspects
 
-What would you prefer ? `
+                            What would you prefer ? `
             }];
 
-            // Open the modal and show the imported state
-            const chatContainer = document.getElementById('chatContainer');
-            chatContainer.innerHTML = `
-                <div class="chat-message ai">
-                    <div class="chat-bubble">
-                        📊 <strong>Scenario Imported Successfully!</strong><br><br>
-                        I've received the scenario <strong>"${scenario.title}"</strong> from the Scenario Narrative Platform with ${scenario.riskDrivers.length} risk drivers.<br><br>
-                        <strong>Key Risk Drivers:</strong><br>
-                        ${scenario.riskDrivers.slice(0, 5).map(d => `• ${d.title} (${d.category})`).join('<br>')}
-                        ${scenario.riskDrivers.length > 5 ? `<br>...and ${scenario.riskDrivers.length - 5} more` : ''}<br><br>
-                        Based on this scenario, I'm ready to analyze the impact on RBC's 18 CET1 capital components.<br><br>
-                        Would you like me to:<br>
-                        <ol>
-                            <li><strong>Proceed with assessment</strong> - I'll analyze each component and provide severity ratings</li>
-                            <li><strong>Review the scenario first</strong> - I can summarize the key points before assessment</li>
-                            <li><strong>Adjust the scenario</strong> - Tell me if you'd like to modify any aspects</li>
-                        </ol>
-                        What would you prefer?
-                    </div>
-                </div>
-            `;
+                            // Open the modal and show the imported state
+                            const chatContainer = document.getElementById('chatContainer');
+                            chatContainer.innerHTML = `
+                            <div class="chat-message ai">
+                                <div class="chat-bubble">
+                                    📊 <strong>Scenario Imported Successfully!</strong><br><br>
+                                        I've received the scenario <strong>"${scenario.title}"</strong> from the Scenario Narrative Platform with ${scenario.riskDrivers.length} risk drivers.<br><br>
+                                            <strong>Key Risk Drivers:</strong><br>
+                                                ${scenario.riskDrivers.slice(0, 5).map(d => `• ${d.title} (${d.category})`).join('<br>')}
+                                                ${scenario.riskDrivers.length > 5 ? `<br>...and ${scenario.riskDrivers.length - 5} more` : ''}<br><br>
+                                                    Based on this scenario, I'm ready to analyze the impact on RBC's 18 CET1 capital components.<br><br>
+                                                        Would you like me to:<br>
+                                                            <ol>
+                                                                <li><strong>Proceed with assessment</strong> - I'll analyze each component and provide severity ratings</li>
+                                                                <li><strong>Review the scenario first</strong> - I can summarize the key points before assessment</li>
+                                                                <li><strong>Adjust the scenario</strong> - Tell me if you'd like to modify any aspects</li>
+                                                            </ol>
+                                                            What would you prefer?
+                                                        </div>
+                                                    </div>
+                                                        `;
 
-            // Move to sessionStorage so it persists for the browser session
-            // This allows user to close/reopen modal or refresh page
-            sessionStorage.setItem('astraImportedScenario', JSON.stringify(scenario));
-            localStorage.removeItem('astraScenarioImport'); // Clear the transfer storage
+                                                        // Move to sessionStorage so it persists for the browser session
+                                                        // This allows user to close/reopen modal or refresh page
+                                                        sessionStorage.setItem('astraImportedScenario', JSON.stringify(scenario));
+                                                        localStorage.removeItem('astraScenarioImport'); // Clear the transfer storage
 
-            // Open the AI modal (use style.display per existing pattern)
-            initializeDefaultSeverities();
-            document.getElementById('inputScenarioModal').style.display = 'block';
+                                                        // Open the AI modal (use style.display per existing pattern)
+                                                        initializeDefaultSeverities();
+                                                        document.getElementById('inputScenarioModal').style.display = 'block';
         }
 
-        // Store imported scenario globally for conversation context
-        let importedScenarioContext = null;
+                                                        // Store imported scenario globally for conversation context
+                                                        let importedScenarioContext = null;
 
 
-        async function exportPDF() {
-            const { jsPDF } = window.jspdf;
-            if (!jsPDF) {
-                alert('PDF library not loaded.');
-                return;
+                                                        async function exportPDF() {
+            const {jsPDF} = window.jspdf;
+                                                        if (!jsPDF) {
+                                                            alert('PDF library not loaded.');
+                                                        return;
             }
 
-            const btn = document.querySelector('button[onclick="exportPDF()"]');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = 'Generating PDF...';
-            btn.disabled = true;
+                                                        const btn = document.querySelector('button[onclick="exportPDF()"]');
+                                                        const originalText = btn.innerHTML;
+                                                        btn.innerHTML = 'Generating PDF...';
+                                                        btn.disabled = true;
 
-            const previousScenario = selectedDetailScenario;
+                                                        const previousScenario = selectedDetailScenario;
 
-            try {
+                                                        try {
                 // Force switch to custom scenario for the report
                 if (selectedDetailScenario !== 'custom') {
-                    selectScenarioForDetails('custom');
+                                                            selectScenarioForDetails('custom');
                     await new Promise(r => setTimeout(r, 500));
                 }
 
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                const pageWidth = pdf.internal.pageSize.getWidth();
-                const pageHeight = pdf.internal.pageSize.getHeight();
-                let yOffset = 15;
-                const margin = 10;
-                const contentWidth = pageWidth - (margin * 2);
+                                                        const pdf = new jsPDF('p', 'mm', 'a4');
+                                                        const pageWidth = pdf.internal.pageSize.getWidth();
+                                                        const pageHeight = pdf.internal.pageSize.getHeight();
+                                                        let yOffset = 15;
+                                                        const margin = 10;
+                                                        const contentWidth = pageWidth - (margin * 2);
 
-                // Title Page
-                pdf.setFontSize(18);
-                pdf.text(`Scenario Report: ${customScenarioName}`, margin, yOffset);
-                yOffset += 10;
+                                                        // Title Page
+                                                        pdf.setFontSize(18);
+                                                        pdf.text(`Scenario Report: ${customScenarioName}`, margin, yOffset);
+                                                        yOffset += 10;
 
-                pdf.setFontSize(10);
-                pdf.setTextColor(100);
-                pdf.text(`Generated on: ${new Date().toLocaleString()}`, margin, yOffset);
-                yOffset += 15;
-                pdf.setTextColor(0);
+                                                        pdf.setFontSize(10);
+                                                        pdf.setTextColor(100);
+                                                        pdf.text(`Generated on: ${new Date().toLocaleString()}`, margin, yOffset);
+                                                        yOffset += 15;
+                                                        pdf.setTextColor(0);
 
                 // Helper to add element to PDF
                 const addContentToPDF = async (elementId, title) => {
                     const el = document.getElementById(elementId);
-                    if (!el) return;
+                                                        if (!el) return;
 
                     // If title + reasonable image height (approx 80mm) exceeds page, add page
                     if (yOffset > pageHeight - 100) {
-                        pdf.addPage();
-                        yOffset = 15;
+                                                            pdf.addPage();
+                                                        yOffset = 15;
                     }
 
-                    if (title) {
-                        pdf.setFontSize(14);
-                        pdf.setFont(undefined, 'bold');
-                        pdf.text(title, margin, yOffset);
-                        yOffset += 8;
-                        pdf.setFont(undefined, 'normal');
+                                                        if (title) {
+                                                            pdf.setFontSize(14);
+                                                        pdf.setFont(undefined, 'bold');
+                                                        pdf.text(title, margin, yOffset);
+                                                        yOffset += 8;
+                                                        pdf.setFont(undefined, 'normal');
                     }
 
-                    const canvas = await html2canvas(el, {
-                        scale: 2,
-                        backgroundColor: '#ffffff'
+                                                        const canvas = await html2canvas(el, {
+                                                            scale: 2,
+                                                        backgroundColor: '#ffffff'
                     });
-                    const imgData = canvas.toDataURL('image/png');
-                    const imgHeight = (canvas.height * contentWidth) / canvas.width;
+                                                        const imgData = canvas.toDataURL('image/png');
+                                                        const imgHeight = (canvas.height * contentWidth) / canvas.width;
 
                     // Check validation again with exact height
                     if (yOffset + imgHeight > pageHeight - margin) {
                         if (yOffset > 30) { // If not at top of page, break
-                            pdf.addPage();
-                            yOffset = 15;
+                                                            pdf.addPage();
+                                                        yOffset = 15;
                             // Redraw title if moved to new page? 
                             // Simplification: Just draw image.
                         }
                     }
 
-                    pdf.addImage(imgData, 'PNG', margin, yOffset, contentWidth, imgHeight);
-                    yOffset += imgHeight + 10;
+                                                        pdf.addImage(imgData, 'PNG', margin, yOffset, contentWidth, imgHeight);
+                                                        yOffset += imgHeight + 10;
                 };
 
-                // 1. Trough Summary
-                await addContentToPDF('cet1TroughCard', 'Projected CET1 Ratios (Trough)');
+                                                        // 1. Trough Summary
+                                                        await addContentToPDF('cet1TroughCard', 'Projected CET1 Ratios (Trough)');
 
-                // 2. Capital Projection
-                await addContentToPDF('capitalProjectionCard', 'Capital Projection');
+                                                        // 2. Capital Projection
+                                                        await addContentToPDF('capitalProjectionCard', 'Capital Projection');
 
                 // 3. Detailed Analysis
-                if (yOffset > pageHeight - 50) { pdf.addPage(); yOffset = 15; }
-                else { yOffset += 5; } // spacers
+                if (yOffset > pageHeight - 50) {pdf.addPage(); yOffset = 15; }
+                                                        else {yOffset += 5; } // spacers
 
-                pdf.setFontSize(16);
-                pdf.text('Detailed Impact Analysis', margin, yOffset);
-                yOffset += 10;
+                                                        pdf.setFontSize(16);
+                                                        pdf.text('Detailed Impact Analysis', margin, yOffset);
+                                                        yOffset += 10;
 
-                // Cycle through tabs
-                const views = [
-                    { id: 'waterfall', title: 'Waterfall Chart' },
-                    { id: 'decomposition', title: 'Decomposition Chart' },
-                    { id: 'dollarImpact', title: '$ Impact Table' },
-                    { id: 'bpsImpact', title: 'BPS Impact Table' }
-                ];
+                                                        // Cycle through tabs
+                                                        const views = [
+                                                        {id: 'waterfall', title: 'Waterfall Chart' },
+                                                        {id: 'decomposition', title: 'Decomposition Chart' },
+                                                        {id: 'dollarImpact', title: '$ Impact Table' },
+                                                        {id: 'bpsImpact', title: 'BPS Impact Table' }
+                                                        ];
 
-                for (const view of views) {
+                                                        for (const view of views) {
                     const el = document.getElementById(view.id);
-                    const wasActive = el.classList.contains('active');
+                                                        const wasActive = el.classList.contains('active');
 
-                    // Activate
-                    el.classList.add('active');
+                                                        // Activate
+                                                        el.classList.add('active');
 
-                    // Resize charts if needed
-                    const chart = el.querySelector('.chart-container');
-                    if (chart && chart.id && Plotly) {
-                        Plotly.Plots.resize(document.getElementById(chart.id));
+                                                        // Resize charts if needed
+                                                        const chart = el.querySelector('.chart-container');
+                                                        if (chart && chart.id && Plotly) {
+                                                            Plotly.Plots.resize(document.getElementById(chart.id));
                     }
 
                     await new Promise(r => setTimeout(r, 100)); // Wait for render
 
-                    await addContentToPDF(view.id, view.title);
+                                                        await addContentToPDF(view.id, view.title);
 
-                    // Restore
-                    if (!wasActive) el.classList.remove('active');
+                                                        // Restore
+                                                        if (!wasActive) el.classList.remove('active');
                 }
 
-                pdf.save(`${customScenarioName.replace(/[^a-zA-Z0-9]/g, '_')}_Report.pdf`);
+                                                        pdf.save(`${customScenarioName.replace(/[^a-zA-Z0-9]/g, '_')}_Report.pdf`);
 
             } catch (err) {
-                console.error('Export error:', err);
-                alert('Failed to generate PDF. Check console for details.');
+                                                            console.error('Export error:', err);
+                                                        alert('Failed to generate PDF. Check console for details.');
             } finally {
                 // Restore state
                 if (previousScenario && previousScenario !== 'custom') {
-                    selectScenarioForDetails(previousScenario);
+                                                            selectScenarioForDetails(previousScenario);
                 }
 
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-                // Restore main chart
-                const wChart = document.getElementById('waterfallChart');
-                if (wChart) Plotly.Plots.resize(wChart);
+                                                        btn.innerHTML = originalText;
+                                                        btn.disabled = false;
+                                                        // Restore main chart
+                                                        const wChart = document.getElementById('waterfallChart');
+                                                        if (wChart) Plotly.Plots.resize(wChart);
             }
         }
 
-        // Initialize on load
-        initComponentBuilder();
-        initComponentOverrideList();
-        loadSavedScenarios(); // Load saved scenarios from localStorage
-        calculateScenario();
+                                                        // Initialize on load
+                                                        initComponentBuilder();
+                                                        initComponentOverrideList();
+                                                        loadSavedScenarios(); // Load saved scenarios from localStorage
+                                                        calculateScenario();
 
         // Check for imported scenario after initialization
         setTimeout(() => {
             const importedScenario = checkForImportedScenario();
-            if (importedScenario) {
-                initiateImportedScenarioAnalysis(importedScenario);
+                                                        if (importedScenario) {
+                                                            initiateImportedScenarioAnalysis(importedScenario);
             }
         }, 500);
 
