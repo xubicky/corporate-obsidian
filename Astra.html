@@ -1158,6 +1158,68 @@
             background: #ECFDF5;
             color: #065F46;
         }
+
+        /* Split view modal layout */
+        #inputScenarioModal .modal-content {
+            width: 1200px;
+            max-width: 95vw;
+        }
+
+        .split-panel-left {
+            flex: 1.3;
+            background: #F8FAFC;
+            border-right: 1px solid var(--border-subtle);
+            overflow-y: auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .split-panel-right {
+            flex: 0.8;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            min-width: 350px;
+        }
+
+        .empty-state-placeholder {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            opacity: 0.6;
+        }
+
+        /* Adjust severity list for the panel width */
+        .severity-list {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        /* Make scenario result fill the panel */
+        .scenario-result {
+            border: none;
+            background: transparent;
+            padding: 0;
+            margin: 0;
+            box-shadow: none;
+            max-height: none;
+            overflow: visible;
+        }
+
+        /* Calculate button sticky at bottom */
+        .calculate-sticky-footer {
+            margin-top: auto;
+            padding-top: 24px;
+            background: transparent;
+            z-index: 20;
+        }
     </style>
 
 <body>
@@ -1524,36 +1586,50 @@
                 <h3 style="margin:0; font-size:16px; font-weight:700;">Create Custom Scenario with AI</h3>
                 <button class="side-panel-close" onclick="closeInputScenarioModal()">✕</button>
             </div>
-            <div class="modal-body">
-                <div class="chat-container" id="chatContainer">
-                    <div class="chat-message ai">
-                        <div class="chat-bubble">
-                            Hello! Describe your stress testing scenario or upload a document. I'll help you assess the
-                            impact on RBC's capital components.
-                        </div>
+            <div class="modal-body" style="padding: 0; display: flex; overflow: hidden; height: calc(85vh - 60px);">
+                <!-- Left Panel: Scenario Configuration & Results -->
+                <div class="split-panel-left" id="scenarioConfigPanel">
+                    <div class="empty-state-placeholder">
+                        <div style="font-size: 48px; margin-bottom: 20px;">🤖</div>
+                        <h3 style="margin: 0; color: var(--text-main);">AI Scenario Builder</h3>
+                        <p style="color: var(--text-secondary); max-width: 300px; margin: 10px auto;">
+                            Chat with the AI on the right to describe a stress event. The generated scenario details and
+                            component severities will appear here for your review and adjustment.
+                        </p>
                     </div>
                 </div>
-                <div id="scenarioResultContainer"></div>
-                <div class="input-area">
-                    <div id="uploadedFileDisplay"></div>
-                    <textarea id="userInput" class="form-control" placeholder="Type your scenario description..."
-                        style="height:80px; resize:none;"
-                        onkeypress="if(event.key==='Enter' && !event.shiftKey) {event.preventDefault(); sendMessage();}"></textarea>
-                    <div style="display:flex; gap:10px;">
-                        <label class="btn btn-secondary">
-                            📎 Upload
-                            <input type="file" id="fileUpload" style="display:none" accept=".txt,.pdf,.doc,.docx"
-                                onchange="handleFileUpload(event)">
-                        </label>
-                        <button class="btn btn-primary" style="flex:1" onclick="sendMessage()">Send</button>
-                        <button class="btn btn-secondary" onclick="requestFinalization()"
-                            id="requestFinalizeBtn">Complete Setup</button>
+
+                <!-- Right Panel: AI Chat -->
+                <div class="split-panel-right">
+                    <div class="chat-container" id="chatContainer" style="flex: 1; min-height: 0; padding: 20px;">
+                        <div class="chat-message ai">
+                            <div class="chat-bubble">
+                                Hello! Describe your stress testing scenario or upload a document. I'll help you assess
+                                the
+                                impact on RBC's capital components.
+                            </div>
+                        </div>
                     </div>
-                    <div style="display: flex; gap: 8px; margin-top: 8px;">
-                        <button class="btn btn-secondary" onclick="saveCurrentScenario()" id="saveScenarioBtn"
-                            style="display: none; flex: 1;">💾 Save Scenario</button>
-                        <button class="btn btn-primary" onclick="applyScenario()" id="applyScenarioBtn"
-                            style="display: none; flex: 1;">Apply to Dashboard</button>
+
+                    <!-- Input Area fixed at bottom of right panel -->
+                    <div class="input-area"
+                        style="border-top: 1px solid var(--border-subtle); padding: 20px; background: white;">
+                        <div id="uploadedFileDisplay"></div>
+                        <textarea id="userInput" class="form-control" placeholder="Type your scenario description..."
+                            style="height:60px; resize:none; margin-bottom: 12px;"
+                            onkeypress="if(event.key==='Enter' && !event.shiftKey) {event.preventDefault(); sendMessage();}"></textarea>
+                        <div style="display:flex; gap:10px; align-items: center;">
+                            <label class="btn btn-secondary" style="padding: 8px 12px; font-size: 13px;">
+                                📎 Upload
+                                <input type="file" id="fileUpload" style="display:none" accept=".txt,.pdf,.doc,.docx"
+                                    onchange="handleFileUpload(event)">
+                            </label>
+                            <button class="btn btn-secondary" onclick="requestFinalization()" id="requestFinalizeBtn"
+                                style="font-size: 13px;">Complete Setup</button>
+                            <button class="btn btn-primary" style="flex:1; margin-left: auto;"
+                                onclick="sendMessage()">Send <i class="fas fa-paper-plane"
+                                    style="margin-left: 6px;"></i></button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -4032,7 +4108,7 @@ Be conversational, ask thoughtful questions, and help the user think through all
 
         function displayScenarioResult(scenarioData) {
 
-            const resultContainer = document.getElementById('scenarioResultContainer');
+            const resultContainer = document.getElementById('scenarioConfigPanel');
 
 
 
@@ -4079,9 +4155,8 @@ Be conversational, ask thoughtful questions, and help the user think through all
                 <div class="scenario-result">
                     <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom: 12px;">
                         <div>
-                             <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: var(--text-main);">${scenarioData.title}</h3>
-
-                             <div style="margin-top: 6px;">
+                             <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: var(--text-main);">${scenarioData.title}</h3>
+                             <div style="margin-top: 8px;">
                                 <span class="severity-badge severity-${scenarioData.severity}">
                                     Overall: ${scenarioData.severity.replace('_', ' ')}
                                 </span>
@@ -4089,12 +4164,10 @@ Be conversational, ask thoughtful questions, and help the user think through all
                         </div>
                     </div>
                     
-                    <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 16px;">${scenarioData.description}</p>
+                    <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 20px;">${scenarioData.description}</p>
 
-                    
-
-                    <h4 style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px; margin-bottom: 6px;">
-                        Component Severities <span style="font-weight: 400;">(hover for AI reasoning)</span>
+                    <h4 style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px; margin-bottom: 12px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px;">
+                        Component Severities <span style="font-weight: 400; color: var(--text-muted);">(hover for AI reasoning)</span>
                     </h4>
                     
                     <div class="severity-list">
@@ -4102,14 +4175,14 @@ Be conversational, ask thoughtful questions, and help the user think through all
                     </div>
                 </div>
                 
-                <div style="margin-top: 16px; display: flex; gap: 10px;">
-                    <button class="btn btn-primary" onclick="applyScenario()" style="flex: 1; padding: 14px 20px; font-size: 14px; font-weight: 600;">
+                <div class="calculate-sticky-footer">
+                    <button class="btn btn-primary" onclick="applyScenario()" style="width: 100%; padding: 14px 20px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);">
                         📊 Calculate & Apply to Dashboard
                     </button>
+                    <p style="text-align: center; margin-top: 10px; font-size: 11px; color: var(--text-muted);">
+                        This will override the current dashboard values with the AI-generated stress scenario.
+                    </p>
                 </div>
-
-                </div>
-
             `;
 
         }
@@ -4132,7 +4205,7 @@ Be conversational, ask thoughtful questions, and help the user think through all
 
             const compId = component.replace(/\s+/g, '_');
 
-            const valueElement = document.querySelector(`[data-component="${component}"] .severity-item-value`);
+            const valueElement = document.querySelector(`[data - component="${component}"] .severity - item - value`);
 
 
 
@@ -4162,7 +4235,7 @@ Be conversational, ask thoughtful questions, and help the user think through all
 
             // Show feedback
 
-            console.log(`Updated ${component} to ${newSeverity}`);
+            console.log(`Updated ${component} to ${newSeverity} `);
 
         }
 
@@ -4188,7 +4261,7 @@ Be conversational, ask thoughtful questions, and help the user think through all
 
             COMPONENTS.forEach(comp => {
 
-                const selectId = `comp_${comp.replace(/\s+/g, '_')}`;
+                const selectId = `comp_${comp.replace(/\s+/g, '_')} `;
 
                 const selectElement = document.getElementById(selectId);
 
@@ -4303,7 +4376,7 @@ Be conversational, ask thoughtful questions, and help the user think through all
             let hasAnySelection = false;
 
             COMPONENTS.forEach(comp => {
-                const selectId = `comp_${comp.replace(/\s+/g, '_')}`;
+                const selectId = `comp_${comp.replace(/\s+/g, '_')} `;
                 const selectEl = document.getElementById(selectId);
                 if (selectEl) {
                     componentSeverities[comp] = selectEl.value;
@@ -4384,17 +4457,17 @@ Be conversational, ask thoughtful questions, and help the user think through all
                 const breakdownText = breakdownParts.join(', ');
 
                 return `
-                    <div class="saved-scenario-card" style="
-                        background: white;
-                        border: 1px solid var(--border-subtle);
-                        border-radius: 12px;
-                        padding: 14px;
-                        cursor: pointer;
-                        transition: all 0.2s ease;
-                        margin-bottom: 12px;
-                    " onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)'" 
-                       onmouseout="this.style.boxShadow='none'"
-                       onclick="loadSavedScenario('${s.id}')">
+                < div class="saved-scenario-card" style = "
+            background: white;
+            border: 1px solid var(--border - subtle);
+            border - radius: 12px;
+            padding: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin - bottom: 12px;
+            " onmouseover="this.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)'" 
+            onmouseout = "this.style.boxShadow='none'"
+            onclick = "loadSavedScenario('${s.id}')" >
                         <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
                             <span style="
                                 font-size: 10px;
@@ -4415,11 +4488,11 @@ Be conversational, ask thoughtful questions, and help the user think through all
                         
                         ${breakdownText ? `<div style="font-size: 10px; color: var(--text-medium); margin-bottom: 8px; background: #f1f5f9; padding: 4px 8px; border-radius: 4px;">Outcome: ${breakdownText}</div>` : ''}
 
-                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: var(--text-muted);">
-                            <span>📅 ${s.savedAt}</span>
-                            <span>${s.importedFrom === 'Scenario Narrative Platform' ? '🔗 from Scenario' : '✏️ Manual'}</span>
-                        </div>
-                    </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: var(--text-muted);">
+                <span>📅 ${s.savedAt}</span>
+                <span>${s.importedFrom === 'Scenario Narrative Platform' ? '🔗 from Scenario' : '✏️ Manual'}</span>
+            </div>
+                    </div >
                 `;
             }).join('');
         }
@@ -4445,14 +4518,14 @@ Be conversational, ask thoughtful questions, and help the user think through all
 
             // 2. Apply the component severities to the UI dropdowns
             for (const [comp, severity] of Object.entries(scenario.componentSeverities)) {
-                const selectId = `comp_${comp.replace(/\s+/g, '_')}`;
+                const selectId = `comp_${comp.replace(/\s+/g, '_')} `;
                 const selectEl = document.getElementById(selectId);
                 if (selectEl) {
                     // Validate severity value
                     const validSeverity = ['very_severe', 'severe', 'moderate', 'benchmark'].includes(severity)
                         ? severity : 'moderate';
                     selectEl.value = validSeverity;
-                    console.log(`Set dropdown ${selectId} = ${validSeverity}`);
+                    console.log(`Set dropdown ${selectId} = ${validSeverity} `);
                 }
             }
 
@@ -4541,70 +4614,70 @@ Be conversational, ask thoughtful questions, and help the user think through all
             console.log('📊 Importing scenario from scenario.html:', scenario.title);
 
             // Build enhanced system prompt with scenario context
-            const enhancedSystemPrompt = `You are a financial risk analyst helping to create stress testing scenarios for Royal Bank of Canada (RBC). 
+            const enhancedSystemPrompt = `You are a financial risk analyst helping to create stress testing scenarios for Royal Bank of Canada(RBC).
 
-IMPORTANT: A scenario has been imported from the Scenario Narrative Platform. You must analyze this scenario and determine CET1 component severity levels.
+                IMPORTANT: A scenario has been imported from the Scenario Narrative Platform.You must analyze this scenario and determine CET1 component severity levels.
 
 IMPORTED SCENARIO CONTEXT:
 ${scenario.narrativeSummary}
 
 Your job now is to:
-1. Acknowledge that you've received the imported scenario "${scenario.title}"
-2. Briefly summarize the key risks and their implications for RBC
+            1. Acknowledge that you've received the imported scenario "${scenario.title}"
+            2. Briefly summarize the key risks and their implications for RBC
 3. Ask if the user wants you to proceed with the CET1 component severity assessment
-4. When ready (or if user confirms), provide the severity assessments for all 18 CET1 components
+            4. When ready(or if user confirms), provide the severity assessments for all 18 CET1 components
 
 The 18 CET1 components are:
-- PPNR Canada, PPNR US, PPNR International
-- PCL Canada, PCL US, PCL International (Provision for Credit Losses by geography)
-- Dividend
-- Trading PnL
-- AFS Losses
-- Operational Risk Losses
-- Currency Translation Adj
-- Shortfall in Allowance
-- Credit RWA Change Canada, Credit RWA Change US, Credit RWA Change International (Credit Risk-Weighted Assets by geography)
-- Market CCR CVA RWA Change
-- Operational Risk RWA Change
-- Other
+            - PPNR Canada, PPNR US, PPNR International
+                - PCL Canada, PCL US, PCL International(Provision for Credit Losses by geography)
+            - Dividend
+                - Trading PnL
+                    - AFS Losses
+                        - Operational Risk Losses
+                            - Currency Translation Adj
+                                - Shortfall in Allowance
+                                - Credit RWA Change Canada, Credit RWA Change US, Credit RWA Change International(Credit Risk - Weighted Assets by geography)
+                                    - Market CCR CVA RWA Change
+                                        - Operational Risk RWA Change
+                                            - Other
 
 When the user asks you to finalize or you believe you have enough information, respond with a JSON object in this EXACT format:
-{
-  "FINALIZE": true,
-  "title": "${scenario.title}",
-  "description": "Brief description based on imported scenario",
-  "severity": "very_severe|severe|moderate|benchmark",
-  "componentSeverities": {
-    "PPNR Canada": "very_severe|severe|moderate|benchmark",
-    "PPNR US": "very_severe|severe|moderate|benchmark",
-    "PPNR International": "very_severe|severe|moderate|benchmark",
-    "PCL Canada": "very_severe|severe|moderate|benchmark",
-    "PCL US": "very_severe|severe|moderate|benchmark",
-    "PCL International": "very_severe|severe|moderate|benchmark",
-    "Dividend": "very_severe|severe|moderate|benchmark",
-    "Trading PnL": "very_severe|severe|moderate|benchmark",
-    "AFS Losses": "very_severe|severe|moderate|benchmark",
-    "Operational Risk Losses": "very_severe|severe|moderate|benchmark",
-    "Currency Translation Adj": "very_severe|severe|moderate|benchmark",
-    "Shortfall in Allowance": "very_severe|severe|moderate|benchmark",
-    "Credit RWA Change Canada": "very_severe|severe|moderate|benchmark",
-    "Credit RWA Change US": "very_severe|severe|moderate|benchmark",
-    "Credit RWA Change International": "very_severe|severe|moderate|benchmark",
-    "Market CCR CVA RWA Change": "very_severe|severe|moderate|benchmark",
-    "Operational Risk RWA Change": "very_severe|severe|moderate|benchmark",
-    "Other": "very_severe|severe|moderate|benchmark"
-  },
-  "componentRationale": {
-    "PPNR Canada": "1-2 sentence explanation",
+            {
+                "FINALIZE": true,
+                    "title": "${scenario.title}",
+                        "description": "Brief description based on imported scenario",
+                            "severity": "very_severe|severe|moderate|benchmark",
+                                "componentSeverities": {
+                    "PPNR Canada": "very_severe|severe|moderate|benchmark",
+                        "PPNR US": "very_severe|severe|moderate|benchmark",
+                            "PPNR International": "very_severe|severe|moderate|benchmark",
+                                "PCL Canada": "very_severe|severe|moderate|benchmark",
+                                    "PCL US": "very_severe|severe|moderate|benchmark",
+                                        "PCL International": "very_severe|severe|moderate|benchmark",
+                                            "Dividend": "very_severe|severe|moderate|benchmark",
+                                                "Trading PnL": "very_severe|severe|moderate|benchmark",
+                                                    "AFS Losses": "very_severe|severe|moderate|benchmark",
+                                                        "Operational Risk Losses": "very_severe|severe|moderate|benchmark",
+                                                            "Currency Translation Adj": "very_severe|severe|moderate|benchmark",
+                                                                "Shortfall in Allowance": "very_severe|severe|moderate|benchmark",
+                                                                    "Credit RWA Change Canada": "very_severe|severe|moderate|benchmark",
+                                                                        "Credit RWA Change US": "very_severe|severe|moderate|benchmark",
+                                                                            "Credit RWA Change International": "very_severe|severe|moderate|benchmark",
+                                                                                "Market CCR CVA RWA Change": "very_severe|severe|moderate|benchmark",
+                                                                                    "Operational Risk RWA Change": "very_severe|severe|moderate|benchmark",
+                                                                                        "Other": "very_severe|severe|moderate|benchmark"
+                },
+                "componentRationale": {
+                    "PPNR Canada": "1-2 sentence explanation",
     ... (for each component)
   }
-}
+            }
 
-Use the imported scenario details to make informed severity assessments. Consider:
-- Risk driver categories and their assessed likelihood/materiality/velocity
-- Macroeconomic projections (GDP, unemployment, housing, etc.)
-- Geographic concentration of risks (Canada vs US vs International)
-- Speed of impact (velocity) for time-sensitive components`;
+Use the imported scenario details to make informed severity assessments.Consider:
+            - Risk driver categories and their assessed likelihood / materiality / velocity
+                - Macroeconomic projections(GDP, unemployment, housing, etc.)
+                    - Geographic concentration of risks(Canada vs US vs International)
+                        - Speed of impact(velocity) for time - sensitive components`;
 
             // Set up conversation with imported context
             conversationHistory = [{
@@ -4612,28 +4685,28 @@ Use the imported scenario details to make informed severity assessments. Conside
                 content: enhancedSystemPrompt
             }, {
                 role: 'assistant',
-                content: `📊 **Scenario Imported Successfully!**
+                content: `📊 ** Scenario Imported Successfully! **
 
-I've received the scenario **"${scenario.title}"** from the Scenario Narrative Platform with ${scenario.riskDrivers.length} risk drivers.
+                I've received the scenario **"${scenario.title}"** from the Scenario Narrative Platform with ${scenario.riskDrivers.length} risk drivers.
 
-**Key Risk Drivers:**
-${scenario.riskDrivers.slice(0, 5).map(d => `• ${d.title} (${d.category})`).join('\n')}
+                    ** Key Risk Drivers:**
+                        ${scenario.riskDrivers.slice(0, 5).map(d => `• ${d.title} (${d.category})`).join('\n')}
 ${scenario.riskDrivers.length > 5 ? `\n...and ${scenario.riskDrivers.length - 5} more` : ''}
 
 Based on this scenario, I'm ready to analyze the impact on RBC's 18 CET1 capital components.
 
 Would you like me to:
-1. **Proceed with assessment** - I'll analyze each component and provide severity ratings
-2. **Review the scenario first** - I can summarize the key points before assessment
-3. **Adjust the scenario** - Tell me if you'd like to modify any aspects
+            1. ** Proceed with assessment ** - I'll analyze each component and provide severity ratings
+            2. ** Review the scenario first ** - I can summarize the key points before assessment
+            3. ** Adjust the scenario ** - Tell me if you'd like to modify any aspects
 
-What would you prefer?`
+What would you prefer ? `
             }];
 
             // Open the modal and show the imported state
             const chatContainer = document.getElementById('chatContainer');
             chatContainer.innerHTML = `
-                <div class="chat-message ai">
+                < div class="chat-message ai" >
                     <div class="chat-avatar">AI</div>
                     <div class="chat-bubble">
                         📊 <strong>Scenario Imported Successfully!</strong><br><br>
