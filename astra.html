@@ -4135,6 +4135,8 @@ Be conversational, ask thoughtful questions, and help the user think through all
                         const textBeforeJson = aiResponse.substring(0, aiResponse.indexOf(finalizeMatch[0])).trim();
                         if (textBeforeJson) {
                             addMessageToChat('ai', textBeforeJson);
+                        } else {
+                            addMessageToChat('ai', "✅ Scenario analysis complete. I've updated the configuration panel with component severities and rationale for your review.");
                         }
 
                         displayScenarioResult(scenarioData);
