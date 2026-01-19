@@ -23,22 +23,29 @@ const ForceGraph2D = dynamic(() => import("react-force-graph-2d"), {
 });
 
 interface GraphNode {
-    id: number;
+    id: number | string;
     title: string;
     group: string;
+    type?: string;
     linkCount?: number;
     x?: number;
     y?: number;
 }
 
 interface GraphLink {
-    source: number | GraphNode;
-    target: number | GraphNode;
+    source: number | string | GraphNode;
+    target: number | string | GraphNode;
+    type?: string;
 }
 
 interface GraphData {
     nodes: GraphNode[];
     links: GraphLink[];
+}
+
+interface FullGraphData extends GraphData {
+    tags: GraphNode[];
+    tagLinks: GraphLink[];
 }
 
 interface GraphSettings {
@@ -81,7 +88,7 @@ export default function NetworkGraph() {
     const graphRef = useRef<any>(null);
     const containerRef = useRef<HTMLDivElement>(null);
 
-    const [data, setData] = useState<GraphData>({ nodes: [], links: [] });
+    const [data, setData] = useState<FullGraphData>({ nodes: [], links: [], tags: [], tagLinks: [] });
     const [filteredData, setFilteredData] = useState<GraphData>({ nodes: [], links: [] });
     const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
     const [settings, setSettings] = useState<GraphSettings>(defaultSettings);
@@ -102,7 +109,7 @@ export default function NetworkGraph() {
                 const jsonData = await res.json();
 
                 // Calculate link counts for each node
-                const linkCounts: Record<number, number> = {};
+                const linkCounts: Record<number | string, number> = {};
                 jsonData.links.forEach((link: any) => {
                     const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
                     const targetId = typeof link.target === 'object' ? link.target.id : link.target;
@@ -115,7 +122,12 @@ export default function NetworkGraph() {
                     linkCount: linkCounts[n.id] || 0
                 }));
 
-                setData({ nodes: nodesWithCounts, links: jsonData.links });
+                setData({
+                    nodes: nodesWithCounts,
+                    links: jsonData.links,
+                    tags: jsonData.tags || [],
+                    tagLinks: jsonData.tagLinks || []
+                });
             } catch (err) {
                 console.error(err);
                 setData({
@@ -127,7 +139,9 @@ export default function NetworkGraph() {
                     links: [
                         { source: 1, target: 2 },
                         { source: 1, target: 3 }
-                    ]
+                    ],
+                    tags: [],
+                    tagLinks: []
                 });
             }
         };
@@ -138,6 +152,12 @@ export default function NetworkGraph() {
     useEffect(() => {
         let nodes = [...data.nodes];
         let links = [...data.links];
+
+        // Include tags if showTags is enabled
+        if (settings.showTags && data.tags.length > 0) {
+            nodes = [...nodes, ...data.tags];
+            links = [...links, ...data.tagLinks];
+        }
 
         // Search filter
         if (settings.searchQuery) {
@@ -153,7 +173,7 @@ export default function NetworkGraph() {
 
         // Orphan filter
         if (!settings.showOrphans) {
-            const connectedIds = new Set<number>();
+            const connectedIds = new Set<number | string>();
             links.forEach(l => {
                 const sourceId = typeof l.source === 'object' ? l.source.id : l.source;
                 const targetId = typeof l.target === 'object' ? l.target.id : l.target;
@@ -163,8 +183,30 @@ export default function NetworkGraph() {
             nodes = nodes.filter(n => connectedIds.has(n.id));
         }
 
-        setFilteredData({ nodes, links });
-    }, [data, settings.searchQuery, settings.showOrphans]);
+        // Recalculate link counts based on current filtered links
+        const linkCounts: Record<number | string, number> = {};
+        links.forEach(l => {
+            const sourceId = typeof l.source === 'object' ? l.source.id : l.source;
+            const targetId = typeof l.target === 'object' ? l.target.id : l.target;
+            linkCounts[sourceId] = (linkCounts[sourceId] || 0) + 1;
+            linkCounts[targetId] = (linkCounts[targetId] || 0) + 1;
+        });
+
+        // Update nodes with recalculated link counts
+        const nodesWithUpdatedCounts = nodes.map(n => ({
+            ...n,
+            linkCount: linkCounts[n.id] || 0
+        }));
+
+        // Create fresh link copies to avoid mutation issues with force graph
+        const freshLinks = links.map(l => ({
+            source: typeof l.source === 'object' ? l.source.id : l.source,
+            target: typeof l.target === 'object' ? l.target.id : l.target,
+            type: l.type
+        }));
+
+        setFilteredData({ nodes: nodesWithUpdatedCounts, links: freshLinks });
+    }, [data, settings.searchQuery, settings.showOrphans, settings.showTags]);
 
     // 3. Responsive Sizing
     useEffect(() => {
@@ -233,26 +275,98 @@ export default function NetworkGraph() {
         </div>
     );
 
-    // Slider Component
+    // Slider Component - uses local state during drag for smooth interaction
     const Slider = ({ value, onChange, min, max, step, label }: {
         value: number; onChange: (v: number) => void; min: number; max: number; step: number; label: string
-    }) => (
-        <div className="py-1.5">
-            <div className="flex justify-between mb-1">
-                <span className="text-sm text-slate-600">{label}</span>
-                <span className="text-xs text-slate-400 font-mono">{value}</span>
+    }) => {
+        const [localValue, setLocalValue] = React.useState(value);
+        const [isDragging, setIsDragging] = React.useState(false);
+
+        // Sync local value when parent value changes (and not dragging)
+        React.useEffect(() => {
+            if (!isDragging) {
+                setLocalValue(value);
+            }
+        }, [value, isDragging]);
+
+        const displayValue = isDragging ? localValue : value;
+        const percentage = ((displayValue - min) / (max - min)) * 100;
+
+        return (
+            <div className="py-1.5">
+                <div className="flex justify-between mb-1">
+                    <span className="text-sm text-slate-600">{label}</span>
+                    <span className="text-xs text-slate-400 font-mono">{displayValue}</span>
+                </div>
+                <input
+                    type="range"
+                    min={min}
+                    max={max}
+                    step={step}
+                    defaultValue={value}
+                    onMouseDown={() => setIsDragging(true)}
+                    onTouchStart={() => setIsDragging(true)}
+                    onInput={(e) => {
+                        const newValue = Number((e.target as HTMLInputElement).value);
+                        setLocalValue(newValue);
+                    }}
+                    onMouseUp={(e) => {
+                        setIsDragging(false);
+                        onChange(Number((e.target as HTMLInputElement).value));
+                    }}
+                    onTouchEnd={(e) => {
+                        setIsDragging(false);
+                        onChange(Number((e.target as HTMLInputElement).value));
+                    }}
+                    onChange={(e) => {
+                        // For keyboard accessibility
+                        if (!isDragging) {
+                            onChange(Number(e.target.value));
+                        }
+                    }}
+                    className="slider-input"
+                    style={{
+                        width: '100%',
+                        height: '6px',
+                        background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${percentage}%, #e2e8f0 ${percentage}%, #e2e8f0 100%)`,
+                        borderRadius: '9999px',
+                        appearance: 'none',
+                        WebkitAppearance: 'none',
+                        cursor: 'pointer',
+                        outline: 'none',
+                    }}
+                />
+                <style jsx>{`
+                    .slider-input::-webkit-slider-thumb {
+                        -webkit-appearance: none;
+                        appearance: none;
+                        width: 16px;
+                        height: 16px;
+                        background: #3b82f6;
+                        border-radius: 50%;
+                        cursor: grab;
+                        border: 2px solid white;
+                        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+                    }
+                    .slider-input::-webkit-slider-thumb:active {
+                        cursor: grabbing;
+                    }
+                    .slider-input::-moz-range-thumb {
+                        width: 16px;
+                        height: 16px;
+                        background: #3b82f6;
+                        border-radius: 50%;
+                        cursor: grab;
+                        border: 2px solid white;
+                        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+                    }
+                    .slider-input::-moz-range-thumb:active {
+                        cursor: grabbing;
+                    }
+                `}</style>
             </div>
-            <input
-                type="range"
-                min={min}
-                max={max}
-                step={step}
-                value={value}
-                onChange={(e) => onChange(Number(e.target.value))}
-                className="w-full h-1.5 bg-slate-200 rounded-full appearance-none cursor-pointer accent-blue-500"
-            />
-        </div>
-    );
+        );
+    };
 
     // Section Header
     const SectionHeader = ({ title, icon: Icon, open, onToggle }: {
@@ -314,11 +428,13 @@ export default function NetworkGraph() {
                 </div>
 
                 <ForceGraph2D
+                    key={`graph-${settings.showTags}`}
                     ref={graphRef}
                     width={dimensions.width}
                     height={dimensions.height}
                     graphData={filteredData}
                     backgroundColor="#f8fafc"
+                    nodeId="id"
 
                     // Nodes
                     nodeLabel={settings.showLabels ? "title" : ""}
@@ -329,6 +445,7 @@ export default function NetworkGraph() {
                             case "public": return "#22c55e";
                             case "private": return "#ef4444";
                             case "team": return "#3b82f6";
+                            case "tag": return "#a855f7"; // purple for tags
                             default: return "#64748b";
                         }
                     }}
@@ -343,7 +460,8 @@ export default function NetworkGraph() {
                         ctx.fillStyle = hoveredNode?.id === node.id ? "#3b82f6" :
                             node.group === "public" ? "#22c55e" :
                                 node.group === "private" ? "#ef4444" :
-                                    node.group === "team" ? "#3b82f6" : "#64748b";
+                                    node.group === "team" ? "#3b82f6" :
+                                        node.group === "tag" ? "#a855f7" : "#64748b";
                         ctx.fill();
 
                         // Glow effect
