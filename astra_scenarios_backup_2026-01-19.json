@@ -1,0 +1,32 @@
+[
+  {
+    "id": "astra_1768517004510",
+    "title": "Oil Glut Credit Squeeze",
+    "description": "Manually configured scenario from Scenario Builder",
+    "severity": "moderate",
+    "componentSeverities": {
+      "PPNR Canada": "severe",
+      "PPNR US": "moderate",
+      "PPNR International": "moderate",
+      "PCL Canada": "severe",
+      "PCL US": "moderate",
+      "PCL International": "moderate",
+      "Dividend": "moderate",
+      "Trading PnL": "moderate",
+      "AFS Losses": "moderate",
+      "Operational Risk Losses": "benchmark",
+      "Currency Translation Adj": "benchmark",
+      "Shortfall in Allowance": "moderate",
+      "Credit RWA Change Canada": "severe",
+      "Credit RWA Change US": "moderate",
+      "Credit RWA Change International": "moderate",
+      "Market CCR CVA RWA Change": "severe",
+      "Operational Risk RWA Change": "benchmark",
+      "Other": "moderate"
+    },
+    "componentRationale": {},
+    "savedAt": "1/15/2026, 5:43:24 PM",
+    "timestamp": 1768517004510,
+    "importedFrom": "Manual"
+  }
+]
