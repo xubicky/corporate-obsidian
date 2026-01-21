@@ -286,6 +286,201 @@
             color: #003168;
         }
 
+        /* Scenario Description Editable Wrapper */
+        .scenario-desc-wrapper {
+            position: relative;
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .scenario-desc-edit-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-4px);
+            transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+            background: rgba(0, 49, 104, 0.9);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 12px rgba(0, 49, 104, 0.25);
+            z-index: 10;
+        }
+
+        .scenario-desc-edit-btn:hover {
+            background: rgba(0, 49, 104, 1);
+            transform: translateY(-6px) scale(1.02);
+            box-shadow: 0 6px 16px rgba(0, 49, 104, 0.35);
+        }
+
+        .scenario-desc-wrapper.show-edit-btn .scenario-desc-edit-btn {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        /* Scenario Description Edit Modal */
+        .scenario-edit-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .scenario-edit-modal.active {
+            display: flex;
+        }
+
+        .scenario-edit-modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .scenario-edit-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            border-bottom: 1px solid #E2E8F0;
+        }
+
+        .scenario-edit-modal-header h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #003168;
+            margin: 0;
+        }
+
+        .scenario-edit-modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #64748B;
+            transition: color 0.2s;
+            padding: 4px 8px;
+        }
+
+        .scenario-edit-modal-close:hover {
+            color: #003168;
+        }
+
+        .scenario-edit-modal-body {
+            padding: 24px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .scenario-edit-textarea {
+            width: 100%;
+            min-height: 250px;
+            padding: 16px;
+            border: 1px solid #E2E8F0;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #334155;
+            resize: vertical;
+            font-family: inherit;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            box-sizing: border-box;
+        }
+
+        .scenario-edit-textarea:focus {
+            outline: none;
+            border-color: #003168;
+            box-shadow: 0 0 0 3px rgba(0, 49, 104, 0.1);
+        }
+
+        .scenario-edit-modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            padding: 16px 24px;
+            border-top: 1px solid #E2E8F0;
+            background: #F8FAFC;
+            border-radius: 0 0 16px 16px;
+        }
+
+        .scenario-edit-btn-cancel {
+            padding: 10px 20px;
+            border: 1px solid #CBD5E1;
+            background: white;
+            color: #64748B;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .scenario-edit-btn-cancel:hover {
+            background: #F1F5F9;
+            border-color: #94A3B8;
+        }
+
+        .scenario-edit-btn-save {
+            padding: 10px 24px;
+            border: none;
+            background: #003168;
+            color: white;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .scenario-edit-btn-save:hover {
+            background: #004080;
+            transform: translateY(-1px);
+        }
+
+        .scenario-edit-note {
+            font-size: 11px;
+            color: #94A3B8;
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
         /* Executive Report Background - Light RBC Grey-Blue Gradient */
         .exec-glass-bg {
             background:
@@ -3423,6 +3618,13 @@
                 <rect x="3" y="14" width="7" height="7"></rect>
             </svg>
         </div>
+        <div class="nav-item" title="Playground" onclick="showPlayground()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z">
+                </path>
+            </svg>
+        </div>
 
         <div class="nav-item" title="Heat Map" onclick="showHeatMap()">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -3471,13 +3673,6 @@
             </div>
         </div>
 
-        <div class="nav-item" title="Folder" onclick="showSavedScenarios()">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-            </svg>
-        </div>
-
         <!-- Executive Report -->
         <div class="nav-item" title="Executive Report" onclick="showExecutiveReport()">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -3485,6 +3680,13 @@
                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                 <line x1="3" y1="9" x2="21" y2="9"></line>
                 <line x1="9" y1="21" x2="9" y2="9"></line>
+            </svg>
+        </div>
+
+        <div class="nav-item" title="Folder" onclick="showSavedScenarios()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
             </svg>
         </div>
 
@@ -3545,6 +3747,71 @@
                 </div>
                 <div class="drivers-area" id="driversContainer">
                     <!-- Drivers populate here -->
+                </div>
+            </section>
+
+            <!-- CENTER: Playground View -->
+            <section class="center-panel" id="playgroundPanel"
+                style="display: none; background: #fafafa; flex-direction: column; position: relative;">
+                <!-- Header -->
+                <div class="panel-header">
+                    <span class="panel-title">Playground</span>
+                </div>
+
+                <!-- Canvas Area -->
+                <div id="playgroundCanvas"
+                    style="flex: 1; overflow-y: auto; padding: 40px; display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px;">
+                    <!-- Empty State -->
+                    <div id="playgroundPlaceholder"
+                        style="grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh; text-align: center; opacity: 0.6;">
+                        <div style="font-size: 48px; margin-bottom: 20px;">✨</div>
+                        <h2 style="font-size: 24px; color: #1f2937; margin-bottom: 12px; font-weight: 600;">Explore your
+                            ideas</h2>
+                        <p style="color: #6b7280; max-width: 400px; line-height: 1.5;">
+                            Describe a risk scenario or upload a document to brainstorm creative risk drivers not
+                            typically captured by the news.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Chat Bottom Bar -->
+                <div
+                    style="padding: 24px; background: white; border-top: 1px solid #e5e7eb; position: sticky; bottom: 0; z-index: 10;">
+                    <div style="max-width: 800px; margin: 0 auto; position: relative;">
+                        <!-- Hidden File Input -->
+                        <input type="file" id="playgroundFileUpload" style="display: none;"
+                            onchange="handlePlaygroundFile(this)">
+
+                        <!-- Plus Button -->
+                        <button onclick="document.getElementById('playgroundFileUpload').click()" title="Upload File"
+                            style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%); background: white; color: #64748B; border: 1px solid #E2E8F0; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; z-index: 2;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                        </button>
+
+                        <input type="text" id="playgroundChatInput"
+                            style="width: 100%; padding: 16px 60px 16px 60px; border-radius: 99px; border: 1px solid #e2e8f0; font-size: 16px; outline: none; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); transition: all 0.2s;"
+                            placeholder="Describe your idea or refining request..."
+                            onkeypress="handlePlaygroundEnter(event)">
+
+                        <button onclick="submitPlaygroundChat()" id="playgroundSendBtn"
+                            style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: #2563EB; color: white; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="22" y1="2" x2="11" y2="13"></line>
+                                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                            </svg>
+                        </button>
+                    </div>
+                    <div id="playgroundLoader"
+                        style="display: none; justify-content: center; margin-top: 12px; color: #6b7280; font-size: 14px; align-items: center; gap: 8px;">
+                        <span class="spinner"
+                            style="width: 16px; height: 16px; border: 2px solid #e5e7eb; border-top-color: #2563EB; border-radius: 50%; animation: spin 1s linear infinite;"></span>
+                        AI is brainstorming...
+                    </div>
                 </div>
             </section>
 
@@ -3651,26 +3918,48 @@
                         style="font-size: 32px; font-weight: 800; color: white; letter-spacing: -1px; text-shadow: 0 2px 20px rgba(0,0,0,0.3);">
                         Astra | Executive Report
                     </h2>
-                    <button id="execExportBtn" onclick="exportExecutiveReportPDF()" style="
-                        display: flex;
-                        align-items: center;
-                        gap: 8px;
-                        padding: 10px 20px;
-                        background: rgba(255, 255, 255, 0.15);
-                        backdrop-filter: blur(10px);
-                        -webkit-backdrop-filter: blur(10px);
-                        color: white;
-                        border: 1px solid rgba(255, 255, 255, 0.2);
-                        border-radius: 100px;
-                        font-size: 13px;
-                        font-weight: 600;
-                        cursor: pointer;
-                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-                        transition: all 0.3s ease;
-                    " onmouseover="this.style.background='rgba(255, 255, 255, 0.25)'; this.style.transform='translateY(-2px)';"
-                        onmouseout="this.style.background='rgba(255, 255, 255, 0.15)'; this.style.transform='translateY(0)';">
-                        <span>📄</span> Export PDF
-                    </button>
+                    <div style="display: flex; gap: 12px;">
+                        <button onclick="saveExecutiveReport()" style="
+                            display: flex;
+                            align-items: center;
+                            gap: 8px;
+                            padding: 10px 20px;
+                            background: rgba(96, 205, 255, 0.2);
+                            backdrop-filter: blur(10px);
+                            -webkit-backdrop-filter: blur(10px);
+                            color: white;
+                            border: 1px solid rgba(96, 205, 255, 0.4);
+                            border-radius: 100px;
+                            font-size: 13px;
+                            font-weight: 600;
+                            cursor: pointer;
+                            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+                            transition: all 0.3s ease;
+                        " onmouseover="this.style.background='rgba(96, 205, 255, 0.3)'; this.style.transform='translateY(-2px)';"
+                            onmouseout="this.style.background='rgba(96, 205, 255, 0.2)'; this.style.transform='translateY(0)';">
+                            <span>💾</span> Save Report
+                        </button>
+                        <button id="execExportBtn" onclick="exportExecutiveReportPDF()" style="
+                            display: flex;
+                            align-items: center;
+                            gap: 8px;
+                            padding: 10px 20px;
+                            background: rgba(255, 255, 255, 0.15);
+                            backdrop-filter: blur(10px);
+                            -webkit-backdrop-filter: blur(10px);
+                            color: white;
+                            border: 1px solid rgba(255, 255, 255, 0.2);
+                            border-radius: 100px;
+                            font-size: 13px;
+                            font-weight: 600;
+                            cursor: pointer;
+                            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+                            transition: all 0.3s ease;
+                        " onmouseover="this.style.background='rgba(255, 255, 255, 0.25)'; this.style.transform='translateY(-2px)';"
+                            onmouseout="this.style.background='rgba(255, 255, 255, 0.15)'; this.style.transform='translateY(0)';">
+                            <span>📄</span> Export PDF
+                        </button>
+                    </div>
                 </div>
 
                 <div class="exec-grid-container" style="position: relative; z-index: 1;">
@@ -4178,6 +4467,32 @@
             <div class="cet1-override-modal-footer">
                 <button class="astra-btn astra-btn-secondary" onclick="cet1CloseDirectOverlayModal()">Cancel</button>
                 <button class="astra-btn astra-btn-primary" onclick="cet1ApplyDirectOverlay()">Apply Overlay</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scenario Description Edit Modal -->
+    <div class="scenario-edit-modal" id="scenarioDescEditModal">
+        <div class="scenario-edit-modal-content">
+            <div class="scenario-edit-modal-header">
+                <h3>✏️ Edit Scenario Description</h3>
+                <button class="scenario-edit-modal-close" onclick="closeScenarioDescEditor()">×</button>
+            </div>
+            <div class="scenario-edit-modal-body">
+                <textarea class="scenario-edit-textarea" id="scenarioDescEditTextarea"
+                    placeholder="Enter your scenario description..."></textarea>
+                <div class="scenario-edit-note">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                    This will override the AI-generated description. Changes are saved locally.
+                </div>
+            </div>
+            <div class="scenario-edit-modal-footer">
+                <button class="scenario-edit-btn-cancel" onclick="closeScenarioDescEditor()">Cancel</button>
+                <button class="scenario-edit-btn-save" onclick="saveScenarioDescEdit()">Save Changes</button>
             </div>
         </div>
     </div>
@@ -6611,11 +6926,69 @@ The drivers should reflect the actual risk environment of that time period.
             }
         }
 
+        // Helper to strip heavy data from drivers for storage
+        function sanitizeDriverForStorage(d) {
+            if (!d) return d;
+            // Create shallow copy first
+            const newD = { ...d };
+            // Remove heavy fields
+            delete newD.chatHistory;
+            delete newD.tavilyContext;
+            delete newD.originalContext;
+
+            // If we have sub-objects that are heavy, clean them too
+            return newD;
+        }
+
+        // Helper to strip heavy data from execState
+        function sanitizeExecState(state) {
+            if (!state) return state;
+            const newState = JSON.parse(JSON.stringify(state));
+
+            if (newState.heatMap && newState.heatMap.drivers) {
+                newState.heatMap.drivers = newState.heatMap.drivers.map(sanitizeDriverForStorage);
+            }
+            if (newState.scenario && newState.scenario.drivers) {
+                newState.scenario.drivers = newState.scenario.drivers.map(sanitizeDriverForStorage);
+            }
+            return newState;
+        }
+
         function saveScenariosToStorage() {
             try {
                 localStorage.setItem(SAVED_SCENARIOS_KEY, JSON.stringify(savedScenarios));
             } catch (e) {
                 console.error('Failed to save scenarios:', e);
+
+                if (e.name === 'QuotaExceededError' || e.code === 22) {
+                    // Emergency cleanup: sanitize ALL saved scenarios to recover space
+                    let recovered = false;
+
+                    savedScenarios = savedScenarios.map(s => {
+                        let modified = false;
+                        if (s.type === 'executive_report' && s.execState) {
+                            s.execState = sanitizeExecState(s.execState);
+                            modified = true;
+                        }
+                        if (s.type === 'heatmap' && s.drivers) {
+                            s.drivers = s.drivers.map(sanitizeDriverForStorage);
+                            modified = true;
+                        }
+                        if (modified) recovered = true;
+                        return s;
+                    });
+
+                    if (recovered) {
+                        try {
+                            localStorage.setItem(SAVED_SCENARIOS_KEY, JSON.stringify(savedScenarios));
+                            console.log('✅ Storage recovered by sanitizing old reports.');
+                        } catch (retryErr) {
+                            alert('Storage full! Please delete old reports from your folder.');
+                        }
+                    } else {
+                        alert('Storage full! Please delete old reports from your folder.');
+                    }
+                }
             }
         }
 
@@ -9446,8 +9819,8 @@ ${driverSummary}
                 const isCalculation = s.type === 'calculation' || (s.id && s.id.startsWith('cet1_'));
 
                 let typeLabel = 'Scenario';
-                let typeColor = '#E0E7FF'; // Indigo
-                let typeText = '#4338CA';
+                let typeColor = '#E0F2FE'; // Teal/Cyan
+                let typeText = '#0891B2';
                 let icon = '📄';
 
                 if (isHeatmap) {
@@ -9460,9 +9833,45 @@ ${driverSummary}
                     typeColor = '#DCFCE7'; // Green
                     typeText = '#15803d';
                     icon = '🧮';
+                } else if (s.type === 'executive_report') {
+                    typeLabel = 'Report';
+                    typeColor = '#F3E8FF'; // Purple
+                    typeText = '#7E22CE';
+                    icon = '📊';
                 }
 
+
                 console.log(`Rendering ${typeLabel}:`, s.title);
+
+                // Calculate the details section HTML
+                let detailsHtml = '';
+                if (s.type === 'executive_report' && s.execState && s.execState.tempBar) {
+                    const tempBar = s.execState.tempBar;
+                    const cet1Ratio = tempBar.troughCET1 || tempBar.minimumRatio || (tempBar.data ? tempBar.data.minimumRatio : null);
+                    if (cet1Ratio) {
+                        const ratioColor = cet1Ratio >= 11 ? '#10B981' : cet1Ratio >= 9 ? '#F59E0B' : '#EF4444';
+                        detailsHtml = '<div class="driver-desc" style="margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">' +
+                            '<span style="font-weight: 600; color: #003168;">CET1 Ratio:</span>' +
+                            '<span style="font-size: 16px; font-weight: 700; color: ' + ratioColor + ';">' +
+                            parseFloat(cet1Ratio).toFixed(1) + '%</span></div>';
+                    }
+                }
+
+                // Fallback: show Risk Drivers for other types or if no CET1 ratio
+                if (!detailsHtml) {
+                    const driverCount = s.driverCount || (s.drivers ? s.drivers.length : 0);
+                    const driverTags = (s.drivers || []).slice(0, 8).map(d =>
+                        '<span style="font-size: 10px; padding: 2px 6px; border-radius: 4px; background: ' +
+                        (d.tagColor || '#eee') + '; color: ' + (d.textColor || '#333') +
+                        '; white-space: nowrap; max-width: 150px; overflow: hidden; text-overflow: ellipsis;">' +
+                        d.title + '</span>'
+                    ).join('');
+                    const moreTag = (s.drivers || []).length > 8 ?
+                        '<span style="font-size: 10px; padding: 2px 6px; color: var(--text-muted);">+' +
+                        (s.drivers.length - 8) + ' more</span>' : '';
+                    detailsHtml = '<div class="driver-desc" style="margin-bottom: 6px;">' + driverCount + ' Risk Drivers:</div>' +
+                        '<div style="display: flex; flex-wrap: wrap; gap: 4px;">' + driverTags + moreTag + '</div>';
+                }
 
                 return `
                 <div class="driver-card" onclick="openSavedItem('${s.id}')">
@@ -9478,15 +9887,7 @@ ${driverSummary}
                     </div>
                     <div class="driver-title">${s.title}</div>
                     <div style="margin-top: 12px;">
-                        <div class="driver-desc" style="margin-bottom: 6px;">${s.driverCount} Risk Drivers:</div>
-                        <div style="display: flex; flex-wrap: wrap; gap: 4px;">
-                            ${(s.drivers || []).slice(0, 8).map(d => `
-                                <span style="font-size: 10px; padding: 2px 6px; border-radius: 4px; background: ${d.tagColor || '#eee'}; color: ${d.textColor || '#333'}; white-space: nowrap; max-width: 150px; overflow: hidden; text-overflow: ellipsis;">
-                                    ${d.title}
-                                </span>
-                            `).join('')}
-                            ${(s.drivers || []).length > 8 ? `<span style="font-size: 10px; padding: 2px 6px; color: var(--text-muted);">+${s.drivers.length - 8} more</span>` : ''}
-                        </div>
+                        ${detailsHtml}
                     </div>
                 </div>
             `}).join('');
@@ -9506,7 +9907,7 @@ ${driverSummary}
                 type: 'heatmap',
                 title: title,
                 date: new Date().toLocaleDateString(),
-                drivers: selectedDrivers,
+                drivers: selectedDrivers.map(sanitizeDriverForStorage),
                 heatMapData: JSON.parse(JSON.stringify(heatMapData)),
                 driverCount: selectedDrivers.length
             };
@@ -9537,6 +9938,40 @@ ${driverSummary}
                     cet1LoadSavedScenario(item.data);
                 } else {
                     alert('CET1 loader not initialized.');
+                }
+                return;
+            }
+
+            // Handle Executive Reports
+            if (item.type === 'executive_report') {
+                // Restore execState from saved data
+                if (item.execState) {
+                    window.execState = {
+                        heatMap: item.execState.heatMap || null,
+                        scenario: item.execState.scenario || null,
+                        tempBar: item.execState.tempBar || null,
+                        macro: item.execState.macro || null,
+                        scenarioBadgeOverride: item.execState.scenarioBadgeOverride || null
+                    };
+
+                    // Show executive report panel first
+                    showExecutiveReport();
+
+                    // Re-render all components with restored data
+                    if (window.execState.heatMap) {
+                        renderExecHeatMap(window.execState.heatMap);
+                    }
+                    if (window.execState.scenario) {
+                        renderExecScenarioDesc(window.execState.scenario);
+                    }
+                    if (window.execState.macro) {
+                        renderExecMacro(window.execState.macro);
+                    }
+                    if (window.execState.tempBar) {
+                        renderExecTempBar(window.execState.tempBar);
+                    }
+                } else {
+                    alert('This report appears to be corrupted or missing data.');
                 }
                 return;
             }
@@ -9613,6 +10048,7 @@ ${driverSummary}
             document.getElementById('execPickerModal').style.display = 'none';
             document.getElementById('basketPanel').style.display = 'flex';
             document.getElementById('heatmapBasketPanel').style.display = 'none';
+            document.getElementById('playgroundPanel').style.display = 'none';
 
             // Update nav active state
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -9634,6 +10070,7 @@ ${driverSummary}
             document.getElementById('execPickerModal').style.display = 'none';
             document.getElementById('basketPanel').style.display = 'none';
             document.getElementById('heatmapBasketPanel').style.display = 'none';
+            document.getElementById('playgroundPanel').style.display = 'none';
 
             renderSavedScenarios();
 
@@ -9734,6 +10171,7 @@ ${driverSummary}
             document.getElementById('execPickerModal').style.display = 'none';
             document.getElementById('basketPanel').style.display = 'none';
             document.getElementById('heatmapBasketPanel').style.display = 'flex';
+            document.getElementById('playgroundPanel').style.display = 'none';
 
             // Update nav active state
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -11358,7 +11796,10 @@ These are reference values for context only.Generate stress projections as absol
 
             // Hide scenario basket and heatmap basket
             document.getElementById('basketPanel').style.display = 'none';
+            document.getElementById('basketPanel').style.display = 'none';
             document.getElementById('heatmapBasketPanel').style.display = 'none';
+            const pgPanel = document.getElementById('playgroundPanel');
+            if (pgPanel) pgPanel.style.display = 'none';
 
             // Update nav
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -12957,7 +13398,7 @@ Be conversational, ask thoughtful questions, and help the user think through all
 
         function showExecutiveReport() {
             // Hide all panels
-            ['marketplacePanel', 'savedScenariosPanel', 'heatMapPanel', 'cet1AnalysisPanel', 'basketPanel', 'heatmapBasketPanel'].forEach(id => {
+            ['marketplacePanel', 'savedScenariosPanel', 'heatMapPanel', 'cet1AnalysisPanel', 'basketPanel', 'heatmapBasketPanel', 'playgroundPanel'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.style.display = 'none';
             });
@@ -13219,8 +13660,19 @@ Be conversational, ask thoughtful questions, and help the user think through all
             container.className = '';
             container.style.cursor = 'default';
 
-            /* Use name logic consistent with picker */
-            const scenarioName = data.name || data.title || "Untitled Scenario";
+            /* Debug: Log data structure */
+            console.log("renderExecScenarioDesc called with data:", data);
+
+            /* Handle case where data is undefined or empty */
+            if (!data || typeof data !== 'object') {
+                console.error("Invalid data passed to renderExecScenarioDesc:", data);
+                container.innerHTML = `<div style="padding: 20px; color: #EF4444;">Error: Invalid scenario data</div>`;
+                return;
+            }
+
+            /* Use name logic consistent with picker - check all possible fields */
+            const scenarioName = data.scenarioTitle || data.name || data.title || "Untitled Scenario";
+            console.log("Scenario name resolved to:", scenarioName);
 
             /* Extract global and Canadian conditions from scenario data */
             const globalConditions = data.global || data.globalConditions || '';
@@ -13351,43 +13803,44 @@ Be conversational, ask thoughtful questions, and help the user think through all
                 return;
             }
 
-            /* Prepare AI Prompt - focus on global and Canadian conditions, avoid macro projections */
-            const prompt = `
-                You are a financial risk analyst. Write a concise executive summary of approximately 100 words for a stress testing scenario.
-                
-                Scenario Title: "${scenarioName}"
-                
-                Global Economic Conditions:
-                ${globalText || "Not specified."}
-                
-                Canadian Economic Conditions:
-                ${canadianText || "Not specified."}
-                
-                STRICT Requirements:
-                1. Write EXACTLY around 100 words (90-110 words acceptable).
-                2. Do NOT mention any specific macro variable projections (no GDP percentages, unemployment rates, HPI numbers, interest rates, etc.).
-                3. Focus on the qualitative narrative describing the risk events, economic conditions, and potential impacts.
-                4. Write in a professional, executive tone suitable for senior management.
-                5. Do NOT use bullet points or lists - write in flowing paragraph form.
-                6. Summarize the key themes and risks without quoting specific numbers.
-            `;
+            /* Prepare AI Prompt */
+            const systemPrompt = `You are a financial risk analyst writing executive summaries for stress testing scenarios.`;
+
+            const userPrompt = `Write a 100-word executive summary for this scenario:
+
+Title: ${scenarioName}
+
+Global Conditions:
+${globalText}
+
+Canadian Conditions:
+${canadianText}
+
+IMPORTANT: Write ONLY qualitative narrative. Do NOT mention ANY macro variables including GDP, unemployment, inflation, interest rates, exchange rates, house prices, stock indices, or credit spreads. Focus purely on the economic events and risk drivers. Write in professional prose.`;
 
             try {
-                const API_BASE = window.location.protocol === 'file:' ? 'http://localhost:5001' : '';
-                const response = await fetch(`${API_BASE}/api/chat`, {
+                const response = await fetch(AZURE_OPENAI_API_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify({
                         model: 'gpt-5-2025-08-07-eastus-dz',
-                        messages: [{ role: 'user', content: prompt }],
-                        max_completion_tokens: 300
+                        messages: [
+                            { role: 'system', content: systemPrompt },
+                            { role: 'user', content: userPrompt }
+                        ],
+                        // temperature omitted - GPT-5 only supports default value of 1
+                        max_tokens: 20000
                     })
                 });
 
-                if (!response.ok) throw new Error('AI Unavailable');
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
 
-                const resData = await response.json();
-                const aiText = resData.choices[0].message.content;
+                const data = await response.json();
+                const aiText = data.choices[0].message.content;
 
                 renderDescHTML(container, scenarioName, aiText, true, badgeHtml);
 
@@ -13402,6 +13855,11 @@ Be conversational, ask thoughtful questions, and help the user think through all
             // Ensure badgeHtml is a string
             const safeBadge = badgeHtml || '';
 
+            // Store the current text for editing purposes
+            window.currentScenarioDescText = text;
+            window.currentScenarioDescTitle = title;
+            window.currentScenarioDescBadge = safeBadge;
+
             container.innerHTML = `
                 <div style="font-size: 16px; line-height: 1.5; color: #334155; height: 100%; display: flex; flex-direction: column;">
                     <div style="display: flex; align-items: center; margin-bottom: 12px;">
@@ -13410,15 +13868,92 @@ Be conversational, ask thoughtful questions, and help the user think through all
                             ${title}
                         </div>
                     </div>
-                    <div style="flex: 1; overflow-y: auto; padding-right: 4px;">
-                        ${text}
-                        ${isAI ? `<div style="margin-top: 16px; padding: 12px; background: rgba(37, 99, 235, 0.2); border-radius: 8px; border-left: 3px solid rgba(96, 205, 255, 1); font-size: 12px; color: rgba(96, 205, 255, 1);">
-                            <strong>Astra Insight:</strong> Narrative generated based on scenario drivers.
-                        </div>` : ''}
+                    <div class="scenario-desc-wrapper" id="scenarioDescWrapper">
+                        <button class="scenario-desc-edit-btn" onclick="event.stopPropagation(); openScenarioDescEditor()">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                            </svg>
+                            Edit Description
+                        </button>
+                        <div id="scenarioDescText" style="padding-right: 8px;">
+                            ${text}
+                        </div>
                     </div>
                 </div>
             `;
+
+            // Setup 2-second hover to show edit button
+            setupScenarioDescHover();
         }
+
+        // Hover timeout tracker for scenario description
+        let scenarioDescHoverTimeout = null;
+
+        function setupScenarioDescHover() {
+            const wrapper = document.getElementById('scenarioDescWrapper');
+            if (!wrapper) return;
+
+            wrapper.addEventListener('mouseenter', () => {
+                // Start 2-second timer to show edit button
+                scenarioDescHoverTimeout = setTimeout(() => {
+                    wrapper.classList.add('show-edit-btn');
+                }, 2000);
+            });
+
+            wrapper.addEventListener('mouseleave', () => {
+                // Clear timer and hide button
+                if (scenarioDescHoverTimeout) {
+                    clearTimeout(scenarioDescHoverTimeout);
+                    scenarioDescHoverTimeout = null;
+                }
+                wrapper.classList.remove('show-edit-btn');
+            });
+        }
+
+        // Open the scenario description editor modal
+        function openScenarioDescEditor() {
+            const modal = document.getElementById('scenarioDescEditModal');
+            const textarea = document.getElementById('scenarioDescEditTextarea');
+
+            if (modal && textarea) {
+                // Get current text (strip HTML tags if any)
+                const currentText = window.currentScenarioDescText || '';
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = currentText;
+                textarea.value = tempDiv.textContent || tempDiv.innerText || '';
+
+                modal.classList.add('active');
+            }
+        }
+
+        // Close the scenario description editor modal
+        function closeScenarioDescEditor() {
+            const modal = document.getElementById('scenarioDescEditModal');
+            if (modal) {
+                modal.classList.remove('active');
+            }
+        }
+
+        // Save the edited scenario description
+        function saveScenarioDescEdit() {
+            const textarea = document.getElementById('scenarioDescEditTextarea');
+            const textWrapper = document.getElementById('scenarioDescText');
+
+            if (textarea && textWrapper) {
+                const newText = textarea.value.trim();
+
+                // Update the displayed text
+                textWrapper.innerHTML = newText;
+
+                // Update the stored text for future edits
+                window.currentScenarioDescText = newText;
+
+                // Close the modal
+                closeScenarioDescEditor();
+            }
+        }
+
 
         // Track which variables are currently displayed in macro card
         let execMacroSelectedVars = ['canadaGDP', 'unemployment', 'housePrice', 'tsx'];
@@ -13583,7 +14118,8 @@ Be conversational, ask thoughtful questions, and help the user think through all
 
             // Custom scenario - full name
             const customName = data.name || data.title || 'Custom Scenario';
-            const customTrough = data.troughCET1 || 10.5;
+            // Check multiple possible locations for trough value
+            const customTrough = data.troughCET1 || data.minimumRatio || data.data?.minimumRatio || 10.5;
 
             // All scenarios sorted by value
             const scenarios = [
@@ -14239,13 +14775,8 @@ Be conversational, ask thoughtful questions, and help the user think through all
                     velocity: velocity
                 };
 
-                // Re-render scenario description and temp bar (to update badge on both)
-                if (window.execState.scenario) {
-                    renderExecScenarioDesc(window.execState.scenario);
-                }
-                if (window.execState.tempBar) {
-                    renderExecTempBar(window.execState.tempBar);
-                }
+                // Just update the badge visually without regenerating content
+                updateScenarioBadgeDisplay();
                 closeBadgeModal();
             } catch (e) {
                 console.error("Error saving badge:", e);
@@ -14253,22 +14784,341 @@ Be conversational, ask thoughtful questions, and help the user think through all
             }
         }
 
+        function updateScenarioBadgeDisplay() {
+            // Update badge in scenario description card
+            const scenarioContainer = document.getElementById('execScenarioDescContent');
+            if (scenarioContainer && window.execState.scenarioBadgeOverride) {
+                const ov = window.execState.scenarioBadgeOverride;
+                const colorMap = { 'high': '#EF4444', 'med': '#F59E0B', 'low': '#10B981' };
+                const bg = colorMap[ov.velocity] || '#EF4444';
+
+                const badgeHtml = `<div onclick="event.stopPropagation(); openBadgeEditor()" style="
+                    display: inline-flex;
+                    cursor: pointer;
+                    align-items: center;
+                    justify-content: center;
+                    width: 28px;
+                    height: 28px;
+                    background: ${bg};
+                    color: white;
+                    border-radius: 50%;
+                    font-size: 14px;
+                    font-weight: 700;
+                    margin-right: 12px;
+                    flex-shrink: 0;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                    transition: transform 0.2s;
+                " onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" title="Click to edit">${ov.number}</div>`;
+
+                // Find and update just the badge element
+                const titleDiv = scenarioContainer.querySelector('div[style*="display: flex"]');
+                if (titleDiv) {
+                    const existingBadge = titleDiv.querySelector('div[onclick*="openBadgeEditor"]');
+                    if (existingBadge) {
+                        existingBadge.outerHTML = badgeHtml;
+                    } else {
+                        titleDiv.insertAdjacentHTML('afterbegin', badgeHtml);
+                    }
+                }
+            }
+
+            // Update badge in temperature bar if needed
+            if (window.execState.tempBar) {
+                renderExecTempBar(window.execState.tempBar);
+            }
+        }
+
         function clearBadgeOverride() {
             try {
                 if (window.execState.scenarioBadgeOverride) {
                     delete window.execState.scenarioBadgeOverride;
-                    // Re-render to revert to auto or empty
-                    if (window.execState.scenario) {
-                        renderExecScenarioDesc(window.execState.scenario);
-                    }
-                    if (window.execState.tempBar) {
-                        renderExecTempBar(window.execState.tempBar);
-                    }
+                    // Just update the badge display without regenerating content
+                    updateScenarioBadgeDisplay();
                 }
                 closeBadgeModal();
             } catch (e) {
                 console.error("Error clearing badge:", e);
             }
+        }
+
+        function saveExecutiveReport() {
+            try {
+                // Check if report has content
+                if (!window.execState || (!window.execState.scenario && !window.execState.heatMap && !window.execState.tempBar)) {
+                    alert('Please add content to the executive report before saving.');
+                    return;
+                }
+
+                // Get report name from scenario or prompt user
+                let reportName = window.execState.scenario?.title || window.execState.scenario?.name || 'Executive Report';
+
+                const customName = prompt('Enter a name for this executive report:', reportName);
+                if (!customName) return; // User cancelled
+
+                const timestamp = Date.now();
+                const dateStr = new Date().toLocaleDateString();
+
+                // Create report data object with SANITIZED state
+                const reportData = {
+                    id: 'exec_' + timestamp,
+                    type: 'executive_report',
+                    title: customName,
+                    date: dateStr,
+                    timestamp: timestamp,
+                    execState: sanitizeExecState(window.execState)
+                };
+
+                // Add to savedScenarios
+                if (typeof savedScenarios === 'undefined') savedScenarios = [];
+
+                // Check if updating existing report
+                const existingIdx = savedScenarios.findIndex(s => s.id === reportData.id || (s.title === customName && s.type === 'executive_report'));
+                if (existingIdx > -1) {
+                    savedScenarios[existingIdx] = reportData;
+                } else {
+                    savedScenarios.push(reportData);
+                }
+
+                // Save using the robust function
+                saveScenariosToStorage();
+
+                // Update folder UI
+                if (typeof renderSavedScenarios === 'function') {
+                    renderSavedScenarios();
+                }
+
+                alert(`✅ Executive report "${customName}" saved to folder!`);
+            } catch (e) {
+                console.error('Error saving executive report:', e);
+                alert('Failed to save executive report: ' + e.message);
+            }
+        }
+
+
+        // ========================================
+        // PLAYGROUND FUNCTIONS //
+        // ========================================
+
+        let currentPlaygroundDrivers = [];
+
+        function showPlayground() {
+            // Hide other specific panels used in other views
+            const panels = [
+                'marketplacePanel', 'savedScenariosPanel', 'heatMapPanel',
+                'cet1AnalysisPanel', 'executiveReportPanel', 'execPickerModal',
+                'basketPanel', 'heatmapBasketPanel'
+            ];
+            panels.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
+
+            // Show Playground
+            const playground = document.getElementById('playgroundPanel');
+            if (playground) playground.style.display = 'flex';
+
+            // Update nav
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            const navItem = document.querySelector('.nav-item[title="Playground"]');
+            if (navItem) navItem.classList.add('active');
+        }
+
+        async function handlePlaygroundEnter(e) {
+            if (e.key === 'Enter') submitPlaygroundChat();
+        }
+
+        async function submitPlaygroundChat() {
+            const input = document.getElementById('playgroundChatInput');
+            const val = input.value.trim();
+            if (!val) return;
+
+            const loader = document.getElementById('playgroundLoader');
+            loader.style.display = 'flex';
+            input.disabled = true;
+
+            // Context: Existing drivers on board
+            const existingContext = currentPlaygroundDrivers.map(d => `${d.title}: ${d.description}`).join('\n');
+
+            const prompt = `User Request: "${val}"
+            
+            Current Canvas Ideas:
+            ${existingContext}
+            
+            Task:
+            1. If the user is asking to create new ideas, generate 1 to 4 CREATIVE, FORWARD-LOOKING risk driver concepts (Style: Mixboard/Brainstorming).
+            2. If the user is asking to refine, update the existing ideas based on the request.
+
+            Return a JSON object:
+            {
+               "newDrivers": [ { "category": "Macroeconomic | Geopolitical | Cyber | Financial | Environmental | Social", "title": "Concise Title", "description": "Brief description..." } ],
+               "updatedDrivers": [ { "originalTitle": "Exact Title of existing driver", "newTitle": "Optional new title", "newDescription": "Optional new description" } ]
+            }
+            
+            Output ONLY JSON.
+            `;
+
+            try {
+                const response = await fetch(AZURE_OPENAI_API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        model: 'gpt-5-2025-08-07-eastus-dz',
+                        messages: [{ role: 'user', content: prompt }],
+                        max_tokens: 3000
+                    })
+                });
+
+                if (!response.ok) throw new Error('API Error');
+                const data = await response.json();
+                const content = data.choices[0].message.content;
+
+                let result = {};
+                try {
+                    const jsonMatch = content.match(/\{[\s\S]*\}/);
+                    if (jsonMatch) result = JSON.parse(jsonMatch[0]);
+                } catch (e) { console.error(e); }
+
+                // Handle New Drivers
+                if (result.newDrivers && Array.isArray(result.newDrivers)) {
+                    document.getElementById('playgroundPlaceholder').style.display = 'none';
+                    result.newDrivers.forEach(d => {
+                        d.id = 'pg_' + Date.now() + Math.random().toString(36).substr(2, 5);
+                        currentPlaygroundDrivers.push(d);
+                    });
+                }
+
+                // Handle Updates
+                if (result.updatedDrivers) {
+                    result.updatedDrivers.forEach(u => {
+                        const match = currentPlaygroundDrivers.find(d => d.title === u.originalTitle || d.title === u.title);
+                        if (match) {
+                            if (u.newTitle) match.title = u.newTitle;
+                            if (u.newDescription) match.description = u.newDescription;
+                        }
+                    });
+                }
+
+                renderPlaygroundCards();
+                input.value = '';
+
+            } catch (error) {
+                alert('Error: ' + error.message);
+            } finally {
+                loader.style.display = 'none';
+                input.disabled = false;
+                input.focus();
+            }
+        }
+
+        function renderPlaygroundCards() {
+            const container = document.getElementById('playgroundCanvas');
+            container.innerHTML = '';
+
+            if (currentPlaygroundDrivers.length === 0) {
+                container.innerHTML = `
+                     <div id="playgroundPlaceholder" style="grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh; text-align: center; opacity: 0.6;">
+                         <div style="font-size: 48px; margin-bottom: 20px;">✨</div>
+                         <h2 style="font-size: 24px; color: #1f2937; margin-bottom: 12px; font-weight: 600;">Explore your ideas</h2>
+                         <p style="color: #6b7280; max-width: 400px; line-height: 1.5;">
+                            Describe a risk scenario or upload a document to brainstorm creative risk drivers.
+                         </p>
+                     </div>`;
+                return;
+            }
+
+            currentPlaygroundDrivers.forEach(d => {
+                const card = document.createElement('div');
+                Object.assign(card.style, {
+                    background: 'white', border: '1px solid #e5e7eb', borderRadius: '16px', padding: '24px',
+                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)', display: 'flex', flexDirection: 'column', gap: '16px',
+                    transition: 'all 0.2s', position: 'relative'
+                });
+                card.innerHTML = `
+                    <div style="font-size: 12px; font-weight: 700; color: #2563EB; letter-spacing: 0.05em; text-transform: uppercase;">${d.category || 'Idea'}</div>
+                    <h3 style="font-size: 18px; font-weight: 700; color: #111827; margin: 0; line-height: 1.4;">${d.title}</h3>
+                    <p style="font-size: 14px; color: #4b5563; line-height: 1.6; flex: 1;">${d.description}</p>
+                    <div style="padding-top: 16px; border-top: 1px solid #f3f4f6; display: flex; align-items: center; justify-content: space-between;">
+                         <button onclick="exportPlaygroundDriver('${d.id}')" 
+                            style="background: #F3F4F6; color: #374151; border: none; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s;">
+                            Export
+                        </button>
+                        <div style="font-size: 20px; opacity: 0.5;">✨</div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function exportPlaygroundDriver(id) {
+            const d = currentPlaygroundDrivers.find(driver => driver.id === id);
+            if (!d) return;
+
+            const newId = 'cust_' + Date.now();
+            INITIAL_DRIVERS.push({
+                id: newId,
+                cat: 'Customized',
+                title: d.title,
+                desc: d.description,
+                tagColor: '#CFFAFE',
+                textColor: '#0E7490',
+                chatHistory: [{ role: 'ai', text: 'Imported from Playground.' }]
+            });
+            saveCustomDrivers();
+            alert('Driver exported to Risk Drivers view!');
+            showMarketplace();
+            setTimeout(() => openDriverDetails(newId), 500);
+        }
+
+        async function handlePlaygroundFile(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const loader = document.getElementById('playgroundLoader');
+            loader.style.display = 'flex';
+            loader.innerHTML = '<span class="spinner" style="width: 16px; height: 16px; border: 2px solid #e5e7eb; border-top-color: #2563EB; border-radius: 50%; animation: spin 1s linear infinite;"></span> Reading file...';
+
+            const reader = new FileReader();
+            reader.onload = async function (e) {
+                const text = e.target.result;
+                const prompt = `Analyze this document and generate 1-4 risk drivers: \n\n ${text.substring(0, 5000)}`;
+
+                // Populate input and submit via fetch directly to avoid UI confusion
+                try {
+                    const response = await fetch(AZURE_OPENAI_API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            model: 'gpt-5-2025-08-07-eastus-dz',
+                            messages: [{ role: 'user', content: prompt + "\n Return JSON { newDrivers: [{category, title, description}] }" }],
+                            max_tokens: 3000
+                        })
+                    });
+                    const data = await response.json();
+                    const content = data.choices[0].message.content;
+                    let result = {};
+                    try {
+                        const jsonMatch = content.match(/\{[\s\S]*\}/);
+                        if (jsonMatch) result = JSON.parse(jsonMatch[0]);
+                    } catch (e) { }
+
+                    if (result.newDrivers) {
+                        document.getElementById('playgroundPlaceholder').style.display = 'none';
+                        result.newDrivers.forEach(d => {
+                            d.id = 'pg_' + Date.now() + Math.random().toString(36).substr(2, 5);
+                            currentPlaygroundDrivers.push(d);
+                        });
+                        renderPlaygroundCards();
+                    }
+
+                } catch (err) {
+                    alert(err.message);
+                } finally {
+                    loader.style.display = 'none';
+                    loader.innerHTML = '<span class="spinner" style="width: 16px; height: 16px; border: 2px solid #e5e7eb; border-top-color: #2563EB; border-radius: 50%; animation: spin 1s linear infinite;"></span> AI is brainstorming...';
+                    input.value = '';
+                }
+            };
+            reader.readAsText(file);
         }
     </script>
 </body>
