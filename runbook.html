@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Runbook Dashboard</title>
+    <title>ASTRA Runbook</title>
 
     <!-- React & ReactDOM -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -302,10 +302,69 @@
             Send: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>,
             Sparkles: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" /></svg>,
             Brain: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z" /><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z" /></svg>,
-            Mic: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" /><path d="M19 10v2a7 7 0 0 1-14 0v-2" /><line x1="12" x2="12" y1="19" y2="23" /><line x1="8" x2="16" y1="23" y2="23" /></svg>
+            Mic: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" /><path d="M19 10v2a7 7 0 0 1-14 0v-2" /><line x1="12" x2="12" y1="19" y2="23" /><line x1="8" x2="16" y1="23" y2="23" /></svg>,
+            // Indicator Icons
+            Diamond: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M12 2L2 12l10 10 10-10L12 2z" /></svg>,
+            Star: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" {...props}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>,
+            MessageCircle: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" /></svg>,
+            Flag: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" /><line x1="4" x2="4" y1="22" y2="15" stroke="currentColor" strokeWidth="2" fill="none" /></svg>,
+            // Additional Indicator Icons
+            Shield: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>,
+            Zap: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></svg>,
+            ShoppingCart: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" /><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" /></svg>,
+            DollarSign: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><line x1="12" y1="1" x2="12" y2="23" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></svg>,
+            Target: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" /></svg>,
+            Globe: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></svg>
         };
 
-        // --- SUBCOMPONENT: DROPDOWN FILTER ---
+        // --- INDICATOR HELPERS ---
+        // Check if a value is truthy (handles "Yes", "Y", "TRUE", true, 1, "1", "X", etc.)
+        const isIndicatorTrue = (value) => {
+            if (!value) return false;
+            if (typeof value === 'boolean') return value;
+            if (typeof value === 'number') return value !== 0;
+            const str = String(value).toLowerCase().trim();
+            return ['yes', 'y', 'true', '1', 'x', '✓', '✔'].includes(str);
+        };
+
+        // Get indicator badges for a task
+        const getTaskIndicators = (task) => {
+            return {
+                isMilestone: isIndicatorTrue(task['Milestone']),
+                isKeyMilestone: isIndicatorTrue(task['Key Milestone']),
+                isDiscussion: isIndicatorTrue(task['Discussion'])
+            };
+        };
+
+        // Indicator Badge Component for Overview/Table
+        const IndicatorBadges = ({ task, size = 'sm' }) => {
+            const { isMilestone, isKeyMilestone, isDiscussion } = getTaskIndicators(task);
+            const hasAny = isMilestone || isKeyMilestone || isDiscussion;
+            if (!hasAny) return null;
+
+            const iconSize = size === 'sm' ? 'w-3.5 h-3.5' : size === 'xs' ? 'w-3 h-3' : 'w-4 h-4';
+
+            return (
+                <div className="flex items-center gap-1 shrink-0">
+                    {isKeyMilestone && (
+                        <span className="text-amber-400 drop-shadow-[0_0_3px_rgba(251,191,36,0.5)]" title="Key Milestone">
+                            <Icons.Star className={iconSize} />
+                        </span>
+                    )}
+                    {isMilestone && !isKeyMilestone && (
+                        <span className="text-purple-400" title="Milestone">
+                            <Icons.Diamond className={iconSize} />
+                        </span>
+                    )}
+                    {isDiscussion && (
+                        <span className="text-orange-400" title="Discussion Required">
+                            <Icons.MessageCircle className={iconSize} />
+                        </span>
+                    )}
+                </div>
+            );
+        };
+
         const MultiSelectDropdown = ({ label, options, selected, onChange }) => {
             const [isOpen, setIsOpen] = useState(false);
 
@@ -451,10 +510,11 @@
                     style={{ width: 'max-content', minWidth: '260px', maxWidth: '360px' }}
                 >
                     <div
-                        className="font-bold text-sm mb-3 text-white/95 border-b border-white/10 pb-2"
+                        className="font-bold text-sm mb-3 text-white/95 border-b border-white/10 pb-2 flex items-center gap-2"
                         style={{ wordBreak: 'break-word', whiteSpace: 'normal', overflowWrap: 'break-word' }}
                     >
-                        {task["Task Description"]}
+                        <IndicatorBadges task={task} size="md" />
+                        <span>{task["Task Description"]}</span>
                     </div>
                     <div className="grid grid-cols-2 gap-2 text-[11px]">
                         {task["Task Number"] && (
@@ -534,23 +594,37 @@
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={() => { setIsHovered(false); onMouseUp(); }}
                 >
-                    <div
-                        draggable
-                        onDragStart={(e) => onDragStart(e, task)}
-                        onMouseDown={() => onMouseDown(task)}
-                        onMouseUp={onMouseUp}
-                        onTouchStart={() => onMouseDown(task)}
-                        onTouchEnd={onMouseUp}
-                        onDoubleClick={(e) => { e.stopPropagation(); onDoubleClick(task); }}
-                        className={`rounded-md border cursor-move hover:shadow-md truncate transition-all ${getStatusColor(task.Status)}
-                            ${highlightedTaskId === task._id ? 'ring-2 ring-yellow-400 shadow-lg' : ''}
-                            ${draggedTask && draggedTask._id === task._id ? 'opacity-50' : ''}
-                            ${calendarMode === 'single' ? 'text-xs px-1.5 py-1 font-medium' : 'text-[8px] p-0.5'}
-                            ${task.isBold ? 'font-bold border-slate-400' : ''}
-                        `}
-                    >
-                        {task["Task Description"]}
-                    </div>
+                    {(() => {
+                        const { isMilestone, isKeyMilestone, isDiscussion } = getTaskIndicators(task);
+                        let indicatorClass = '';
+                        if (isKeyMilestone) indicatorClass = 'ring-2 ring-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.5)] z-10';
+                        else if (isMilestone) indicatorClass = 'ring-2 ring-purple-500 shadow-[0_0_8px_rgba(168,85,247,0.4)]';
+                        if (isDiscussion) indicatorClass += ' border-dashed border-2 border-orange-500';
+
+                        return (
+                            <div
+                                draggable
+                                onDragStart={(e) => onDragStart(e, task)}
+                                onMouseDown={() => onMouseDown(task)}
+                                onMouseUp={onMouseUp}
+                                onTouchStart={() => onMouseDown(task)}
+                                onTouchEnd={onMouseUp}
+                                onDoubleClick={(e) => { e.stopPropagation(); onDoubleClick(task); }}
+                                className={`rounded-md border cursor-move hover:shadow-md truncate transition-all flex items-center gap-0.5 ${getStatusColor(task.Status)}
+                                    ${highlightedTaskId === task._id ? 'ring-2 ring-yellow-400 shadow-lg' : ''}
+                                    ${draggedTask && draggedTask._id === task._id ? 'opacity-50' : ''}
+                                    ${calendarMode === 'single' ? 'text-xs px-1.5 py-1 font-medium' : 'text-[8px] p-0.5'}
+                                    ${(task.isBold || isMilestone || isKeyMilestone) ? 'font-bold border-slate-400' : ''}
+                                    ${indicatorClass}
+                                `}
+                            >
+                                {isKeyMilestone && <span className="text-amber-400 shrink-0"><Icons.Star className="w-3 h-3" /></span>}
+                                {isMilestone && !isKeyMilestone && <span className="text-purple-400 shrink-0"><Icons.Diamond className="w-2.5 h-2.5" /></span>}
+                                {isDiscussion && <span className="text-orange-400 shrink-0"><Icons.MessageCircle className="w-2.5 h-2.5" /></span>}
+                                <span className="truncate">{task["Task Description"]}</span>
+                            </div>
+                        );
+                    })()}
 
                     {/* Rich Tooltip - rendered via Portal to escape overflow clipping */}
                     {isHovered && ReactDOM.createPortal(
@@ -628,10 +702,11 @@
                     style={{ width: 'max-content', minWidth: '260px', maxWidth: '360px' }}
                 >
                     <div
-                        className="font-bold text-sm mb-3 text-white/95 border-b border-white/10 pb-2"
+                        className="font-bold text-sm mb-3 text-white/95 border-b border-white/10 pb-2 flex items-center gap-2"
                         style={{ wordBreak: 'break-word', whiteSpace: 'normal', overflowWrap: 'break-word' }}
                     >
-                        {task["Task Description"]}
+                        <IndicatorBadges task={task} size="md" />
+                        <span>{task["Task Description"]}</span>
                     </div>
                     <div className="grid grid-cols-2 gap-2 text-[11px]">
                         {task["Task Number"] && (
@@ -709,40 +784,54 @@
 
             return (
                 <>
-                    <div
-                        ref={barRef}
-                        draggable
-                        onDragStart={(e) => onDragStart(e, task)}
-                        onMouseDown={() => onMouseDown(task)}
-                        onMouseUp={onMouseUp}
-                        onMouseEnter={handleMouseEnter}
-                        onMouseLeave={() => { setIsHovered(false); onMouseUp(); }}
-                        onTouchStart={() => onMouseDown(task)}
-                        onTouchEnd={onMouseUp}
-                        onDoubleClick={(e) => { e.stopPropagation(); onDoubleClick(task); }}
-                        className={`cursor-move hover:shadow-lg hover:brightness-105 transition-all overflow-hidden
-                            ${getStatusColor(task.Status)}
-                            ${highlightedTaskId === task._id ? 'ring-2 ring-yellow-400 shadow-lg' : ''}
-                            ${draggedTask && draggedTask._id === task._id ? 'opacity-50' : ''}
-                            ${calendarMode === 'single' ? 'text-xs font-medium' : 'text-[9px]'}
-                            ${task.isBold ? 'font-bold' : ''}
-                        `}
-                        style={barPosition}
-                    >
-                        {isFirstSegment && (
-                            <span className="truncate whitespace-nowrap">
-                                {task["Task Description"]}
-                                <span className={`ml-1 opacity-70 ${calendarMode === 'single' ? 'text-[10px]' : 'text-[8px]'}`}>
-                                    ({bar.totalDays}d)
-                                </span>
-                            </span>
-                        )}
-                        {!isFirstSegment && (
-                            <span className="truncate whitespace-nowrap opacity-70">
-                                ‹ {task["Task Description"]}
-                            </span>
-                        )}
-                    </div>
+                    {(() => {
+                        const { isMilestone, isKeyMilestone, isDiscussion } = getTaskIndicators(task);
+                        let indicatorClass = '';
+                        if (isKeyMilestone) indicatorClass = 'ring-2 ring-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.5)] z-10';
+                        else if (isMilestone) indicatorClass = 'ring-2 ring-purple-500 shadow-[0_0_8px_rgba(168,85,247,0.4)]';
+                        if (isDiscussion) indicatorClass += ' border-dashed border-2 border-orange-500';
+
+                        return (
+                            <div
+                                ref={barRef}
+                                draggable
+                                onDragStart={(e) => onDragStart(e, task)}
+                                onMouseDown={() => onMouseDown(task)}
+                                onMouseUp={onMouseUp}
+                                onMouseEnter={handleMouseEnter}
+                                onMouseLeave={() => { setIsHovered(false); onMouseUp(); }}
+                                onTouchStart={() => onMouseDown(task)}
+                                onTouchEnd={onMouseUp}
+                                onDoubleClick={(e) => { e.stopPropagation(); onDoubleClick(task); }}
+                                className={`cursor-move hover:shadow-lg hover:brightness-105 transition-all overflow-hidden flex items-center
+                                    ${getStatusColor(task.Status)}
+                                    ${highlightedTaskId === task._id ? 'ring-2 ring-yellow-400 shadow-lg' : ''}
+                                    ${draggedTask && draggedTask._id === task._id ? 'opacity-50' : ''}
+                                    ${calendarMode === 'single' ? 'text-xs font-medium' : 'text-[9px]'}
+                                    ${(task.isBold || isMilestone || isKeyMilestone) ? 'font-bold' : ''}
+                                    ${indicatorClass}
+                                `}
+                                style={barPosition}
+                            >
+                                {isFirstSegment && (
+                                    <span className="truncate whitespace-nowrap flex items-center gap-0.5">
+                                        {isKeyMilestone && <span className="text-amber-400 shrink-0"><Icons.Star className="w-3 h-3" /></span>}
+                                        {isMilestone && !isKeyMilestone && <span className="text-purple-400 shrink-0"><Icons.Diamond className="w-2.5 h-2.5" /></span>}
+                                        {isDiscussion && <span className="text-orange-400 shrink-0"><Icons.MessageCircle className="w-2.5 h-2.5" /></span>}
+                                        <span className="truncate">{task["Task Description"]}</span>
+                                        <span className={`ml-1 opacity-70 ${calendarMode === 'single' ? 'text-[10px]' : 'text-[8px]'}`}>
+                                            ({bar.totalDays}d)
+                                        </span>
+                                    </span>
+                                )}
+                                {!isFirstSegment && (
+                                    <span className="truncate whitespace-nowrap opacity-70">
+                                        ‹ {task["Task Description"]}
+                                    </span>
+                                )}
+                            </div>
+                        );
+                    })()}
 
                     {/* Rich Tooltip - rendered via Portal */}
                     {isHovered && ReactDOM.createPortal(
@@ -799,6 +888,21 @@
             else if (s.includes('progress')) { statusColor = 'bg-blue-500'; statusGradient = 'from-blue-400 to-blue-600'; }
             else if (s.includes('risk') || s.includes('delay')) { statusColor = 'bg-red-500'; statusGradient = 'from-red-400 to-red-600'; }
             else if (s.includes('not start')) { statusColor = 'bg-slate-600'; statusGradient = 'from-slate-500 to-slate-700'; }
+
+            // Get task indicators
+            const { isMilestone, isKeyMilestone, isDiscussion } = getTaskIndicators(task);
+
+            // Apply indicator-based bar styling
+            let indicatorBarClass = '';
+            let indicatorBorderStyle = '';
+            if (isKeyMilestone) {
+                indicatorBarClass = 'ring-2 ring-amber-400/50 shadow-[0_0_12px_rgba(251,191,36,0.4)]';
+            } else if (isMilestone) {
+                indicatorBarClass = 'ring-1 ring-purple-400/50 shadow-[0_0_8px_rgba(168,85,247,0.3)]';
+            }
+            if (isDiscussion) {
+                indicatorBorderStyle = 'border-dashed border-orange-400/70';
+            }
 
             // Calculate days from position
             const posToDate = useCallback((posX) => {
@@ -993,14 +1097,15 @@
                         }}
                     >
                         <div
-                            className="font-bold text-sm mb-3 text-white/95 border-b border-white/10 pb-2"
+                            className="font-bold text-sm mb-3 text-white/95 border-b border-white/10 pb-2 flex items-center gap-2"
                             style={{
                                 wordBreak: 'break-word',
                                 whiteSpace: 'normal',
                                 overflowWrap: 'break-word'
                             }}
                         >
-                            {taskName}
+                            <IndicatorBadges task={task} size="md" />
+                            <span>{taskName}</span>
                         </div>
                         <div className="grid grid-cols-2 gap-2 text-[11px]">
                             <div className="text-slate-400">Task #:</div>
@@ -1077,11 +1182,12 @@
                 >
                     {/* Sticky Left Column Cell */}
                     <div
-                        className="sticky left-0 z-20 bg-slate-900 border-r border-white/10 flex items-center px-4 text-sm text-slate-300 truncate group-hover:bg-slate-800 transition-colors"
+                        className="sticky left-0 z-20 bg-slate-900 border-r border-white/10 flex items-center px-3 text-sm text-slate-300 truncate group-hover:bg-slate-800 transition-colors"
                         style={{ width: leftColWidth, minWidth: leftColWidth }}
                     >
-                        <div className="flex flex-col truncate w-full">
-                            <span className="truncate font-medium text-white/90" title={task["Task Description"]}>{task["Task Description"]}</span>
+                        <IndicatorBadges task={task} size="xs" />
+                        <div className="flex flex-col truncate w-full ml-1">
+                            <span className={`truncate ${(isMilestone || isKeyMilestone) ? 'font-bold text-white' : 'font-medium text-white/90'}`} title={task["Task Description"]}>{task["Task Description"]}</span>
                             <span className="text-[10px] text-slate-500">{task["Task Number"]}</span>
                         </div>
                     </div>
@@ -1092,7 +1198,7 @@
                         {startPos >= 0 && (
                             <div
                                 ref={barRef}
-                                className={`absolute top-2 h-8 rounded-lg shadow-lg border border-white/20 flex items-center justify-between text-xs font-bold text-white whitespace-nowrap overflow-visible cursor-grab hover:shadow-xl transition-all z-10 bg-gradient-to-r ${statusGradient} ${isDragging ? 'cursor-grabbing shadow-2xl scale-[1.02]' : ''} ${isResizing ? 'ring-2 ring-cyan-400' : ''}`}
+                                className={`absolute top-2 rounded-lg shadow-lg border flex items-center justify-between text-xs ${(isMilestone || isKeyMilestone) ? 'font-bold' : 'font-medium'} text-white whitespace-nowrap overflow-visible cursor-grab hover:shadow-xl transition-all z-10 bg-gradient-to-r ${statusGradient} ${isDragging ? 'cursor-grabbing shadow-2xl scale-[1.02]' : ''} ${isResizing ? 'ring-2 ring-cyan-400' : ''} ${indicatorBarClass} ${indicatorBorderStyle || 'border-white/20'} ${isKeyMilestone ? 'h-9' : 'h-8'}`}
                                 style={{ left: startPos, width: width, minWidth: colWidth }}
                                 onMouseEnter={() => setIsHovered(true)}
                                 onMouseLeave={() => setIsHovered(false)}
@@ -1130,15 +1236,59 @@
                                     )}
                                 </div>
 
-                                {/* Tooltip - Position based on viewport location */}
+                                {/* Tooltip - Stable Hybrid Positioning */}
                                 {isHovered && !isDragging && !isResizing && (() => {
-                                    // Show tooltip below if in top half of visible rows, above if in bottom half
                                     const showBelow = visibleRowIndex < totalVisibleRows / 2;
+                                    // Removed 'animate-fade-in' to prevent transform conflicts causing jumps
+                                    // Using standard opacity transition
+                                    let className = `absolute transition-opacity duration-200 pointer-events-none ${showBelow ? 'top-full mt-2' : 'bottom-full mb-2'}`;
+                                    const tooltipWidth = 280;
+
+                                    // Default styles
+                                    let style = {
+                                        zIndex: 9999,
+                                        width: tooltipWidth
+                                    };
+
+                                    const barRect = barRef.current?.getBoundingClientRect();
+
+                                    if (barRect) {
+                                        const viewportWidth = window.innerWidth;
+                                        const sidebarEdge = (leftColWidth || 300) + 24;
+                                        const visibleAreaWidth = viewportWidth - sidebarEdge - 24;
+
+                                        // Check if task is "long" (extending beyond visible viewport area)
+                                        const isLongTask = barRect.width > visibleAreaWidth;
+
+                                        if (isLongTask) {
+                                            // LONG TASK: Center tooltip on the VISIBLE portion of the bar
+                                            const activeLeft = Math.max(barRect.left, sidebarEdge);
+                                            const activeRight = Math.min(barRect.right, viewportWidth - 24);
+
+                                            if (activeLeft < activeRight) {
+                                                const visibleCenterAbs = (activeLeft + activeRight) / 2;
+                                                const relativeLeft = visibleCenterAbs - barRect.left;
+
+                                                style.left = `${relativeLeft}px`;
+                                                style.marginLeft = -(tooltipWidth / 2); // Center using fixed margin
+                                            } else {
+                                                // Bar not visible? Default to center
+                                                className += ' left-1/2';
+                                                style.marginLeft = -(tooltipWidth / 2);
+                                            }
+                                        } else {
+                                            // SHORT TASK: Standard Centered Behavior
+                                            className += ' left-1/2';
+                                            style.marginLeft = -(tooltipWidth / 2);
+                                        }
+                                    } else {
+                                        // Fallback
+                                        className += ' left-1/2';
+                                        style.marginLeft = -(tooltipWidth / 2);
+                                    }
+
                                     return (
-                                        <div
-                                            className={`absolute left-1/2 -translate-x-1/2 animate-fade-in pointer-events-none ${showBelow ? 'top-full mt-2' : 'bottom-full mb-2'}`}
-                                            style={{ zIndex: 9999 }}
-                                        >
+                                        <div className={className} style={style}>
                                             {tooltipContent}
                                         </div>
                                     );
@@ -1433,10 +1583,18 @@
                 else if (currentStatus.includes('progress')) nextStatus = 'Completed';
                 else if (currentStatus.includes('complete')) nextStatus = 'Not Started';
 
+                // Match casing to existing statuses in the tasks array
+                const matchedStatus = tasks.find(t =>
+                    t.Status && t.Status.toLowerCase() === nextStatus.toLowerCase()
+                );
+                if (matchedStatus) {
+                    nextStatus = matchedStatus.Status;
+                }
+
                 if (onStatusChange) {
                     onStatusChange(task._id, nextStatus);
                 }
-            }, [onStatusChange]);
+            }, [onStatusChange, tasks]);
 
             // Handle date changes from drag/resize operations
             const handleGanttDateChange = useCallback((taskId, newStart, newEnd) => {
@@ -1475,10 +1633,21 @@
                             </button>
                         </div>
 
-                        {/* Performance indicator & Tips */}
+                        {/* Legend & Tips */}
                         <div className="hidden md:flex items-center space-x-3 text-[10px] font-medium text-slate-400 bg-black/20 px-3 py-1.5 rounded-full border border-white/5">
-                            <span className="flex items-center font-bold text-emerald-400">⚡ Interactive</span>
-                            <span className="w-1 h-1 rounded-full bg-slate-600"></span>
+                            <div className="flex items-center gap-1 text-amber-400" title="Key Milestone">
+                                <Icons.Star className="w-3 h-3" />
+                                <span>Key</span>
+                            </div>
+                            <div className="flex items-center gap-1 text-purple-400" title="Milestone">
+                                <Icons.Diamond className="w-3 h-3" />
+                                <span>Milestone</span>
+                            </div>
+                            <div className="flex items-center gap-1 text-orange-400" title="Discussion">
+                                <Icons.MessageCircle className="w-3 h-3" />
+                                <span>Discussion</span>
+                            </div>
+                            <span className="w-px h-3 bg-slate-600"></span>
                             <span className="flex items-center">Drag: Move</span>
                             <span className="w-1 h-1 rounded-full bg-slate-600"></span>
                             <span className="flex items-center">Edges: Resize</span>
@@ -1738,9 +1907,10 @@
             onDateUpdate,
             onBoldHover,
             onBoldLeave,
-            onToggleBold,
+            onToggleIndicator,
             anomalies,
-            rowRef
+            rowRef,
+            sidebarOpen = true
         }) => {
             const [showNotes, setShowNotes] = useState(false);
             const [notesPos, setNotesPos] = useState({ top: 0, left: 0 });
@@ -1749,6 +1919,10 @@
             const [showAnomalyTooltip, setShowAnomalyTooltip] = useState(false);
             const [anomalyPos, setAnomalyPos] = useState({ top: 0, left: 0 });
             const [isHoveringAnomaly, setIsHoveringAnomaly] = useState(false);
+            const [showIndicatorMenu, setShowIndicatorMenu] = useState(false);
+
+            // Get current indicator states
+            const { isMilestone, isKeyMilestone, isDiscussion } = getTaskIndicators(row);
 
             const handleAnomalyEnter = (e) => {
                 const rect = e.currentTarget.getBoundingClientRect();
@@ -1791,14 +1965,15 @@
                     <td className="px-6 py-3 font-medium text-slate-800">{row.Program}</td>
                     <td className="px-6 py-3 text-slate-500 text-xs">{row["Task Type"]}</td>
                     <td
-                        className={`px-6 py-3 max-w-xs relative group/task ${row.isBold ? 'font-bold text-slate-900' : ''}`}
+                        className={`px-6 py-3 relative group/task ${(isMilestone || isKeyMilestone) ? 'font-bold text-slate-900' : ''} ${sidebarOpen ? 'max-w-xs' : 'max-w-lg'}`}
                         onMouseEnter={onBoldHover}
-                        onMouseLeave={onBoldLeave}
+                        onMouseLeave={(e) => { onBoldLeave(); setShowIndicatorMenu(false); }}
                     >
                         <div className="flex items-center w-full">
+                            <IndicatorBadges task={row} size="sm" />
                             {row.Notes && (
                                 <span
-                                    className="mr-2 shrink-0 text-amber-500 hover:text-amber-600 cursor-help transition-colors"
+                                    className="ml-1 mr-2 shrink-0 text-amber-500 hover:text-amber-600 cursor-help transition-colors"
                                     onMouseEnter={handleNotesEnter}
                                     onMouseLeave={() => setShowNotes(false)}
                                 >
@@ -1836,14 +2011,50 @@
                                 </>
                             )}
                         </div>
+                        {/* Indicator Toggle Menu */}
                         {hoveredForBold && !isHoveringAnomaly && (
-                            <div className="absolute right-2 top-1/2 -translate-y-1/2 z-20">
+                            <div
+                                className="absolute right-2 top-1/2 -translate-y-1/2 z-20"
+                                onMouseEnter={() => setShowIndicatorMenu(true)}
+                                onMouseLeave={() => setShowIndicatorMenu(false)}
+                            >
                                 <button
-                                    onClick={onToggleBold}
-                                    className="bg-slate-800 text-white text-[10px] px-2 py-1 rounded shadow-lg animate-scale-in hover:bg-slate-700 font-medium whitespace-nowrap"
+                                    onClick={(e) => { e.stopPropagation(); setShowIndicatorMenu(!showIndicatorMenu); }}
+                                    className="bg-slate-800 text-white text-[10px] px-2 py-1 rounded shadow-lg animate-scale-in hover:bg-slate-700 font-medium whitespace-nowrap flex items-center gap-1"
                                 >
-                                    {row.isBold ? 'Unimportant' : 'Important'}
+                                    <Icons.Flag className="w-3 h-3" />
+                                    Mark
                                 </button>
+                                {showIndicatorMenu && (
+                                    <div className="absolute right-0 top-full pt-1">
+                                        <div className="bg-slate-800 rounded-lg shadow-xl border border-white/10 py-1 min-w-[140px] animate-scale-in">
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); onToggleIndicator('Key Milestone'); }}
+                                                className={`w-full px-3 py-1.5 text-left text-[11px] flex items-center gap-2 hover:bg-white/10 transition-colors ${isKeyMilestone ? 'text-amber-400' : 'text-white/80'}`}
+                                            >
+                                                <Icons.Star className="w-3 h-3" />
+                                                <span>Key Milestone</span>
+                                                {isKeyMilestone && <span className="ml-auto">✓</span>}
+                                            </button>
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); onToggleIndicator('Milestone'); }}
+                                                className={`w-full px-3 py-1.5 text-left text-[11px] flex items-center gap-2 hover:bg-white/10 transition-colors ${isMilestone ? 'text-purple-400' : 'text-white/80'}`}
+                                            >
+                                                <Icons.Diamond className="w-3 h-3" />
+                                                <span>Milestone</span>
+                                                {isMilestone && <span className="ml-auto">✓</span>}
+                                            </button>
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); onToggleIndicator('Discussion'); }}
+                                                className={`w-full px-3 py-1.5 text-left text-[11px] flex items-center gap-2 hover:bg-white/10 transition-colors ${isDiscussion ? 'text-orange-400' : 'text-white/80'}`}
+                                            >
+                                                <Icons.MessageCircle className="w-3 h-3" />
+                                                <span>Discussion</span>
+                                                {isDiscussion && <span className="ml-auto">✓</span>}
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         )}
                         {showNotes && ReactDOM.createPortal(
@@ -1889,23 +2100,22 @@
                     </td>
                     <td className="px-6 py-3">
                         <select
-                            value={(() => {
-                                const s = String(row.Status || '').toLowerCase();
-                                if (s.includes('complete') || s.includes('done')) return 'Completed';
-                                if (s.includes('progress')) return 'In Progress';
-                                if (s.includes('delay')) return 'Delayed';
-                                if (s.includes('cancel')) return 'Cancelled';
-                                return 'Not Started';
-                            })()}
+                            value={row.Status || 'Not Started'}
                             onChange={onStatusUpdate}
                             onMouseDown={(e) => e.stopPropagation()}
                             className={`w-full text-[11px] font-bold uppercase tracking-wide border-0 rounded-md px-2 py-1.5 cursor-pointer outline-none status-select ${getStatusColor(row.Status)} ${isTaskPastDue(row) ? 'ring-2 ring-red-600' : 'ring-1 ring-inset ring-black/5 focus:ring-2 focus:ring-blue-500'}`}
                         >
+                            {/* Include current status as option in case it has unique casing */}
+                            {row.Status && !['Not Started', 'In Progress', 'Completed', 'Delayed', 'Cancelled', 'Skipped'].includes(row.Status) && (
+                                <option value={row.Status}>{row.Status}</option>
+                            )}
                             <option value="Not Started">Not Started</option>
                             <option value="In Progress">In Progress</option>
                             <option value="Completed">Completed</option>
                             <option value="Delayed">Delayed</option>
+                            <option value="Overdue">Overdue</option>
                             <option value="Cancelled">Cancelled</option>
+                            <option value="Skipped">Skipped</option>
                         </select>
                     </td>
                     <td className="px-3 py-3 text-center">
@@ -1920,6 +2130,9 @@
                 prevProps.row["End Date"] === nextProps.row["End Date"] &&
                 prevProps.row["Task Description"] === nextProps.row["Task Description"] &&
                 prevProps.row.isBold === nextProps.row.isBold &&
+                prevProps.row['Milestone'] === nextProps.row['Milestone'] &&
+                prevProps.row['Key Milestone'] === nextProps.row['Key Milestone'] &&
+                prevProps.row['Discussion'] === nextProps.row['Discussion'] &&
                 prevProps.isLongPress === nextProps.isLongPress &&
                 prevProps.isHighlighted === nextProps.isHighlighted &&
                 prevProps.hoveredForBold === nextProps.hoveredForBold;
@@ -2202,7 +2415,10 @@
                         Task: d["Task Description"],
                         Status: d.Status,
                         End: d["End Date"] ? new Date(d["End Date"]).toISOString().split('T')[0] : 'N/A',
-                        Lead: d.Lead
+                        Lead: d.Lead,
+                        Program: d.Program,
+                        Milestone: d.Milestone,
+                        KeyMilestone: d['Key Milestone']
                     }));
 
                     const systemPrompt = `You are Runbook AI, an expert project manager.
@@ -2217,6 +2433,8 @@ If the user's intent is to create, update, or delete a task, you MUST return a v
     "Lead": "string",
     "Status": "string",
     "End Date": "YYYY-MM-DD",
+    "Milestone": "TRUE/FALSE",
+    "Key Milestone": "TRUE/FALSE",
     "id": "string (only for update)"
   }
 }
@@ -2236,7 +2454,7 @@ Stats: ${JSON.stringify(currentStats)}
                             'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
                             'Content-Type': 'application/json',
                             'HTTP-Referer': window.location.href,
-                            'X-Title': 'Runbook Dashboard'
+                            'X-Title': 'ASTRA Runbook'
                         },
                         body: JSON.stringify({
                             model: "openai/gpt-4o-mini",
@@ -2353,7 +2571,7 @@ Structure:
                             'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
                             'Content-Type': 'application/json',
                             'HTTP-Referer': window.location.href,
-                            'X-Title': 'Runbook Dashboard'
+                            'X-Title': 'ASTRA Runbook'
                         },
                         body: JSON.stringify({
                             model: "openai/gpt-4o-mini",
@@ -2527,6 +2745,9 @@ Structure:
             // Auto-Save State
             const [lastSavedTime, setLastSavedTime] = useState(null);
 
+            // Stats Collapse State
+            const [statsCollapsed, setStatsCollapsed] = useState(false);
+
             // --- AUTO-SAVE LOGIC ---
             const hasCheckedRestore = useRef(false);
 
@@ -2615,19 +2836,22 @@ Structure:
                 }
             };
 
-            // Store original file for export with formatting preservation
+            // Store original file for export
             const [originalFileBuffer, setOriginalFileBuffer] = useState(null);
             const [originalFileName, setOriginalFileName] = useState('');
-            const [originalSheetName, setOriginalSheetName] = useState('');
+
 
             // Filters
             const [searchTerm, setSearchTerm] = useState('');
             const [activeFilters, setActiveFilters] = useState({});
+            const [headerFilters, setHeaderFilters] = useState({ ID: '', Task: '' });
             const [sidebarOpen, setSidebarOpen] = useState(true);
             const [smartFilterMode, setSmartFilterMode] = useState(false);
             const [smartFilterQuery, setSmartFilterQuery] = useState('');
             const [smartFilterLoading, setSmartFilterLoading] = useState(false);
             const [aiDateFilter, setAiDateFilter] = useState(null); // { type: 'due_within_days' | 'overdue', value: number | boolean, label: string }
+            const [autoFilterEnabled, setAutoFilterEnabled] = useState(true);
+            const [persistedIds, setPersistedIds] = useState(new Set());
 
             // Calendar
             const [currentDate, setCurrentDate] = useState(new Date(2025, 10, 1)); // Default Nov 2025
@@ -2770,7 +2994,7 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
                             'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
                             'Content-Type': 'application/json',
                             'HTTP-Referer': window.location.href,
-                            'X-Title': 'Runbook Dashboard'
+                            'X-Title': 'ASTRA Runbook'
                         },
                         body: JSON.stringify({
                             model: "openai/gpt-4o-mini",
@@ -2874,6 +3098,8 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
                 else if (currentStatus.includes('progress')) nextStatus = 'Completed';
                 else if (currentStatus.includes('complete')) nextStatus = 'Not Started';
 
+                // Match casing to existing statuses in the data
+                nextStatus = matchStatusCasing(nextStatus, data);
                 handleStatusUpdate(task._id, nextStatus);
             };
 
@@ -3002,12 +3228,52 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
                 } catch (e) { return ''; }
             };
 
+            // Parse a YYYY-MM-DD string as LOCAL midnight (not UTC)
+            // This fixes the timezone issue where new Date("2024-01-15") is parsed as
+            // UTC midnight, which becomes Jan 14th 7pm in US Eastern time
+            const parseLocalDate = (dateStr) => {
+                if (!dateStr) return null;
+                if (dateStr instanceof Date) return dateStr;
+                try {
+                    const parts = dateStr.split('-');
+                    if (parts.length === 3) {
+                        const year = parseInt(parts[0], 10);
+                        const month = parseInt(parts[1], 10) - 1; // JS months are 0-indexed
+                        const day = parseInt(parts[2], 10);
+                        return new Date(year, month, day); // Local midnight
+                    }
+                    return new Date(dateStr);
+                } catch (e) {
+                    return null;
+                }
+            };
+
+            // Match status casing to existing values in the data
+            // This ensures "In Progress" matches "In progress" if that's what exists
+            const matchStatusCasing = useCallback((targetStatus, dataArray) => {
+                if (!targetStatus || !dataArray || dataArray.length === 0) return targetStatus;
+                const targetLower = targetStatus.toLowerCase();
+
+                // Find an existing status that matches (case-insensitive)
+                for (const row of dataArray) {
+                    const existingStatus = row.Status;
+                    if (existingStatus && typeof existingStatus === 'string') {
+                        if (existingStatus.toLowerCase() === targetLower) {
+                            return existingStatus; // Return the existing casing
+                        }
+                    }
+                }
+
+                // No match found, return the original
+                return targetStatus;
+            }, []);
+
             const getStatusColor = useCallback((status) => {
                 if (!status) return 'bg-gray-100 text-gray-800 border-gray-200';
                 const s = String(status).toLowerCase();
                 if (s.includes('complete') || s.includes('done')) return 'bg-emerald-100 text-emerald-800 border-emerald-200';
                 if (s.includes('progress')) return 'bg-blue-100 text-blue-800 border-blue-200';
-                if (s.includes('risk') || s.includes('delay') || s.includes('fail')) return 'bg-red-100 text-red-800 border-red-200';
+                if (s.includes('risk') || s.includes('delay') || s.includes('fail') || s.includes('overdue')) return 'bg-red-100 text-red-800 border-red-200';
                 if (s.includes('not start')) return 'bg-slate-100 text-slate-600 border-slate-200';
                 return 'bg-indigo-50 text-indigo-700 border-indigo-200';
             }, []);
@@ -3015,10 +3281,15 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
             const isTaskPastDue = useCallback((task) => {
                 if (!task["End Date"]) return false;
                 const status = String(task.Status || '').toLowerCase();
-                if (status.includes('complete')) return false;
+                if (status.includes('complete') || status.includes('skipped') || status.includes('cancelled')) return false;
+
+                // Ensure date is comparable
+                const dueDate = task["End Date"] instanceof Date ? task["End Date"] : parseLocalDate(task["End Date"]);
+                if (!dueDate) return false;
+
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
-                return task["End Date"] < today;
+                return dueDate < today;
             }, []);
 
             // Enhanced Calendar Helper Functions
@@ -3187,69 +3458,18 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
                 }));
             }, []);
 
+            // Toggle task indicators (Milestone, Key Milestone, Discussion)
+            const toggleTaskIndicator = useCallback((taskId, indicatorField) => {
+                setData(prev => prev.map(row => {
+                    if (row._id === taskId) {
+                        const currentValue = isIndicatorTrue(row[indicatorField]);
+                        return { ...row, [indicatorField]: currentValue ? '' : 'Y' };
+                    }
+                    return row;
+                }));
+            }, []);
+
             // --- HANDLERS ---
-            const extractStyles = async (buffer, sheetName, currentData, headers, cacheKey) => {
-                try {
-                    // Load workbook to check for styling (bold text)
-                    const workbook = new ExcelJS.Workbook();
-                    await workbook.xlsx.load(buffer);
-
-                    let worksheet = workbook.getWorksheet(sheetName);
-                    if (!worksheet) {
-                        worksheet = workbook.worksheets.find(ws => ws.name.toLowerCase() === sheetName.toLowerCase()) || workbook.worksheets[0];
-                    }
-
-                    if (!worksheet) return;
-
-                    // Find "Task Description" column
-                    const headerRow = worksheet.getRow(1);
-                    let taskDescCol = -1;
-                    headerRow.eachCell((cell, colNumber) => {
-                        if (cell.value === "Task Description") taskDescCol = colNumber;
-                    });
-
-                    if (taskDescCol === -1) return;
-
-                    const updates = new Map();
-
-                    // Check each row for bold text in the description column
-                    currentData.forEach((row, idx) => {
-                        // Excel rows are 1-based, and row 1 is header. So data starts at row 2.
-                        // row._id is 0-based index from the data array.
-                        // So Excel Row = row._id + 2
-                        const excelRow = worksheet.getRow(row._id + 2);
-                        const cell = excelRow.getCell(taskDescCol);
-
-                        // Check for bold
-                        if (cell.font && cell.font.bold) {
-                            updates.set(row._id, true);
-                        }
-                    });
-
-                    if (updates.size > 0) {
-                        const enrichedData = currentData.map(r => {
-                            if (updates.has(r._id)) {
-                                return { ...r, isBold: true };
-                            }
-                            return r;
-                        });
-
-                        setData(enrichedData);
-                        showNotification(`✨ Applied bold formatting to ${updates.size} tasks`);
-
-                        // Update cache with bold data
-                        if (cacheKey) {
-                            localStorage.setItem(cacheKey, JSON.stringify({
-                                headers,
-                                data: enrichedData,
-                                sheetName
-                            }));
-                        }
-                    }
-                } catch (err) {
-                    console.warn("Style extraction warning:", err);
-                }
-            };
 
             // Load State for Animations
             const [loadState, setLoadState] = useState('idle'); // 'idle' | 'parsing' | 'success' | 'complete'
@@ -3261,36 +3481,22 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
                 setLoadState('parsing');
                 setIsLoading(true);
                 setLoadingProgress(10);
-                const startTime = performance.now();
 
                 try {
-                    // CRITICAL: Always read the file buffer first for export preservation
+                    // Read the file buffer for export preservation
                     const arrayBuffer = await file.arrayBuffer();
-                    setLoadingProgress(30);
+                    setLoadingProgress(40);
 
-                    // ALWAYS store original file data for export preservation
+                    // Store original file data for export
                     setOriginalFileBuffer(arrayBuffer);
                     setOriginalFileName(file.name);
 
-                    // CRITICAL: We need to detect the sheet name from the actual file
-                    const wbForSheetName = XLSX.read(arrayBuffer, {
-                        type: 'array',
-                        bookSheets: true,
-                        bookProps: false,
-                        bookVBA: false
-                    });
-                    const detectedSheetName = wbForSheetName.SheetNames.find(n => n.toLowerCase().includes('consolidated')) || wbForSheetName.SheetNames[0];
-                    setOriginalSheetName(detectedSheetName);
-
-                    setLoadingProgress(50);
-
-                    // Check cache
-                    const cacheKey = `runbook_v3_cache_${file.name}_${file.size}`;
+                    // Check cache first for ultra-fast loading
+                    const cacheKey = `runbook_v4_cache_${file.name}_${file.size}`;
                     const cachedData = localStorage.getItem(cacheKey);
 
                     let processedData = [];
                     let headers = [];
-                    let sheetName = detectedSheetName;
 
                     if (cachedData) {
                         try {
@@ -3302,28 +3508,30 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
                                 "End Date": row["End Date"] ? new Date(row["End Date"]) : null,
                             }));
                             headers = parsed.headers;
-                            sheetName = parsed.sheetName || detectedSheetName;
-                            setLoadingProgress(80);
+                            setLoadingProgress(90);
                         } catch (e) {
                             console.warn("Cache parse error", e);
                         }
                     }
 
-                    // If no cache or cache failed, parse fresh
+                    // If no cache or cache failed, parse fresh using SheetJS (fast)
                     if (processedData.length === 0) {
-                        // Work via worker/timeout to avoid freezing UI
-                        await new Promise(resolve => setTimeout(resolve, 100));
+                        setLoadingProgress(50);
 
+                        // Parse Excel with SheetJS - use first sheet only
                         const wb = XLSX.read(arrayBuffer, { type: 'array', cellDates: true });
+                        const sheetName = wb.SheetNames[0];
                         const ws = wb.Sheets[sheetName];
                         const jsonData = XLSX.utils.sheet_to_json(ws, { defval: "" });
 
                         if (jsonData.length === 0) throw new Error("Empty Sheet");
 
+                        setLoadingProgress(70);
+
                         // Extract headers
                         headers = Object.keys(jsonData[0]);
 
-                        // Pre-process dates
+                        // Pre-process dates and normalize data
                         processedData = jsonData.map((row, idx) => {
                             const newRow = { _id: idx + 1, ...row };
                             if (newRow["Begin Date"]) newRow["Begin Date"] = new Date(newRow["Begin Date"]);
@@ -3342,7 +3550,7 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
                         setLoadingProgress(90);
                     }
 
-                    // Set data but DON'T switch view yet
+                    // Set data
                     setHeaders(headers);
                     resetData(processedData);
                     setLoadingProgress(100);
@@ -3355,30 +3563,26 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
                         setIsDataLoaded(true);
                         setIsLoading(false);
                         setLoadState('complete');
-                        // Reset progress after switch
                         setTimeout(() => setLoadingProgress(0), 500);
-                    }, 1500); // 1.5s success animation delay
+                    }, 1500);
 
-                    // Cache data
+                    // Cache data for next time (non-blocking)
                     setTimeout(() => {
                         try {
+                            // Clean up old cache entries
                             Object.keys(localStorage).forEach(key => {
-                                if (key.startsWith('runbook_cache_') && key !== cacheKey) {
+                                if (key.startsWith('runbook_v') && key.includes('_cache_') && key !== cacheKey) {
                                     localStorage.removeItem(key);
                                 }
                             });
                             localStorage.setItem(cacheKey, JSON.stringify({
                                 headers,
-                                data: processedData,
-                                sheetName: sheetName
+                                data: processedData
                             }));
                         } catch (e) {
                             console.warn('Could not cache data:', e);
                         }
                     }, 0);
-
-                    // Start background style extraction
-                    extractStyles(arrayBuffer, sheetName, processedData, headers, cacheKey);
 
                 } catch (err) {
                     console.error(err);
@@ -3419,8 +3623,8 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
                         .join(' | ');
 
                     const title = filterDesc
-                        ? `Runbook Dashboard - Filtered (${filterDesc})`
-                        : 'Runbook Dashboard - All Data';
+                        ? `ASTRA Runbook - Filtered (${filterDesc})`
+                        : 'ASTRA Runbook - All Data';
 
                     // Read current document to get all the HTML structure
                     const currentHTML = document.documentElement.outerHTML;
@@ -3529,59 +3733,18 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
                 }
 
                 try {
-                    showNotification("🔄 Exporting with ALL sheets, formatting, and conditional formatting preserved...");
+                    showNotification("🔄 Exporting updated data...");
 
-                    // Load the ENTIRE original workbook with ExcelJS
-                    // This preserves EVERYTHING: all sheets, formatting, conditional formatting, etc.
+                    // Load the original workbook with ExcelJS
                     const workbook = new ExcelJS.Workbook();
                     await workbook.xlsx.load(originalFileBuffer);
 
-                    // Get all sheet names for logging
-                    const allSheetNames = workbook.worksheets.map(ws => ws.name);
-                    console.log(`📊 Total sheets in workbook: ${allSheetNames.length}`);
-                    console.log(`📋 Sheet names: ${allSheetNames.join(', ')}`);
-                    console.log(`✏️  Looking for sheet: "${originalSheetName}"`);
-
-                    // Find the specific worksheet we're working with
-                    let worksheet = workbook.getWorksheet(originalSheetName);
-
-                    // If not found, try to find by case-insensitive match or "consolidated"
+                    // Use the first worksheet
+                    const worksheet = workbook.worksheets[0];
                     if (!worksheet) {
-                        console.warn(`⚠️  Sheet "${originalSheetName}" not found, trying alternatives...`);
-
-                        // Try case-insensitive match
-                        worksheet = workbook.worksheets.find(ws =>
-                            ws.name.toLowerCase() === originalSheetName.toLowerCase()
-                        );
-
-                        // Try to find any sheet with "consolidated" in the name
-                        if (!worksheet) {
-                            worksheet = workbook.worksheets.find(ws =>
-                                ws.name.toLowerCase().includes('consolidated')
-                            );
-                        }
-
-                        // Last resort: use first sheet
-                        if (!worksheet) {
-                            worksheet = workbook.worksheets[0];
-                        }
-
-                        if (worksheet) {
-                            console.log(`✅ Using sheet: "${worksheet.name}"`);
-                            setOriginalSheetName(worksheet.name); // Update for next time
-                        }
-                    }
-
-                    if (!worksheet) {
-                        const availableSheets = allSheetNames.join(', ');
-                        showNotification(`❌ Could not find any valid sheet. Available sheets: ${availableSheets}`, "error");
-                        console.error(`Available sheets: ${availableSheets}`);
-                        console.error(`Tried to find: "${originalSheetName}"`);
+                        showNotification("❌ No worksheet found in the file", "error");
                         return;
                     }
-
-                    console.log(`✏️  Updating sheet: "${worksheet.name}"`);
-                    console.log(`🔒 Other ${allSheetNames.length - 1} sheets will remain completely unchanged`);
 
                     // Get the header row to map columns
                     const headerRow = worksheet.getRow(1);
@@ -3590,53 +3753,40 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
                         columnMap[cell.value] = colNumber;
                     });
 
-                    console.log(`📋 Mapped ${Object.keys(columnMap).length} columns`);
-
-                    // CRITICAL: Don't delete rows - just update cell values to preserve ALL formatting
                     const dataRowCount = data.length;
                     const originalRowCount = worksheet.rowCount;
 
-                    console.log(`📝 Updating ${dataRowCount} rows of data`);
-
-                    // Update existing rows with new data while preserving ALL formatting
+                    // Update existing rows with new data
                     data.forEach((dataRow, index) => {
                         const excelRowNumber = index + 2; // +2 because Excel is 1-indexed and row 1 is header
                         const row = worksheet.getRow(excelRowNumber);
 
-                        // Update each cell with new data while preserving cell formatting
+                        // Update each cell with new data
                         headers.forEach(header => {
                             const colNumber = columnMap[header];
                             if (colNumber) {
                                 const cell = row.getCell(colNumber);
                                 let value = dataRow[header];
 
-                                // Handle dates properly to preserve date formatting
+                                // Handle dates properly
                                 if (header === "End Date" || header === "Start Date" || header === "Begin Date") {
                                     if (value instanceof Date && !isNaN(value.getTime())) {
-                                        // Set date value - ExcelJS automatically preserves date formatting
                                         cell.value = value;
                                     } else {
                                         cell.value = null;
                                     }
                                 } else if (typeof value === 'number') {
-                                    // Preserve number formatting
                                     cell.value = value;
                                 } else if (value === '' || value === undefined) {
-                                    // Clear empty values but preserve formatting
                                     cell.value = null;
                                 } else {
-                                    // Preserve the original cell's formatting while updating value
                                     cell.value = value;
                                 }
 
-                                // Apply Bold formatting for Task Description
-                                if (header === "Task Description") {
-                                    const isBold = !!dataRow.isBold;
+                                // Apply Bold formatting for Task Description if needed
+                                if (header === "Task Description" && dataRow.isBold) {
                                     const currentFont = cell.font || {};
-                                    // Create a new font object to avoid mutating shared styles if possible, though ExcelJS handles this
-                                    if (isBold !== !!currentFont.bold) {
-                                        cell.font = { ...currentFont, bold: isBold };
-                                    }
+                                    cell.font = { ...currentFont, bold: true };
                                 }
                             }
                         });
@@ -3644,27 +3794,21 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
                         row.commit();
                     });
 
-                    // If we have fewer rows than the original, clear the extra rows
-                    // but DON'T delete them to preserve any row-level formatting and conditional formatting
+                    // Clear extra rows if we have fewer than original
                     if (dataRowCount + 2 <= originalRowCount) {
-                        console.log(`🧹 Clearing ${originalRowCount - (dataRowCount + 1)} unused rows (keeping formatting)`);
                         for (let i = dataRowCount + 2; i <= originalRowCount; i++) {
                             const row = worksheet.getRow(i);
                             row.eachCell((cell) => {
-                                // Clear value but KEEP all formatting including conditional formatting
                                 cell.value = null;
                             });
                             row.commit();
                         }
                     }
 
-                    console.log(`✅ Data update complete. Generating Excel file with ALL sheets and formatting...`);
-
-                    // Generate the Excel file - this will include ALL sheets with ALL formatting
-                    // ExcelJS preserves: cell formatting, conditional formatting, formulas, charts, etc.
+                    // Generate the Excel file
                     const buffer = await workbook.xlsx.writeBuffer();
 
-                    // Create a download link
+                    // Create download link
                     const blob = new Blob([buffer], {
                         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
                     });
@@ -3682,11 +3826,9 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
                     document.body.removeChild(link);
                     window.URL.revokeObjectURL(url);
 
-                    showNotification(`✅ Exported with ALL ${allSheetNames.length} sheets and formatting preserved!`);
-                    console.log(`📦 Export complete: ${link.download}`);
-                    console.log(`✅ Preserved sheets: ${allSheetNames.join(', ')}`);
+                    showNotification(`✅ Exported successfully!`);
                 } catch (error) {
-                    console.error("❌ Export error:", error);
+                    console.error("Export error:", error);
                     showNotification(`❌ Export failed: ${error.message}`, "error");
                 }
             };
@@ -3745,22 +3887,40 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
             const handleSaveRow = () => {
                 if (editingRowId === 'new') {
                     const newId = data.length > 0 ? Math.max(...data.map(d => d._id)) + 1 : 1;
+
+                    // Calculate next Task Number
+                    let nextTaskNumber = 1;
+                    if (data.length > 0) {
+                        const taskNumbers = data
+                            .map(d => Number(d["Task Number"]))
+                            .filter(n => !isNaN(n));
+                        if (taskNumbers.length > 0) {
+                            nextTaskNumber = Math.max(...taskNumbers) + 1;
+                        }
+                    }
+
                     const newRow = {
                         _id: newId,
+                        "Task Number": nextTaskNumber,
                         ...editFormData,
-                        "End Date": editFormData["End Date"] ? new Date(editFormData["End Date"]) : null
+                        "Begin Date": editFormData["Begin Date"] ? parseLocalDate(editFormData["Begin Date"]) : null,
+                        "Start Date": editFormData["Begin Date"] ? parseLocalDate(editFormData["Begin Date"]) : null, // Mirror begin date
+                        "End Date": editFormData["End Date"] ? parseLocalDate(editFormData["End Date"]) : null
                     };
-                    setData([newRow, ...data]);
-                    showNotification("New task added.");
+
+                    // Add to bottom of list
+                    setData([...data, newRow]);
+                    showNotification(`New task added #${nextTaskNumber}`);
                 } else {
                     const newData = data.map(row => {
                         if (row._id === editingRowId) {
                             let updatedRow = { ...row, ...editFormData };
                             if (editFormData["End Date"] && typeof editFormData["End Date"] === 'string') {
-                                updatedRow["End Date"] = new Date(editFormData["End Date"]);
+                                updatedRow["End Date"] = parseLocalDate(editFormData["End Date"]);
                             }
                             if (editFormData["Begin Date"] && typeof editFormData["Begin Date"] === 'string') {
-                                updatedRow["Begin Date"] = new Date(editFormData["Begin Date"]);
+                                updatedRow["Begin Date"] = parseLocalDate(editFormData["Begin Date"]);
+                                updatedRow["Start Date"] = parseLocalDate(editFormData["Begin Date"]);
                             }
                             return updatedRow;
                         }
@@ -3779,6 +3939,10 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
                 if (longPressTimer.current) {
                     clearTimeout(longPressTimer.current);
                     longPressTimer.current = null;
+                }
+                if (calendarLongPressTimerRef.current) {
+                    clearTimeout(calendarLongPressTimerRef.current);
+                    calendarLongPressTimerRef.current = null;
                 }
 
                 setDraggedTask(task);
@@ -3979,14 +4143,22 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
                 }
             };
 
+
+
+
+            // --- COMPUTED ---
             // --- COMPUTED ---
             const filterOptions = useMemo(() => {
                 if (!data.length) return {};
                 const opts = {};
-                const filterFields = ['Program', 'Task Type', 'Lead', 'Status', 'Milestone (Y/N)', 'R&C', 'STEG', 'At Risk', 'Retail CR Focus', 'Finance Focus', 'MR Focus', 'Carib Focus'];
+                // All Excel columns except Task Number and Task Description
+                const filterFields = ['Program', 'Task Type', 'Lead', 'Contributor', 'Contributors', 'Contributor(s)', 'Dependency', 'Status', 'Discussion', 'Key Milestone', 'Milestone', 'R&C', 'STEG', 'At Risk', 'Retail CR Focus', 'Finance Focus', 'MR Focus', 'Carib Focus'];
 
                 filterFields.forEach(targetField => {
-                    if (headers.includes(targetField)) {
+                    // Find actual header that matches (case-insensitive)
+                    const actualHeader = headers.find(h => h.trim().toLowerCase() === targetField.toLowerCase());
+
+                    if (actualHeader) {
                         // Filter data to determine available options for this field
                         // We filter by Search Term AND all *other* Active Filters
                         const validRows = data.filter(row => {
@@ -4000,7 +4172,7 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
 
                             // 2. Apply all OTHER active filters
                             for (const [key, selectedVals] of Object.entries(activeFilters)) {
-                                if (key === targetField) continue; // Skip the field we are generating options for
+                                if (key === actualHeader) continue; // Skip the field we are generating options for
                                 if (selectedVals && selectedVals.length > 0) {
                                     if (!selectedVals.includes(row[key])) return false;
                                 }
@@ -4008,7 +4180,7 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
                             return true;
                         });
 
-                        opts[targetField] = [...new Set(validRows.map(d => d[targetField]).filter(Boolean))].sort();
+                        opts[actualHeader] = [...new Set(validRows.map(d => d[actualHeader]).filter(Boolean))].sort();
                     }
                 });
                 return opts;
@@ -4019,20 +4191,24 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
                 if (!data.length) return {};
                 const suggestions = {};
 
-                const fields = ['Program', 'Task Type', 'Lead', 'Status', 'Milestone (Y/N)', 'R&C', 'STEG', 'At Risk', 'Retail CR Focus', 'Finance Focus', 'MR Focus', 'Carib Focus'];
-                fields.forEach(field => {
-                    if (headers.includes(field)) {
+                // All Excel columns except Task Number and Task Description
+                const fields = ['Program', 'Task Type', 'Lead', 'Contributor', 'Contributors', 'Contributor(s)', 'Dependency', 'Status', 'Discussion', 'Key Milestone', 'Milestone', 'R&C', 'STEG', 'At Risk', 'Retail CR Focus', 'Finance Focus', 'MR Focus', 'Carib Focus'];
+                fields.forEach(targetField => {
+                    // Find actual header that matches (case-insensitive)
+                    const actualHeader = headers.find(h => h.trim().toLowerCase() === targetField.toLowerCase());
+
+                    if (actualHeader) {
                         // Count occurrences of each value
                         const counts = {};
                         data.forEach(row => {
-                            const value = row[field];
+                            const value = row[actualHeader];
                             if (value && String(value).trim()) {
                                 counts[value] = (counts[value] || 0) + 1;
                             }
                         });
 
                         // Sort by count (descending) and take top 10
-                        suggestions[field] = Object.entries(counts)
+                        suggestions[actualHeader] = Object.entries(counts)
                             .sort((a, b) => b[1] - a[1])
                             .slice(0, 10)
                             .map(([value]) => value);
@@ -4042,62 +4218,176 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
                 return suggestions;
             }, [data, headers]);
 
-            const filteredData = useMemo(() => {
+            const strictMatches = useMemo(() => {
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
 
                 return data.filter(row => {
+                    // Header Filters (ID)
+                    if (headerFilters.ID) {
+                        const val = String(row["Task Number"] || row._id || '').toLowerCase();
+                        if (!val.includes(headerFilters.ID.toLowerCase())) return false;
+                    }
+
                     // Text search filter
                     const matchesSearch = Object.values(row).some(val =>
                         String(val).toLowerCase().includes(searchTerm.toLowerCase())
                     );
                     if (!matchesSearch) return false;
 
-                    // Standard dropdown filters
-                    for (const [key, selectedVals] of Object.entries(activeFilters)) {
-                        if (selectedVals && selectedVals.length > 0) {
-                            if (!selectedVals.includes(row[key])) return false;
+                    // Apply active filters
+                    for (const [key, selectedValues] of Object.entries(activeFilters)) {
+                        if (!selectedValues || selectedValues.length === 0) continue;
+
+                        const rowValue = row[key];
+                        // If row has no value but filter is active, exclude it
+                        if (!rowValue) return false;
+
+                        if (!selectedValues.includes(rowValue)) {
+                            return false;
                         }
                     }
 
-                    // AI Date Filter
+                    // AI Date Filter (Natural Language)
                     if (aiDateFilter) {
-                        const endDate = row["End Date"];
+                        const endDate = parseLocalDate(row["End Date"]);
 
-                        if (aiDateFilter.type === 'due_within_days') {
+                        if (aiDateFilter.start && aiDateFilter.end) {
                             if (!endDate) return false;
-                            const targetDate = new Date(today);
-                            targetDate.setDate(targetDate.getDate() + aiDateFilter.value);
-                            // Task must be due between today and target date
-                            if (endDate < today || endDate > targetDate) return false;
+                            if (endDate < aiDateFilter.start || endDate > aiDateFilter.end) return false;
                         }
 
                         if (aiDateFilter.type === 'overdue') {
                             if (!endDate) return false;
                             const status = String(row.Status).toLowerCase();
-                            // Overdue = End Date < Today AND not completed
                             if (endDate >= today || status.includes('complete')) return false;
                         }
                     }
 
                     return true;
                 });
-            }, [data, searchTerm, activeFilters, aiDateFilter]);
+            }, [data, searchTerm, activeFilters, aiDateFilter, headerFilters]);
+
+            // Snapshot visible items when filters change
+            useEffect(() => {
+                setPersistedIds(new Set(strictMatches.map(d => d._id)));
+            }, [searchTerm, activeFilters, aiDateFilter, headerFilters]);
+
+            // Final displayed data
+            const filteredData = useMemo(() => {
+                if (autoFilterEnabled) {
+                    return strictMatches;
+                } else {
+                    // Union of strictMatches and persistedIds found in data
+                    // We want to maintain the sort order of data if possible, or strictMatches?
+                    // Typically 'data' order.
+                    const strictSet = new Set(strictMatches.map(d => d._id));
+                    const persistedInStrict = new Set([...strictSet, ...persistedIds]);
+
+                    return data.filter(d => persistedInStrict.has(d._id));
+                }
+            }, [strictMatches, persistedIds, autoFilterEnabled, data]);
+
+            // Scroll to first task (for Total Tasks click)
+            const scrollToFirstTask = useCallback(() => {
+                if (filteredData.length > 0) {
+                    const firstTask = filteredData[0];
+                    if (tableRowRefs.current[firstTask._id]) {
+                        tableRowRefs.current[firstTask._id].scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+                        setHighlightedTaskId(firstTask._id);
+                        showNotification(`Viewing first task: ${firstTask["Task Description"]?.slice(0, 40) || 'Task'}...`);
+                    }
+                } else {
+                    showNotification("No tasks found", "error");
+                }
+            }, [filteredData]);
+
+            // Scroll to first in-progress task
+            const scrollToFirstInProgress = useCallback(() => {
+                const inProgressTask = filteredData.find(task => {
+                    const status = String(task.Status || '').toLowerCase();
+                    // Matches "In Progress", "In progress", "Running", etc if standardized
+                    return status.includes('progress');
+                });
+
+                if (inProgressTask) {
+                    const rowEl = tableRowRefs.current[inProgressTask._id];
+                    if (rowEl) {
+                        rowEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        setHighlightedTaskId(inProgressTask._id);
+                        showNotification(`Found In Progress (${inProgressTask.Status}): ID ${inProgressTask["Task Number"]}`);
+                    } else {
+                        // This implies the task is in data but didn't render?
+                        console.warn("Task found but row ref missing", inProgressTask._id);
+                        showNotification("Task found but not visible in table", "error");
+                    }
+                } else {
+                    showNotification("No in-progress tasks visible", "error");
+                }
+            }, [filteredData]);
+
+            // Scroll to first past-due task
+            const scrollToFirstPastDue = useCallback(() => {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                // Helper to ensure robust date parsing inline
+                const getTaskDate = (d) => {
+                    if (!d) return null;
+                    if (d instanceof Date) return d;
+                    try {
+                        const s = String(d);
+                        const parts = s.split('-');
+                        if (parts.length === 3) {
+                            return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+                        }
+                        return new Date(d);
+                    } catch (e) { return null; }
+                };
+
+                const pastDueTask = filteredData.find(task => {
+                    const status = String(task.Status || '').toLowerCase();
+                    if (status.includes('complete') || status.includes('skipped') || status.includes('cancelled')) return false;
+
+                    const endDate = getTaskDate(task["End Date"]);
+                    if (!endDate) return false;
+
+                    return endDate < today;
+                });
+
+                if (pastDueTask) {
+                    const rowEl = tableRowRefs.current[pastDueTask._id];
+                    if (rowEl) {
+                        rowEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        setHighlightedTaskId(pastDueTask._id);
+                        showNotification(`Found Past Due (${pastDueTask.Status}): ID ${pastDueTask["Task Number"]}`);
+                    } else {
+                        console.warn("Task found but row ref missing", pastDueTask._id);
+                        showNotification(`Task ${pastDueTask["Task Number"]} found but not rendered`, "error");
+                    }
+                } else {
+                    showNotification("No past-due tasks visible", "error");
+                }
+            }, [filteredData]);
 
             const stats = useMemo(() => {
                 const total = filteredData.length;
                 const completed = filteredData.filter(d => String(d.Status).toLowerCase().includes('complete')).length;
                 const inProgress = filteredData.filter(d => String(d.Status).toLowerCase().includes('progress')).length;
 
-                // Past Due Logic: End Date < Today AND Status != Completed
+                // Past Due Logic: End Date < Today AND Status != Completed/Skipped/Cancelled
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
 
                 const atRisk = filteredData.filter(d => {
-                    const status = String(d.Status).toLowerCase();
-                    if (status.includes('complete')) return false;
+                    const status = String(d.Status || '').toLowerCase();
+                    if (status.includes('complete') || status.includes('skipped') || status.includes('cancelled')) return false;
 
-                    const endDate = d["End Date"];
+                    // Ensure safe date parsing
+                    const endDate = d["End Date"] instanceof Date ? d["End Date"] : parseLocalDate(d["End Date"]);
                     if (!endDate) return false;
 
                     return endDate < today;
@@ -4106,6 +4396,27 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
                 const completionRate = total ? Math.round((completed / total) * 100) : 0;
                 return { total, completed, inProgress, atRisk, completionRate };
             }, [filteredData]);
+
+            // Get unique status values from the data, preserving original casing
+            // This ensures dropdown options match what's in the Excel file
+            const uniqueStatuses = useMemo(() => {
+                const statusSet = new Map(); // Use Map to preserve first occurrence casing
+                const defaultStatuses = ['Not Started', 'In Progress', 'Completed', 'Delayed', 'Overdue', 'Cancelled', 'Skipped'];
+
+                // Add default statuses first (will be overwritten if data has different casing)
+                defaultStatuses.forEach(s => {
+                    statusSet.set(s.toLowerCase(), s);
+                });
+
+                // Override with actual values from data (preserves their casing)
+                data.forEach(row => {
+                    if (row.Status && typeof row.Status === 'string') {
+                        statusSet.set(row.Status.toLowerCase(), row.Status);
+                    }
+                });
+
+                return Array.from(statusSet.values());
+            }, [data]);
 
             const calendarMonths = useMemo(() => {
                 const months = [];
@@ -4244,7 +4555,7 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
                                                 <Icons.FileSpreadsheet className="w-10 h-10 text-white drop-shadow-md" />
                                             </div>
 
-                                            <h1 className="text-3xl font-bold text-white mb-2 tracking-tight">Runbook Dashboard</h1>
+                                            <h1 className="text-3xl font-bold text-white mb-2 tracking-tight">ASTRA Runbook</h1>
                                             <p className="text-blue-100/80 mb-8 font-light">Upload your Consolidated Runbook (Excel or CSV) to visualize tasks.</p>
 
                                             <label
@@ -4310,8 +4621,8 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
                                     <Icons.FileSpreadsheet className="w-6 h-6 text-white" />
                                 </div>
                                 <div className={`${!sidebarOpen && 'hidden'}`}>
-                                    <h1 className="text-xl font-bold text-white tracking-tight drop-shadow-md">Runbook</h1>
-                                    <p className="text-[10px] text-cyan-200 font-bold tracking-[0.2em] uppercase">Dashboard</p>
+                                    <h1 className="text-xl font-bold text-white tracking-tight drop-shadow-md">ASTRA</h1>
+                                    <p className="text-[10px] text-cyan-200 font-bold tracking-[0.2em] uppercase">Runbook Manager</p>
                                 </div>
                             </div>
 
@@ -4412,14 +4723,22 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
                                             {(Object.keys(activeFilters).some(k => activeFilters[k].length) || searchTerm || aiDateFilter) && (
                                                 <button
                                                     onClick={() => { setHighlightedTaskId(null); setActiveFilters({}); setSearchTerm(''); setAiDateFilter(null); setSmartFilterQuery(''); }}
-                                                    className="text-[10px] bg-white/10 hover:bg-white/20 text-white px-2 py-0.5 rounded-md transition-colors"
+                                                    className="text-[10px] bg-white/10 hover:bg-white/20 text-white px-2 py-0.5 rounded-md transition-colors mr-2"
                                                 >
                                                     Reset
                                                 </button>
                                             )}
+                                            <button
+                                                onClick={() => setAutoFilterEnabled(!autoFilterEnabled)}
+                                                className={`flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] transition-colors border ${autoFilterEnabled ? 'bg-blue-500/20 text-blue-300 border-blue-500/30' : 'bg-white/5 text-white/50 border-white/10'}`}
+                                                title={autoFilterEnabled ? "Tasks auto-hide when edited" : "Tasks stay visible when edited"}
+                                            >
+                                                <div className={`w-1.5 h-1.5 rounded-full ${autoFilterEnabled ? 'bg-blue-400' : 'bg-slate-500'}`} />
+                                                Auto
+                                            </button>
                                         </div>
 
-                                        {/* AI Date Filter Badge */}
+
                                         {aiDateFilter && (
                                             <div className="flex items-center gap-2 px-3 py-2 bg-purple-500/10 border border-purple-500/20 rounded-lg">
                                                 <Icons.Sparkles className="w-3 h-3 text-purple-400" />
@@ -4462,6 +4781,8 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
                                                 "Task Description": payload["Task Description"] || "New AI Task",
                                                 "Status": payload["Status"] || "Not Started",
                                                 "Lead": payload["Lead"] || "AI",
+                                                "Milestone": payload["Milestone"] || "FALSE",
+                                                "Key Milestone": payload["Key Milestone"] || "FALSE",
                                                 "Begin Date": new Date(),
                                                 "End Date": payload["End Date"] ? new Date(payload["End Date"]) : new Date(new Date().setDate(new Date().getDate() + 7)),
                                                 "Dependency": ""
@@ -4477,6 +4798,10 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
                                                             ...t,
                                                             "Status": payload["Status"] || t["Status"],
                                                             "Task Description": payload["Task Description"] || t["Task Description"],
+                                                            "Program": payload["Program"] || t["Program"],
+                                                            "Lead": payload["Lead"] || t["Lead"],
+                                                            "Milestone": payload["Milestone"] || t["Milestone"],
+                                                            "Key Milestone": payload["Key Milestone"] || t["Key Milestone"],
                                                             "End Date": payload["End Date"] ? new Date(payload["End Date"]) : t["End Date"]
                                                         };
                                                     }
@@ -4496,8 +4821,7 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
                                 <div className="flex items-center space-x-3">
                                     <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-pink-500 to-violet-500 border border-white/20 shadow-inner"></div>
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-medium text-white truncate">Admin User</p>
-                                        <p className="text-xs text-cyan-200/60 truncate">admin@company.com</p>
+                                        <p className="text-sm font-medium text-white truncate">CEST Analytics</p>
                                     </div>
                                 </div>
                             </div>
@@ -4522,8 +4846,7 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
                                         {[
                                             { id: 'dashboard', label: 'Overview', icon: Icons.BarChart3 },
                                             { id: 'gantt', label: 'Gantt', icon: Icons.GanttChart },
-                                            { id: 'calendar', label: 'Calendar', icon: Icons.Clock },
-                                            { id: 'list', label: 'Data Grid', icon: Icons.Table }
+                                            { id: 'calendar', label: 'Calendar', icon: Icons.Clock }
                                         ].map(v => (
                                             <button
                                                 key={v.id}
@@ -4587,7 +4910,7 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
                                                     className="p-2 rounded-lg transition-all text-emerald-400 hover:text-emerald-300 hover:bg-emerald-400/10"
                                                     title={`Found unsaved session from ${lastSavedTime.toLocaleTimeString()}. Click to recover.`}
                                                 >
-                                                    <Icons.Save className="w-4 h-4" />
+                                                    <Icons.Download className="w-4 h-4" />
                                                 </button>
                                                 <button
                                                     onClick={clearSavedSession}
@@ -4636,48 +4959,165 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
 
                                 {/* VIEW: DASHBOARD */}
                                 {view === 'dashboard' && (
-                                    <div className="p-8 h-full flex flex-col">
-                                        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 shrink-0">
-                                            <StatCard label="Total Tasks" value={stats.total} icon={Icons.FileSpreadsheet} color="blue" />
-                                            <StatCard label="Completion" value={`${stats.completionRate}%`} icon={Icons.CheckCircle} color="emerald" />
-                                            <StatCard label="In Progress" value={stats.inProgress} icon={Icons.Clock} color="indigo" />
-                                            <StatCard label="Past Due" value={stats.atRisk} icon={Icons.AlertCircle} color="red" />
+                                    <div className={`h-full flex flex-col transition-all duration-300 ${statsCollapsed ? 'p-4' : 'p-8'}`}>
+                                        {/* Collapsible Stats Header */}
+                                        <div className="shrink-0 mb-4">
+                                            <button
+                                                onClick={() => setStatsCollapsed(!statsCollapsed)}
+                                                className="flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-blue-600 transition-colors group mb-2"
+                                            >
+                                                <Icons.ChevronDown className={`w-4 h-4 transition-transform duration-300 ${statsCollapsed ? '-rotate-90' : 'rotate-0'}`} />
+                                                <span>{statsCollapsed ? 'Show Statistics' : 'Hide Statistics'}</span>
+                                                {statsCollapsed && (
+                                                    <span className="ml-2 flex items-center gap-3 text-[10px] font-medium text-slate-400">
+                                                        <span className="flex items-center gap-1"><Icons.FileSpreadsheet className="w-3 h-3" />{stats.total}</span>
+                                                        <span className="flex items-center gap-1"><Icons.CheckCircle className="w-3 h-3 text-emerald-500" />{stats.completionRate}%</span>
+                                                        <span className="flex items-center gap-1"><Icons.Clock className="w-3 h-3 text-indigo-500" />{stats.inProgress}</span>
+                                                        <span className="flex items-center gap-1"><Icons.AlertCircle className="w-3 h-3 text-red-500" />{stats.atRisk}</span>
+                                                    </span>
+                                                )}
+                                            </button>
+                                            <div
+                                                className={`grid grid-cols-1 md:grid-cols-4 gap-6 transition-all duration-300 ease-in-out overflow-hidden ${statsCollapsed ? 'max-h-0 opacity-0 mb-0' : 'max-h-48 opacity-100'}`}
+                                            >
+                                                <StatCard label="Total Tasks" value={stats.total} icon={Icons.FileSpreadsheet} color="blue" onClick={scrollToFirstTask} />
+                                                <StatCard label="Completion" value={`${stats.completionRate}%`} icon={Icons.CheckCircle} color="emerald" />
+                                                <StatCard label="In Progress" value={stats.inProgress} icon={Icons.Clock} color="indigo" onClick={scrollToFirstInProgress} />
+                                                <StatCard label="Past Due" value={stats.atRisk} icon={Icons.AlertCircle} color="red" onClick={scrollToFirstPastDue} />
+                                            </div>
                                         </div>
 
-                                        <div className="glass-strong rounded-2xl border border-white/10 shadow-2xl overflow-hidden flex flex-col flex-1 min-h-0 bg-white/80">
-                                            <div className="px-6 py-4 border-b border-slate-200/50 bg-white/50 backdrop-blur-sm sticky top-0 z-10 flex justify-between items-center">
-                                                <div className="flex items-center space-x-2">
-                                                    <div className="w-1 h-5 bg-blue-500 rounded-full"></div>
-                                                    <h2 className="font-bold text-slate-800 text-lg">Tasks Overview</h2>
-                                                </div>
-                                                <div className="flex items-center space-x-3">
-                                                    <div className="hidden md:flex items-center space-x-2 text-[10px] text-slate-500 bg-slate-100 px-2 py-1 rounded border border-slate-200">
-                                                        <span className="font-bold text-emerald-600">⚡ Optimized</span>
-                                                        <span className="font-bold flex items-center"><Icons.Info className="w-3 h-3 mr-1" /> Tips:</span>
-                                                        <span>Hover task to mark Important</span>
+                                        <div className={`rounded-2xl border shadow-2xl overflow-hidden flex flex-col flex-1 min-h-0 bg-white/80 transition-all duration-300 ${statsCollapsed ? 'border-slate-200' : 'glass-strong border-white/10'}`}>
+                                            {/* Tasks Overview Header - Hidden when stats collapsed */}
+                                            {!statsCollapsed && (
+                                                <div className="px-6 py-4 border-b border-slate-200/50 bg-white/50 backdrop-blur-sm sticky top-0 z-10 flex justify-between items-center">
+                                                    <div className="flex items-center space-x-2">
+                                                        <div className="w-1 h-5 bg-blue-500 rounded-full"></div>
+                                                        <h2 className="font-bold text-slate-800 text-lg">Tasks Overview</h2>
                                                     </div>
-                                                    <button
-                                                        onClick={goToCurrentDate}
-                                                        className="flex items-center space-x-2 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 text-xs font-bold rounded-lg transition-colors border border-blue-200"
-                                                    >
-                                                        <Icons.Clock className="w-3.5 h-3.5" />
-                                                        <span>Today</span>
-                                                    </button>
-                                                    <span className="text-xs text-slate-400 font-medium bg-slate-100 px-2 py-1 rounded-md">{filteredData.length} tasks</span>
+                                                    <div className="flex items-center space-x-3">
+                                                        <div className="hidden md:flex items-center space-x-3 text-[10px] text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
+                                                            <div className="flex items-center gap-1 text-amber-500" title="Key Milestone">
+                                                                <Icons.Star className="w-3 h-3" />
+                                                                <span className="text-slate-600">Key</span>
+                                                            </div>
+                                                            <div className="flex items-center gap-1 text-purple-500" title="Milestone">
+                                                                <Icons.Diamond className="w-3 h-3" />
+                                                                <span className="text-slate-600">Milestone</span>
+                                                            </div>
+                                                            <div className="flex items-center gap-1 text-orange-500" title="Discussion">
+                                                                <Icons.MessageCircle className="w-3 h-3" />
+                                                                <span className="text-slate-600">Discussion</span>
+                                                            </div>
+                                                            <span className="border-l border-slate-300 pl-2 text-slate-400 flex items-center gap-1">
+                                                                <Icons.MousePointer className="w-2.5 h-2.5" />
+                                                                Hover → Mark
+                                                            </span>
+                                                        </div>
+                                                        <button
+                                                            onClick={goToCurrentDate}
+                                                            className="flex items-center space-x-2 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 text-xs font-bold rounded-lg transition-colors border border-blue-200"
+                                                        >
+                                                            <Icons.Clock className="w-3.5 h-3.5" />
+                                                            <span>Today</span>
+                                                        </button>
+                                                        <span className="text-xs text-slate-400 font-medium bg-slate-100 px-2 py-1 rounded-md">{filteredData.length} tasks</span>
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            )}
                                             <div className="overflow-auto flex-1 custom-scrollbar">
                                                 <table className="w-full text-left text-sm text-slate-600">
                                                     <thead className="bg-slate-50/80 border-b border-slate-200 sticky top-0 backdrop-blur-sm z-10">
                                                         <tr>
                                                             <th className="px-6 py-3 w-10"></th>
-                                                            <th className="px-6 py-3 font-semibold text-slate-500 uppercase text-xs tracking-wider">ID</th>
-                                                            <th className="px-6 py-3 font-semibold text-slate-500 uppercase text-xs tracking-wider">Program</th>
-                                                            <th className="px-6 py-3 font-semibold text-slate-500 uppercase text-xs tracking-wider">Type</th>
-                                                            <th className="px-6 py-3 font-semibold text-slate-500 uppercase text-xs tracking-wider">Task</th>
-                                                            <th className="px-6 py-3 font-semibold text-slate-500 uppercase text-xs tracking-wider">Lead</th>
-                                                            <th className="px-6 py-3 font-semibold text-slate-500 uppercase text-xs tracking-wider">Due</th>
-                                                            <th className="px-6 py-3 w-40 font-semibold text-slate-500 uppercase text-xs tracking-wider">Status</th>
+
+                                                            {/* ID: Static Compact Header */}
+                                                            <th className="px-2 py-3 w-14 font-semibold text-slate-500 uppercase text-xs tracking-wider text-center align-middle">ID</th>
+
+                                                            <th className="px-6 py-3 font-semibold text-slate-500 uppercase text-xs tracking-wider align-middle">Program</th>
+
+                                                            {/* TYPE: Select acts as header */}
+                                                            <th className="px-6 py-3 align-middle">
+                                                                <div className="relative flex items-center group">
+                                                                    <select
+                                                                        value={activeFilters['Task Type']?.[0] || ''}
+                                                                        onChange={(e) => {
+                                                                            const val = e.target.value;
+                                                                            const newFilters = { ...activeFilters };
+                                                                            if (val) newFilters['Task Type'] = [val];
+                                                                            else delete newFilters['Task Type'];
+                                                                            setActiveFilters(newFilters);
+                                                                        }}
+                                                                        className="appearance-none bg-transparent border-none p-0 pr-4 text-xs font-semibold text-slate-500 uppercase tracking-wider focus:ring-0 cursor-pointer w-full truncate"
+                                                                    >
+                                                                        <option value="">Type</option>
+                                                                        {(filterOptions['Task Type'] || []).map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                                                    </select>
+                                                                    <Icons.ChevronDown className="w-3 h-3 text-slate-400 absolute right-0 pointer-events-none group-hover:text-blue-500" />
+                                                                </div>
+                                                            </th>
+
+                                                            {/* TASK: Label + Input (Linked to Global Search) */}
+                                                            <th className={`px-6 py-3 align-middle ${!sidebarOpen ? 'w-1/2' : ''}`}>
+                                                                <div className="flex items-center gap-3">
+                                                                    <span>TASK</span>
+                                                                    <div className="relative flex-1 group">
+                                                                        <input
+                                                                            type="text"
+                                                                            placeholder="Search..."
+                                                                            value={searchTerm}
+                                                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                                                            className="w-full bg-transparent border-b border-transparent hover:border-slate-300 focus:border-blue-500 p-0 text-xs text-slate-600 font-normal placeholder-slate-300/0 group-hover:placeholder-slate-300 focus:placeholder-slate-300 focus:ring-0 transition-all"
+                                                                        />
+                                                                        {!searchTerm && <Icons.Search className="w-3 h-3 text-slate-300 absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none group-hover:opacity-0" />}
+                                                                    </div>
+                                                                </div>
+                                                            </th>
+
+                                                            {/* LEAD: Select acts as header */}
+                                                            <th className="px-6 py-3 align-middle">
+                                                                <div className="relative flex items-center group">
+                                                                    <select
+                                                                        value={activeFilters['Lead']?.[0] || ''}
+                                                                        onChange={(e) => {
+                                                                            const val = e.target.value;
+                                                                            const newFilters = { ...activeFilters };
+                                                                            if (val) newFilters['Lead'] = [val];
+                                                                            else delete newFilters['Lead'];
+                                                                            setActiveFilters(newFilters);
+                                                                        }}
+                                                                        className="appearance-none bg-transparent border-none p-0 pr-4 text-xs font-semibold text-slate-500 uppercase tracking-wider focus:ring-0 cursor-pointer w-full truncate"
+                                                                    >
+                                                                        <option value="">Lead</option>
+                                                                        {(filterOptions['Lead'] || []).map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                                                    </select>
+                                                                    <Icons.ChevronDown className="w-3 h-3 text-slate-400 absolute right-0 pointer-events-none group-hover:text-blue-500" />
+                                                                </div>
+                                                            </th>
+
+                                                            <th className="px-6 py-3 font-semibold text-slate-500 uppercase text-xs tracking-wider align-middle">Due</th>
+
+                                                            {/* STATUS: Select acts as header */}
+                                                            <th className="px-6 py-3 w-40 align-middle">
+                                                                <div className="relative flex items-center group">
+                                                                    <select
+                                                                        value={activeFilters['Status']?.[0] || ''}
+                                                                        onChange={(e) => {
+                                                                            const val = e.target.value;
+                                                                            const newFilters = { ...activeFilters };
+                                                                            if (val) newFilters['Status'] = [val];
+                                                                            else delete newFilters['Status'];
+                                                                            setActiveFilters(newFilters);
+                                                                        }}
+                                                                        className="appearance-none bg-transparent border-none p-0 pr-4 text-xs font-semibold text-slate-500 uppercase tracking-wider focus:ring-0 cursor-pointer w-full truncate"
+                                                                    >
+                                                                        <option value="">Status</option>
+                                                                        {(filterOptions['Status'] || []).map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                                                    </select>
+                                                                    <Icons.ChevronDown className="w-3 h-3 text-slate-400 absolute right-0 pointer-events-none group-hover:text-blue-500" />
+                                                                </div>
+                                                            </th>
+
                                                             <th className="px-6 py-3 w-10"></th>
                                                         </tr>
                                                     </thead>
@@ -4703,7 +5143,8 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
                                                                 onDateUpdate={handleDateUpdate}
                                                                 onBoldHover={() => handleTaskMouseEnter(row._id)}
                                                                 onBoldLeave={handleTaskMouseLeave}
-                                                                onToggleBold={(e) => { e.stopPropagation(); toggleTaskBold(row._id); }}
+                                                                onToggleIndicator={(field) => toggleTaskIndicator(row._id, field)}
+                                                                sidebarOpen={sidebarOpen}
                                                             />
                                                         ))}
                                                     </tbody>
@@ -4722,6 +5163,13 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
                                                     <button onClick={() => setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() - 1)))} className="p-1.5 hover:bg-white rounded-md shadow-sm text-slate-600 transition-all"><Icons.ChevronLeft className="w-4 h-4" /></button>
                                                     <button onClick={() => setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() + 1)))} className="p-1.5 hover:bg-white rounded-md shadow-sm text-slate-600 transition-all"><Icons.ChevronRight className="w-4 h-4" /></button>
                                                 </div>
+                                                <button
+                                                    onClick={() => setCurrentDate(new Date())}
+                                                    className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 text-xs font-bold rounded-lg transition-colors border border-blue-200 shadow-sm flex items-center gap-1"
+                                                >
+                                                    <Icons.Clock className="w-3.5 h-3.5" />
+                                                    <span>Today</span>
+                                                </button>
                                                 <h2 className="text-xl font-bold text-slate-800">
                                                     {calendarMode === 'single'
                                                         ? currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })
@@ -4755,6 +5203,20 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
                                                     >
                                                         Due Date
                                                     </button>
+                                                </div>
+                                            </div>
+                                            <div className="hidden md:flex items-center space-x-3 text-[10px] text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
+                                                <div className="flex items-center gap-1 text-amber-500" title="Key Milestone">
+                                                    <Icons.Star className="w-3 h-3" />
+                                                    <span className="text-slate-600">Key</span>
+                                                </div>
+                                                <div className="flex items-center gap-1 text-purple-500" title="Milestone">
+                                                    <Icons.Diamond className="w-3 h-3" />
+                                                    <span className="text-slate-600">Milestone</span>
+                                                </div>
+                                                <div className="flex items-center gap-1 text-orange-500" title="Discussion">
+                                                    <Icons.MessageCircle className="w-3 h-3" />
+                                                    <span className="text-slate-600">Discussion</span>
                                                 </div>
                                             </div>
                                             <div className="text-xs text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100 font-medium flex items-center space-x-3">
@@ -4900,6 +5362,7 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
                                                                                 const slotsInThisWeek = maxSlotsPerWeek[weekRow] || 0;
 
                                                                                 // Get single-day tasks
+                                                                                const isToday = d.date && new Date().toDateString() === d.date.toDateString();
                                                                                 const singleDayTasks = d.tasks ? d.tasks.filter(t => {
                                                                                     if (!showMultiDayBars) return true; // Show all tasks on due date (d.tasks contains tasks ending on this day)
 
@@ -4918,13 +5381,13 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
                                                                                         key={d.id}
                                                                                         data-day={d.day}
                                                                                         data-week={weekRow}
-                                                                                        className={`bg-white p-1 flex flex-col ${!d.day ? 'bg-slate-50/50' : ''} ${draggedTask ? 'transition-colors' : ''}`}
+                                                                                        className={`p-1 flex flex-col ${!d.day ? 'bg-slate-50/50' : (isToday ? 'bg-blue-50 ring-2 ring-blue-400 ring-inset z-10 shadow-[inner_0_0_12px_rgba(59,130,246,0.15)]' : 'bg-white')} ${draggedTask ? 'transition-colors' : ''}`}
                                                                                         onDragOver={d.date ? handleDragOver : undefined}
                                                                                         onDrop={d.date ? (e) => handleDrop(e, d.date) : undefined}
                                                                                     >
                                                                                         {d.day && (
                                                                                             <>
-                                                                                                <span className={`font-bold mb-1 text-slate-400 ${calendarMode === 'single' ? 'text-xs' : 'text-[10px]'}`}>{d.day}</span>
+                                                                                                <span className={`font-bold mb-1 ${isToday ? 'text-blue-600' : 'text-slate-400'} ${calendarMode === 'single' ? 'text-xs' : 'text-[10px]'}`}>{d.day}</span>
 
                                                                                                 {/* Spacer for multi-day bars - height matches the overlay bar area */}
                                                                                                 {slotsInThisWeek > 0 && (
@@ -5023,53 +5486,7 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
                                     </div>
                                 )}
 
-                                {/* VIEW: LIST */}
-                                {view === 'list' && (
-                                    <div className="h-full overflow-auto p-6">
-                                        <div className="bg-white/90 backdrop-blur rounded-2xl shadow-xl border border-white/20 overflow-hidden">
-                                            <table className="w-full text-left text-sm border-collapse">
-                                                <thead className="bg-slate-50 sticky top-0 z-10 shadow-sm border-b border-slate-200">
-                                                    <tr>
-                                                        <th className="p-4 font-semibold text-slate-500 w-16">Edit</th>
-                                                        <th className="p-4 font-semibold text-slate-500">Program</th>
-                                                        <th className="p-4 font-semibold text-slate-500">Task Type</th>
-                                                        <th className="p-4 font-semibold text-slate-500">Task</th>
-                                                        <th className="p-4 font-semibold text-slate-500">Lead</th>
-                                                        <th className="p-4 font-semibold text-slate-500">Date</th>
-                                                        <th className="p-4 font-semibold text-slate-500 w-40">Status</th>
-                                                        <th className="p-4 font-semibold text-slate-500 w-16">Del</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody className="bg-white divide-y divide-slate-100">
-                                                    {filteredData.map(r => (
-                                                        <tr key={r._id} className="hover:bg-blue-50/50 group transition-colors">
-                                                            <td className="p-3 text-center"><button onClick={() => { setEditingRowId(r._id); setEditFormData(r); }} className="p-1.5 text-slate-400 hover:text-blue-600 rounded hover:bg-blue-50"><Icons.Edit2 className="w-4 h-4" /></button></td>
-                                                            <td className="p-3 text-slate-700 font-medium">{r.Program}</td>
-                                                            <td className="p-3 text-slate-500 text-xs">{r["Task Type"]}</td>
-                                                            <td className="p-3 text-slate-600">{r["Task Description"]}</td>
-                                                            <td className="p-3 text-slate-500 text-xs">{r.Lead}</td>
-                                                            <td className="p-3 text-slate-500 font-mono text-xs">{formatDate(r["End Date"])}</td>
-                                                            <td className="p-3">
-                                                                <select
-                                                                    value={r.Status || 'Not Started'}
-                                                                    onChange={(e) => handleStatusUpdate(r._id, e.target.value)}
-                                                                    className={`w-full text-[10px] font-bold uppercase tracking-wide border-0 rounded px-2 py-1 cursor-pointer outline-none status-select ${getStatusColor(r.Status)} ${isTaskPastDue(r) ? 'ring-2 ring-red-600' : 'ring-1 ring-inset ring-slate-200 focus:ring-2 focus:ring-blue-500'}`}
-                                                                >
-                                                                    <option value="Not Started">Not Started</option>
-                                                                    <option value="In Progress">In Progress</option>
-                                                                    <option value="Completed">Completed</option>
-                                                                    <option value="Delayed">Delayed</option>
-                                                                    <option value="Cancelled">Cancelled</option>
-                                                                </select>
-                                                            </td>
-                                                            <td className="p-3 text-center"><button onClick={() => handleDeleteRow(r._id)} className="p-1.5 text-slate-400 hover:text-red-600 rounded hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-opacity"><Icons.Trash2 className="w-4 h-4" /></button></td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                )}
+
 
                                 {/* VIEW: GANTT */}
                                 {view === 'gantt' && (
@@ -5113,6 +5530,7 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
                                         <button onClick={() => setEditingRowId(null)} className="p-1 hover:bg-slate-200 rounded-full transition-colors"><Icons.X className="w-5 h-5 text-slate-400 hover:text-slate-600" /></button>
                                     </div>
                                     <div className="p-8 overflow-y-auto space-y-6">
+                                        {/* Core Fields */}
                                         <div className="grid grid-cols-2 gap-6">
                                             <AutocompleteInput
                                                 label="Program"
@@ -5134,20 +5552,30 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
                                                 onChange={(val) => setEditFormData({ ...editFormData, Lead: val })}
                                                 suggestions={topSuggestions['Lead'] || []}
                                             />
-                                            <div>
-                                                <label className="label">Status</label>
-                                                <select
-                                                    className="input bg-slate-50"
-                                                    value={editFormData.Status || ''}
-                                                    onChange={e => setEditFormData({ ...editFormData, Status: e.target.value })}
-                                                >
-                                                    <option value="Not Started">Not Started</option>
-                                                    <option value="In Progress">In Progress</option>
-                                                    <option value="Completed">Completed</option>
-                                                    <option value="Delayed">Delayed</option>
-                                                    <option value="Cancelled">Cancelled</option>
-                                                </select>
-                                            </div>
+                                            <AutocompleteInput
+                                                label="Contributor"
+                                                value={(() => {
+                                                    const header = headers.find(h => {
+                                                        const lower = h.trim().toLowerCase();
+                                                        return lower === 'contributor' || lower === 'contributors' || lower === 'contributor(s)';
+                                                    });
+                                                    return header ? (editFormData[header] || '') : (editFormData.Contributor || editFormData.Contributors || editFormData['Contributor(s)'] || '');
+                                                })()}
+                                                onChange={(val) => {
+                                                    const header = headers.find(h => {
+                                                        const lower = h.trim().toLowerCase();
+                                                        return lower === 'contributor' || lower === 'contributors' || lower === 'contributor(s)';
+                                                    }) || 'Contributors';
+                                                    setEditFormData({ ...editFormData, [header]: val });
+                                                }}
+                                                suggestions={(() => {
+                                                    const header = headers.find(h => {
+                                                        const lower = h.trim().toLowerCase();
+                                                        return lower === 'contributor' || lower === 'contributors' || lower === 'contributor(s)';
+                                                    });
+                                                    return header ? (topSuggestions[header] || []) : [];
+                                                })()}
+                                            />
                                         </div>
                                         <div>
                                             <label className="label">Task Description</label>
@@ -5159,26 +5587,6 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
                                                 placeholder="Enter task description..."
                                             />
                                         </div>
-                                        <div className="grid grid-cols-2 gap-6">
-                                            <div>
-                                                <label className="label">Begin Date</label>
-                                                <input
-                                                    type="date"
-                                                    className="input bg-slate-50"
-                                                    value={formatDate(editFormData["Begin Date"] ? new Date(editFormData["Begin Date"]) : null)}
-                                                    onChange={e => setEditFormData({ ...editFormData, "Begin Date": e.target.value })}
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="label">End Date</label>
-                                                <input
-                                                    type="date"
-                                                    className="input bg-slate-50"
-                                                    value={formatDate(editFormData["End Date"] ? new Date(editFormData["End Date"]) : null)}
-                                                    onChange={e => setEditFormData({ ...editFormData, "End Date": e.target.value })}
-                                                />
-                                            </div>
-                                        </div>
                                         <div>
                                             <label className="label">Dependency (Task Numbers, comma separated)</label>
                                             <input
@@ -5189,22 +5597,58 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
                                                 placeholder="e.g. 123, 124"
                                             />
                                         </div>
-
-                                        <div className="pt-2 border-t border-slate-100">
-                                            <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Additional Tags</h4>
-                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                                {['Milestone (Y/N)', 'At Risk', 'R&C', 'STEG', 'Retail CR Focus', 'Finance Focus', 'MR Focus', 'Carib Focus'].map(field => (
-                                                    <AutocompleteInput
-                                                        key={field}
-                                                        label={field}
-                                                        value={editFormData[field]}
-                                                        onChange={(val) => setEditFormData({ ...editFormData, [field]: val })}
-                                                        suggestions={topSuggestions[field] || []}
-                                                    />
-                                                ))}
+                                        <div className="grid grid-cols-3 gap-6">
+                                            <div>
+                                                <label className="label">Begin Date</label>
+                                                <input
+                                                    type="date"
+                                                    className="input bg-slate-50"
+                                                    value={(() => {
+                                                        const d = editFormData["Begin Date"];
+                                                        if (!d) return '';
+                                                        // If already a string in YYYY-MM-DD format, use it directly
+                                                        if (typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d)) return d;
+                                                        // If it's a Date object, format it using local components
+                                                        if (d instanceof Date) return formatDate(d);
+                                                        // Otherwise, parse and format
+                                                        const parsed = parseLocalDate(d);
+                                                        return parsed ? formatDate(parsed) : '';
+                                                    })()}
+                                                    onChange={e => setEditFormData({ ...editFormData, "Begin Date": e.target.value })}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="label">End Date</label>
+                                                <input
+                                                    type="date"
+                                                    className="input bg-slate-50"
+                                                    value={(() => {
+                                                        const d = editFormData["End Date"];
+                                                        if (!d) return '';
+                                                        // If already a string in YYYY-MM-DD format, use it directly
+                                                        if (typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d)) return d;
+                                                        // If it's a Date object, format it using local components
+                                                        if (d instanceof Date) return formatDate(d);
+                                                        // Otherwise, parse and format
+                                                        const parsed = parseLocalDate(d);
+                                                        return parsed ? formatDate(parsed) : '';
+                                                    })()}
+                                                    onChange={e => setEditFormData({ ...editFormData, "End Date": e.target.value })}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="label">Status</label>
+                                                <select
+                                                    className="input bg-slate-50"
+                                                    value={editFormData.Status || ''}
+                                                    onChange={e => setEditFormData({ ...editFormData, Status: e.target.value })}
+                                                >
+                                                    {uniqueStatuses.map(status => (
+                                                        <option key={status} value={status}>{status}</option>
+                                                    ))}
+                                                </select>
                                             </div>
                                         </div>
-
                                         <div>
                                             <label className="label">Notes</label>
                                             <textarea
@@ -5214,10 +5658,63 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
                                                 onChange={e => setEditFormData({ ...editFormData, Notes: e.target.value })}
                                             />
                                         </div>
+
+                                        {/* All Indicators */}
+                                        <div className="pt-2 border-t border-slate-100">
+                                            <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                                                <Icons.Flag className="w-3 h-3" /> Indicators & Tags
+                                            </h4>
+                                            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                                                {[
+                                                    { field: 'Discussion', icon: 'MessageCircle', color: 'text-orange-500' },
+                                                    { field: 'Key Milestone', icon: 'Star', color: 'text-amber-500' },
+                                                    { field: 'Milestone', icon: 'Diamond', color: 'text-purple-500' },
+                                                    { field: 'R&C', icon: null },
+                                                    { field: 'STEG', icon: null },
+                                                    { field: 'At Risk', icon: null },
+                                                    { field: 'Retail CR Focus', icon: null },
+                                                    { field: 'Finance Focus', icon: null },
+                                                    { field: 'MR Focus', icon: null },
+                                                    { field: 'Carib Focus', icon: null }
+                                                ].map(({ field, icon, color }) => (
+                                                    <div key={field} className="flex items-center gap-2 bg-slate-50 rounded-lg px-3 py-2 hover:bg-slate-100 transition-colors">
+                                                        <input
+                                                            type="checkbox"
+                                                            id={`edit-${field}`}
+                                                            checked={isIndicatorTrue(editFormData[field])}
+                                                            onChange={(e) => setEditFormData({ ...editFormData, [field]: e.target.checked ? 'Y' : '' })}
+                                                            className="w-4 h-4 rounded border-slate-300 text-blue-500 focus:ring-blue-500"
+                                                        />
+                                                        <label htmlFor={`edit-${field}`} className="text-sm text-slate-700 flex items-center gap-1 cursor-pointer select-none">
+                                                            {icon && Icons[icon] && React.createElement(Icons[icon], { className: `w-3.5 h-3.5 ${color}` })}
+                                                            <span className="truncate">{field}</span>
+                                                        </label>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="px-6 py-4 border-t border-slate-100 bg-slate-50 flex justify-end space-x-3">
-                                        <button onClick={() => setEditingRowId(null)} className="btn-secondary">Cancel</button>
-                                        <button onClick={() => handleSaveRow()} className="btn-primary shadow-lg shadow-blue-500/30">Save Changes</button>
+                                    <div className="px-6 py-4 border-t border-slate-100 bg-slate-50 flex items-center justify-between">
+                                        <div>
+                                            {editingRowId !== 'new' && (
+                                                <button
+                                                    onClick={() => {
+                                                        if (confirm('Are you sure you want to delete this task?')) {
+                                                            handleDeleteRow(editingRowId);
+                                                            setEditingRowId(null);
+                                                        }
+                                                    }}
+                                                    className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors font-medium text-sm border border-red-100"
+                                                >
+                                                    <Icons.Trash2 className="w-4 h-4" />
+                                                    <span>Delete</span>
+                                                </button>
+                                            )}
+                                        </div>
+                                        <div className="flex items-center space-x-3">
+                                            <button onClick={() => setEditingRowId(null)} className="btn-secondary">Cancel</button>
+                                            <button onClick={() => handleSaveRow()} className="btn-primary shadow-lg shadow-blue-500/30">Save Changes</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -5228,8 +5725,11 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
         }
 
         // --- SUBCOMPONENTS & STYLES ---
-        const StatCard = ({ label, value, icon: Icon, color }) => (
-            <div className="glass-strong p-5 rounded-2xl border border-white/30 shadow-xl hover:shadow-2xl transition-all hover:scale-105">
+        const StatCard = ({ label, value, icon: Icon, color, onClick }) => (
+            <div
+                className={`glass-strong p-5 rounded-2xl border border-white/30 shadow-xl hover:shadow-2xl transition-all hover:scale-105 ${onClick ? 'cursor-pointer' : ''}`}
+                onClick={onClick}
+            >
                 <p className="text-slate-600 text-sm font-medium">{label}</p>
                 <div className="flex items-end justify-between mt-2">
                     <span className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">{value}</span>

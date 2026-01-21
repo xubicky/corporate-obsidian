@@ -13,8 +13,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <!-- Marked.js for Markdown parsing -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <!-- PDF.js for PDF text extraction -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="background_data.js"></script> <!-- Pre-loaded background data for PDF export -->
 
     <style>
@@ -196,8 +194,9 @@
         /* Executive Report Styles */
         /* Executive Report Styles - RBC Redesign (Light Theme) */
         .exec-grid-container {
-            display: flex;
-            align-items: stretch;
+            display: grid;
+            grid-template-columns: 2.1fr 0.9fr;
+            grid-template-rows: auto auto;
             gap: 24px;
             padding: 24px 40px;
             max-width: 1600px;
@@ -670,8 +669,6 @@
         .content-panels {
             flex: 1;
             display: flex;
-            flex-direction: row;
-            flex-wrap: nowrap;
             gap: 24px;
             overflow: hidden;
             /* Padding for shadows to breathe */
@@ -683,7 +680,6 @@
            ======================================== */
         .center-panel {
             flex: 1;
-            min-width: 0;
             background: rgba(255, 255, 255, 0.75);
             backdrop-filter: blur(24px);
             -webkit-backdrop-filter: blur(24px);
@@ -969,7 +965,6 @@
            ======================================== */
         .right-panel {
             width: 360px;
-            flex-shrink: 0;
             background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(24px);
             -webkit-backdrop-filter: blur(24px);
@@ -3785,7 +3780,7 @@
                     <div style="max-width: 800px; margin: 0 auto; position: relative;">
                         <!-- Hidden File Input -->
                         <input type="file" id="playgroundFileUpload" style="display: none;"
-                            accept=".txt,.md,.csv,.json,.xml,.html,.pdf" onchange="handlePlaygroundFile(this)">
+                            onchange="handlePlaygroundFile(this)">
 
                         <!-- Plus Button -->
                         <button onclick="document.getElementById('playgroundFileUpload').click()" title="Upload File"
@@ -3921,7 +3916,7 @@
                     style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; position: relative; z-index: 1; padding-left: 24px;">
                     <h2
                         style="font-size: 32px; font-weight: 800; color: white; letter-spacing: -1px; text-shadow: 0 2px 20px rgba(0,0,0,0.3);">
-                        Astra Capital Pulse Brief
+                        Astra | Executive Report
                     </h2>
                     <div style="display: flex; gap: 12px;">
                         <button onclick="saveExecutiveReport()" style="
@@ -3969,104 +3964,84 @@
 
                 <div class="exec-grid-container" style="position: relative; z-index: 1;">
 
-                    <!-- Left Column -->
-                    <div style="flex: 2.1; display: flex; flex-direction: column; gap: 24px;">
-
-                        <!-- Heat Map -->
-                        <div class="exec-card" id="execHeatMapCard" style="min-height: 350px;">
-                            <div
-                                style="display: flex; justify-content: space-between; margin-bottom: 16px; align-items: center;">
-                                <h3 style="font-size: 18px; font-weight: 600;">Heat Map</h3>
-                            </div>
-                            <div id="execHeatMapContent" class="exec-empty-state" onclick="execPickHeatMap()">
-                                <div style="text-align: center; color: var(--text-muted);">
-                                    <div style="font-size: 24px; margin-bottom: 8px;">+</div>
-                                    <div>Add Heat Map</div>
-                                </div>
+                    <!-- 1. Scenario Description (Swapped) -->
+                    <div class="exec-card" id="execScenarioDescCard"
+                        style="grid-column: 2 / 3; grid-row: 1 / 2; min-height: 580px;">
+                        <div
+                            style="display: flex; justify-content: space-between; margin-bottom: 16px; align-items: center;">
+                            <h3 style="font-size: 18px; font-weight: 600;">Scenario Description</h3>
+                        </div>
+                        <div id="execScenarioDescContent" class="exec-empty-state" onclick="execPickScenario()"
+                            style="flex: 1; margin-bottom: 24px; min-height: 200px;">
+                            <div style="text-align: center; color: var(--text-muted);">
+                                <div style="font-size: 24px; margin-bottom: 8px;">+</div>
+                                <div>Add Scenario Narrative</div>
                             </div>
                         </div>
 
-                        <!-- CET1 Waterfall -->
-                        <div class="exec-card" id="execWaterfallCard" style="min-height: 320px;">
-                            <div
-                                style="display: flex; justify-content: space-between; margin-bottom: 16px; align-items: center;">
-                                <h3 style="font-size: 18px; font-weight: 600;">CET1 Waterfall</h3>
-                            </div>
-                            <div id="execWaterfallContent" class="exec-empty-state" onclick="execPickWaterfall()">
+                        <!-- Moved Macro Projections -->
+                        <div style="border-top: 1px solid #E2E8F0; padding-top: 20px;">
+                            <h4 style="font-size: 16px; font-weight: 700; color: #003168; margin-bottom: 16px;">Major
+                                Macro
+                                Variable Projections</h4>
+                            <div id="execMacroContent" class="exec-empty-state" style="min-height: 120px;"
+                                onclick="event.stopPropagation(); execAutoLinkMacro()">
                                 <div style="text-align: center; color: var(--text-muted);">
-                                    <div style="font-size: 24px; margin-bottom: 8px;">📊</div>
-                                    <div>Add CET1 Calculation</div>
+                                    <div style="font-size: 24px; margin-bottom: 8px;">📈</div>
+                                    <div>Add Macro Variables</div>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- CET1 Temperature Bar -->
-                        <div class="exec-card" id="execTempBarCard" style="min-height: 250px;">
-                            <div
-                                style="display: flex; justify-content: space-between; margin-bottom: 16px; align-items: center;">
-                                <h3 style="font-size: 18px; font-weight: 600;">CET1 Temperature</h3>
-                            </div>
-                            <div id="execTempBarContent" class="exec-empty-state" onclick="execAutoLinkTempBar()">
-                                <div style="text-align: center; color: var(--text-muted);">
-                                    <div style="font-size: 24px; margin-bottom: 8px;">+</div>
-                                    <div>Add CET1 Calculation</div>
-                                </div>
-                            </div>
-                        </div>
-
                     </div>
 
-                    <!-- Right Column -->
-                    <div style="flex: 0.9; display: flex; flex-direction: column; gap: 24px;">
-
-                        <!-- Scenario Description -->
-                        <div class="exec-card" id="execScenarioDescCard" style="min-height: 580px;">
-                            <div
-                                style="display: flex; justify-content: space-between; margin-bottom: 16px; align-items: center;">
-                                <h3 style="font-size: 18px; font-weight: 600;">Scenario Description</h3>
-                            </div>
-                            <div id="execScenarioDescContent" class="exec-empty-state" onclick="execPickScenario()"
-                                style="flex: 1; margin-bottom: 24px; min-height: 200px;">
-                                <div style="text-align: center; color: var(--text-muted);">
-                                    <div style="font-size: 24px; margin-bottom: 8px;">+</div>
-                                    <div>Add Scenario Narrative</div>
-                                </div>
-                            </div>
-
-                            <!-- Macro Variables -->
-                            <div style="border-top: 1px solid #E2E8F0; padding-top: 20px;">
-                                <h4 style="font-size: 16px; font-weight: 700; color: #003168; margin-bottom: 16px;">Key
-                                    Macro Shocks</h4>
-                                <div id="execMacroContent" class="exec-empty-state" style="min-height: 120px;"
-                                    onclick="event.stopPropagation(); execAutoLinkMacro()">
-                                    <div style="text-align: center; color: var(--text-muted);">
-                                        <div style="font-size: 24px; margin-bottom: 8px;">📈</div>
-                                        <div>Add Macro Variables</div>
-                                    </div>
-                                </div>
+                    <!-- 2. Heat Map (Swapped) -->
+                    <div class="exec-card" id="execHeatMapCard"
+                        style="grid-column: 1 / 2; grid-row: 1 / 2; min-height: 350px;">
+                        <div
+                            style="display: flex; justify-content: space-between; margin-bottom: 16px; align-items: center;">
+                            <h3 style="font-size: 18px; font-weight: 600;">Heat Map</h3>
+                        </div>
+                        <div id="execHeatMapContent" class="exec-empty-state" onclick="execPickHeatMap()">
+                            <div style="text-align: center; color: var(--text-muted);">
+                                <div style="font-size: 24px; margin-bottom: 8px;">+</div>
+                                <div>Add Heat Map</div>
                             </div>
                         </div>
-
-                        <!-- Future Content -->
-                        <div class="exec-card" style="flex: 1; min-height: 250px;">
-                            <div
-                                style="display: flex; justify-content: space-between; margin-bottom: 16px; align-items: center;">
-                                <h3 style="font-size: 18px; font-weight: 600;">Sector Analysis (future content)</h3>
-                            </div>
-                            <div class="exec-content-area">
-                                <div class="exec-empty-state">
-                                    <div style="text-align: center; color: var(--text-muted);">
-                                        <div style="font-size: 24px; margin-bottom: 8px;">✨</div>
-                                        <div>Coming Soon</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
                     </div>
+
+
+                    <!-- 3. CET1 Temperature Bar (Swapped Position) -->
+                    <div class="exec-card" id="execTempBarCard"
+                        style="grid-column: 1 / 2; grid-row: 2 / 3; min-height: 250px;">
+                        <div
+                            style="display: flex; justify-content: space-between; margin-bottom: 16px; align-items: center;">
+                            <h3 style="font-size: 18px; font-weight: 600;">CET1 Temperature</h3>
+                        </div>
+                        <div id="execTempBarContent" class="exec-empty-state" onclick="execAutoLinkTempBar()">
+                            <div style="text-align: center; color: var(--text-muted);">
+                                <div style="font-size: 24px; margin-bottom: 8px;">+</div>
+                                <div>Add CET1 Calculation</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. Major Macro Variables (Swapped Position) -->
+                    <!-- Future Content Placeholder -->
+                    <div class="exec-card" id="execFutureContentCard"
+                        style="grid-column: 2 / 3; grid-row: 2 / 3; min-height: 250px;">
+                        <div
+                            style="display: flex; justify-content: space-between; margin-bottom: 16px; align-items: center;">
+                            <h3 style="font-size: 18px; font-weight: 600;">Future Content</h3>
+                        </div>
+                        <div class="exec-empty-state">
+                            <div style="text-align: center; color: var(--text-muted);">
+                                <div style="font-size: 24px; margin-bottom: 8px;">✨</div>
+                                <div>Coming Soon</div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
-
-
 
                 <!-- Footer removed per user request -->
             </section>
@@ -4088,7 +4063,7 @@
                     </div>
                     <div class="cet1-metric-grid">
                         <div class="cet1-metric-card">
-                            <div class="cet1-metric-label">Jump-Off (Q4/25)</div>
+                            <div class="cet1-metric-label">Jump-Off</div>
                             <div class="cet1-metric-value" id="cet1JumpOffValue">13.5%</div>
                         </div>
                         <div class="cet1-metric-card selected" id="cet1VsevereCard"
@@ -4855,8 +4830,6 @@
 
                 <!-- Divider -->
                 <div style="height: 1px; background: #e5e7eb; margin: 24px 0;"></div>
-
-
 
                 <!-- Workspace Backup Section -->
                 <div style="margin-bottom: 24px;">
@@ -12478,13 +12451,13 @@ These are reference values for context only.Generate stress projections as absol
             if (troughs['Benchmark']) document.getElementById('cet1BenchmarkTrough').textContent = troughs['Benchmark'].toFixed(1) + '%';
             if (troughs[cet1CustomScenarioName]) document.getElementById('cet1CustomTrough').textContent = troughs[cet1CustomScenarioName].toFixed(1) + '%';
 
-            const colors = { 'Very Severe': '#EF4444', 'Severe': '#F59E0B', 'Moderate': '#10B981', 'Benchmark': '#64748B', 'Jump-Off Q4/25': '#1E293B' };
+            const colors = { 'Very Severe': '#EF4444', 'Severe': '#F59E0B', 'Moderate': '#10B981', 'Benchmark': '#64748B', 'Jump-Off': '#1E293B' };
             colors[cet1CustomScenarioName] = '#2563EB';
 
             const troughList = Object.keys(troughs).map(s => ({ name: s, trough: troughs[s], position: Math.max(0, Math.min(100, (troughs[s] / 15) * 100)) }));
 
             // Add Jump-Off to the list
-            troughList.push({ name: 'Jump-Off Q4/25', trough: CET1_JUMP_OFF, position: Math.max(0, Math.min(100, (CET1_JUMP_OFF / 15) * 100)) });
+            troughList.push({ name: 'Jump-Off', trough: CET1_JUMP_OFF, position: Math.max(0, Math.min(100, (CET1_JUMP_OFF / 15) * 100)) });
 
             troughList.sort((a, b) => a.position - b.position);
             const levelLastPos = [-100, -100, -100];
@@ -12548,7 +12521,7 @@ These are reference values for context only.Generate stress projections as absol
             Object.keys(impacts).forEach(k => { totalImpacts[k] = impacts[k].reduce((a, b) => a + b, 0); });
 
             const comps = ['PPNR', 'PCL', 'Dividend', 'Trading PnL', 'AFS Losses', 'Operational Risk Losses', 'Currency Translation Adj', 'Shortfall in Allowance', 'Other', 'Credit RWA Change', 'Market CCR CVA RWA Change', 'Operational Risk RWA Change'];
-            const labels = ['Jump-Off Q4/25', ...comps, 'Trough'];
+            const labels = ['Jump-Off', ...comps, 'Trough'];
             const startBps = CET1_JUMP_OFF * 100;
             const wValues = [startBps];
             const measures = ['absolute'];
@@ -13493,23 +13466,12 @@ Be conversational, ask thoughtful questions, and help the user think through all
             const list = document.getElementById('execPickerList');
             list.innerHTML = '';
 
-            let savedList = window.savedScenarios || [];
-
-            // Filter for calculations only when picking waterfall
-            if (type === 'waterfall' || type === 'tempBar') {
-                savedList = savedList.filter(sc => sc.type === 'calculation' || (sc.id && sc.id.startsWith('cet1_')));
-            }
+            const savedList = window.savedScenarios || [];
 
             if (savedList.length === 0) {
-                const msg = (type === 'waterfall' || type === 'tempBar')
-                    ? 'No CET1 calculations found in folder.<br>Save a calculation from CET1 Analysis first.'
-                    : 'No saved items found in folder.<br>Save a scenario first to populate this list.';
-                list.innerHTML = `<div style="padding:12px; color:var(--text-muted); text-align: center;">${msg}</div>`;
+                list.innerHTML = '<div style="padding:12px; color:var(--text-muted); text-align: center;">No saved items found in folder.<br>Save a scenario first to populate this list.</div>';
             } else {
-                savedList.forEach((sc, filteredIdx) => {
-                    // Find original index in savedScenarios
-                    const idx = window.savedScenarios.findIndex(s => s.id === sc.id);
-
+                savedList.forEach((sc, idx) => {
                     const name = sc.name || sc.title || 'Untitled Item';
                     const date = new Date(sc.timestamp || sc.savedAt || sc.date || Date.now()).toLocaleDateString();
                     let typeTag = 'Scenario';
@@ -13540,7 +13502,6 @@ Be conversational, ask thoughtful questions, and help the user think through all
         function execPickScenario() { openExecPickerNew('scenario'); }
         function execPickMacro() { openExecPickerNew('macro'); }
         function execPickTempBar() { openExecPickerNew('tempBar'); }
-        function execPickWaterfall() { openExecPickerNew('waterfall'); }
 
         function execSelectItem(index) {
             const scenario = window.savedScenarios[index];
@@ -13557,7 +13518,6 @@ Be conversational, ask thoughtful questions, and help the user think through all
             else if (type === 'scenario') renderExecScenarioDesc(data);
             else if (type === 'macro') renderExecMacro(data);
             else if (type === 'tempBar') renderExecTempBar(data);
-            else if (type === 'waterfall') renderExecWaterfall(data);
         }
 
         function getHeatMapColor(rating) {
@@ -13577,20 +13537,6 @@ Be conversational, ask thoughtful questions, and help the user think through all
 
             const drivers = data.drivers || (data.basketItems ? data.basketItems : []);
             const mapData = data.heatMapData || {};
-
-            // DEBUG: Log all driver IDs and heatMapData keys
-            console.log('=== EXEC HEATMAP DEBUG ===');
-            console.log('Driver IDs:', drivers.map((d, i) => `${i + 1}: ${d.id}`));
-            console.log('HeatMapData keys:', Object.keys(mapData));
-            drivers.forEach((d, i) => {
-                const found = mapData[d.id];
-                if (!found) {
-                    console.error(`❌ Driver ${i + 1} (${d.id}) - "${d.title}" - NO DATA IN mapData`);
-                } else {
-                    console.log(`✓ Driver ${i + 1} (${d.id}) - L:${found.likelihood}, M:${found.materiality}, V:${found.velocity}`);
-                }
-            });
-            console.log('=== END DEBUG ===');
 
             // 1. Render Legend Logic
             const velocityLegend = `
@@ -13621,64 +13567,16 @@ Be conversational, ask thoughtful questions, and help the user think through all
                 `;
             }).join('');
 
-            // 2. Detect overlaps and calculate offsets
-            const positions = [];
-            drivers.forEach((d, i) => {
-                const dData = mapData[d.id];
-                if (dData && dData.likelihood !== undefined && dData.materiality !== undefined) {
-                    const likelihood = Number(dData.likelihood) || 5;
-                    const materiality = Number(dData.materiality) || 5;
-                    const baseX = 5 + ((likelihood - 1) / 9) * 90;
-                    const baseY = 95 - ((materiality - 1) / 9) * 90;
-
-                    // Check for collisions with previously positioned drivers
-                    let offsetX = 0;
-                    let offsetY = 0;
-                    let collisionCount = 0;
-
-                    positions.forEach(pos => {
-                        if (Math.abs(pos.x - baseX) < 3 && Math.abs(pos.y - baseY) < 5) {
-                            collisionCount++;
-                        }
-                    });
-
-                    // Apply offset based on collision count (spiral pattern)
-                    if (collisionCount > 0) {
-                        const angle = collisionCount * (Math.PI / 3); // 60 degree increments
-                        const radius = 4; // % offset
-                        offsetX = Math.cos(angle) * radius;
-                        offsetY = Math.sin(angle) * radius;
-                    }
-
-                    positions.push({ x: baseX + offsetX, y: baseY + offsetY, idx: i });
-                }
-            });
-
-            // 3. Render Bubbles with offsets
+            // 2. Render Bubbles
             const bubbles = drivers.map((d, i) => {
-                // Try to find data by id first, then by index if needed
-                let dData = mapData[d.id];
+                const dData = mapData[d.id];
+                if (!dData || !dData.likelihood || !dData.materiality) return '';
 
-                // If not found by id, try to find by matching title or other identifiers
-                if (!dData) {
-                    // Try looking up by index in the mapData keys
-                    const mapKeys = Object.keys(mapData);
-                    if (mapKeys[i]) {
-                        dData = mapData[mapKeys[i]];
-                    }
-                }
-
-                // Use explicit null/undefined checks (0 is a valid value)
-                if (!dData || dData.likelihood === undefined || dData.likelihood === null ||
-                    dData.materiality === undefined || dData.materiality === null) {
-                    console.warn(`Missing heatmap data for driver ${i + 1}: ${d.title}`, { id: d.id, dData });
-                    return '';
-                }
-
-                // Get pre-calculated position with offset
-                const pos = positions.find(p => p.idx === i);
-                const xPct = pos ? pos.x : 50;
-                const yPct = pos ? pos.y : 50;
+                // Scale 1-10 to %
+                // Likelihood X: 1->5%, 10->95%
+                const xPct = 5 + ((dData.likelihood - 1) / 9) * 90;
+                // Impact Y: 1->95%, 10->5% (inverted)
+                const yPct = 95 - ((dData.materiality - 1) / 9) * 90;
 
                 const velColor = dData.velocity === 3 ? '#EF4444' : dData.velocity === 2 ? '#F59E0B' : '#10B981';
 
@@ -13699,9 +13597,9 @@ Be conversational, ask thoughtful questions, and help the user think through all
                         font-weight: 700; 
                         transform: translate(-50%, -50%);
                         box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-                        z-index: ${10 + i};
+                        z-index: 10;
                         transition: transform 0.2s;
-                    " onmouseover="this.style.transform='translate(-50%, -50%) scale(1.2)'; this.style.zIndex='100'" onmouseout="this.style.transform='translate(-50%, -50%)'; this.style.zIndex='${10 + i}'" title="${d.title} (L:${dData.likelihood}, I:${dData.materiality})">
+                    " onmouseover="this.style.transform='translate(-50%, -50%) scale(1.2)'; this.style.zIndex='20'" onmouseout="this.style.transform='translate(-50%, -50%)'; this.style.zIndex='10'" title="${d.title} (L:${dData.likelihood}, I:${dData.materiality})">
                         ${i + 1}
                     </div>
                 `;
@@ -14209,221 +14107,6 @@ IMPORTANT: Write ONLY qualitative narrative. Do NOT mention ANY macro variables 
             openExecPickerNew('tempBar');
         }
 
-        function renderExecWaterfall(data) {
-            const container = document.getElementById('execWaterfallContent');
-            container.className = '';
-            container.onclick = null;
-            container.style.height = '280px';
-            container.style.padding = '0';
-
-            // 1. Attempt to find component data
-            let scenarioData = data.components || data.data?.components || null;
-            if (!scenarioData && data.scenarioData) scenarioData = data.scenarioData;
-            if (!scenarioData && data.data && data.data.scenarioData) scenarioData = data.data.scenarioData;
-            if (!scenarioData && (data['PPNR'] || data['PCL'] || data['Net Income'])) {
-                scenarioData = data;
-            }
-
-            // Check for severities (lightweight save format)
-            const severities = data.componentSeverities || data.data?.componentSeverities;
-
-            let isSimulated = false;
-
-            // If we have neither direct data nor severities, check if it's a valid object to simulate
-            if (!scenarioData && !severities) {
-                if (data.name || data.title || data.id || Object.keys(data).length > 2) {
-                    isSimulated = true;
-                } else {
-                    const keys = Object.keys(data).join(', ');
-                    container.innerHTML = `
-                        <div style="height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); text-align:center; padding:20px;">
-                            <div style="font-size: 40px; margin-bottom: 12px;">⚠️</div>
-                            <div style="font-size: 13px;">Calculation data unavailable.</div>
-                            <div style="font-size: 10px; margin-top: 8px; color: #EF4444; font-family:monospace; word-break:break-all;">HasKeys: ${keys.substring(0, 100)}...</div>
-                        </div>
-                    `;
-                    return;
-                }
-            }
-
-            // Calculate waterfall data
-            let jumpOff = typeof CET1_JUMP_OFF !== 'undefined' ? CET1_JUMP_OFF : 13.5;
-            let troughCET1 = data.minimumRatio || data.troughCET1 || data.data?.minimumRatio || 10.0;
-
-            const mainComps = ['PPNR', 'Dividend', 'Credit Provision', 'Market Risk Losses', 'Operational Risk Losses', 'Other', 'RWA - Credit', 'RWA - Market', 'RWA - Op Risk'];
-            let finalImpactsValues = [];
-
-            // Helper to get trough index
-            let troughIndex = 9; // Default
-            const path = data.calculatedPath || data.data?.calculatedPath;
-            if (path && Array.isArray(path)) {
-                let min = 999;
-                path.forEach((v, i) => { if (v < min) { min = v; troughIndex = i; } });
-            }
-
-            if (severities && typeof cet1ScenarioData !== 'undefined' && typeof cet1CalculateAttributedBps !== 'undefined') {
-                // METHOD A: Reconstruct Data & Use Official Calculation Engine
-                const reconstructedData = {};
-                const allKeys = [
-                    'PPNR Canada', 'PPNR US', 'PPNR International',
-                    'PCL Canada', 'PCL US', 'PCL International',
-                    'Dividend', 'Trading PnL', 'AFS Losses', 'Operational Risk Losses',
-                    'Currency Translation Adj', 'Shortfall in Allowance', 'Other',
-                    'Credit RWA Change Canada', 'Credit RWA Change US', 'Credit RWA Change International',
-                    'Market CCR CVA RWA Change', 'Operational Risk RWA Change'
-                ];
-
-                allKeys.forEach(k => {
-                    const sev = severities[k] || 'benchmark';
-                    if (cet1ScenarioData[sev] && cet1ScenarioData[sev][k]) {
-                        reconstructedData[k] = cet1ScenarioData[sev][k];
-                    } else if (cet1ScenarioData['severe'] && cet1ScenarioData['severe'][k]) {
-                        reconstructedData[k] = cet1ScenarioData['severe'][k];
-                    } else {
-                        reconstructedData[k] = Array(20).fill(0);
-                    }
-                });
-
-                const computedImpacts = cet1CalculateAttributedBps(reconstructedData, troughIndex);
-                const computedSums = {};
-                Object.keys(computedImpacts).forEach(k => {
-                    computedSums[k] = computedImpacts[k].reduce((a, b) => a + b, 0);
-                });
-
-                finalImpactsValues = [
-                    computedSums['PPNR'] || 0,
-                    computedSums['Dividend'] || 0,
-                    (computedSums['PCL'] || 0) + (computedSums['Shortfall in Allowance'] || 0),
-                    (computedSums['Trading PnL'] || 0) + (computedSums['AFS Losses'] || 0),
-                    computedSums['Operational Risk Losses'] || 0,
-                    (computedSums['Other'] || 0) + (computedSums['Currency Translation Adj'] || 0),
-                    computedSums['Credit RWA Change'] || 0,
-                    computedSums['Market CCR CVA RWA Change'] || 0,
-                    computedSums['Operational Risk RWA Change'] || 0
-                ];
-                isSimulated = false;
-
-            } else if (!isSimulated && scenarioData) {
-                // METHOD B: Direct Data Arrays Fallback
-                const getSum = (key) => {
-                    let val = scenarioData[key];
-                    if (val === undefined && key === 'PCL') {
-                        val = (scenarioData['PCL Canada'] || []).concat(scenarioData['PCL US'] || []);
-                    }
-                    if (Array.isArray(val)) return val.reduce((a, b) => a + b, 0);
-                    if (typeof val === 'number') return val;
-                    return 0;
-                };
-
-                const rawValues = [
-                    getSum('PPNR'),
-                    getSum('Dividend'),
-                    getSum('PCL') + getSum('Shortfall in Allowance'),
-                    getSum('Trading PnL') + getSum('AFS Losses'),
-                    getSum('Operational Risk Losses'),
-                    getSum('Other') + getSum('Currency Translation Adj'),
-                    -(Math.abs(getSum('Credit RWA Change') || 0)),
-                    -(Math.abs(getSum('Market CCR CVA RWA Change') || 0)),
-                    -(Math.abs(getSum('Operational Risk RWA Change') || 0))
-                ];
-                finalImpactsValues = rawValues.map(v => Math.abs(v) > 5000 ? v / 10000 : v);
-            } else {
-                // METHOD C: Simulation Fallback
-                finalImpactsValues = [-80, -35, -120, -50, -25, -5, -200, -20, -10];
-            }
-
-            // Prep Chart Values
-            const startVal = (jumpOff > 1) ? jumpOff * 100 : jumpOff * 10000;
-            const endVal = (troughCET1 > 1) ? troughCET1 * 100 : troughCET1 * 10000;
-
-            let displayJumpOff = jumpOff > 1 ? jumpOff : jumpOff * 100;
-            let displayTrough = troughCET1 > 1 ? troughCET1 : troughCET1 * 100;
-
-            // Define bar chart data for waterfall effect
-            const x = ['Jump-Off Q4/25'];
-            const y = [startVal];
-            const base = [0];
-            const colors = ['#2563EB'];
-            const texts = [displayJumpOff.toFixed(1) + '%'];
-
-            let runningTotal = startVal;
-
-            // Categories mapping to finalImpactsValues indices
-            const catLabels = ['PPNR', 'Dividend', 'Credit Provision', 'Market Risk Losses', 'Operational Risk Losses', 'Other', 'RWA', 'RWA', 'RWA'];
-
-            // Calculate RWA Total for single label
-            const rwaTotal = (finalImpactsValues[6] || 0) + (finalImpactsValues[7] || 0) + (finalImpactsValues[8] || 0);
-
-            finalImpactsValues.forEach((val, i) => {
-                x.push(catLabels[i]);
-                y.push(val);
-                base.push(runningTotal);
-                colors.push(val >= 0 ? '#10B981' : '#EF4444');
-
-                // Text Logic: Hide individual RWA labels, show Total on last RWA segment
-                if (i === 6 || i === 7) {
-                    texts.push('');
-                } else if (i === 8) {
-                    texts.push((rwaTotal > 0 ? '+' : '') + rwaTotal.toFixed(0));
-                } else {
-                    texts.push((val > 0 ? '+' : '') + val.toFixed(0));
-                }
-
-                // Update running total
-                runningTotal += val;
-            });
-
-            // Trough
-            x.push('Trough');
-            y.push(endVal);
-            base.push(0);
-            colors.push('#2563EB');
-            texts.push(displayTrough.toFixed(1) + '%');
-
-            const chartId = 'execWaterfallPlotly';
-            container.innerHTML = `<div id="${chartId}" style="width: 100%; height: 100%;"></div>`;
-
-            const trace = {
-                type: 'bar',
-                x: x,
-                y: y,
-                base: base,
-                marker: { color: colors },
-                text: texts,
-                textposition: 'outside',
-                textfont: { size: 9, color: '#64748B' },
-                cliponaxis: false
-            };
-
-            const layout = {
-                barmode: 'overlay', // Crucial for stacking duplicates at same X
-                font: { family: 'Inter, sans-serif' },
-                paper_bgcolor: 'rgba(0,0,0,0)',
-                plot_bgcolor: 'rgba(0,0,0,0)',
-                xaxis: {
-                    tickangle: -45,
-                    tickfont: { size: 9, color: '#64748B' },
-                    fixedrange: true
-                },
-                yaxis: {
-                    title: { text: isSimulated ? 'Impact (bps) [Simulated]' : 'Impact (bps)', font: { size: 10 } },
-                    gridcolor: '#F1F5F9',
-                    zerolinecolor: '#CBD5E1',
-                    fixedrange: true,
-                    tickfont: { size: 9 }
-                },
-                margin: { t: 20, b: 80, l: 50, r: 10 },
-                showlegend: false,
-                autosize: true
-            };
-
-            setTimeout(() => {
-                if (typeof Plotly !== 'undefined') {
-                    Plotly.newPlot(chartId, [trace], layout, { displayModeBar: false, responsive: true });
-                }
-            }, 100);
-        }
-
         function renderExecTempBar(data) {
             const container = document.getElementById('execTempBarContent');
             container.className = '';
@@ -14445,7 +14128,7 @@ IMPORTANT: Write ONLY qualitative narrative. Do NOT mention ANY macro variables 
                 { name: 'Severe', value: data.troughSevere || 10.6, color: '#F59E0B' },
                 { name: 'Moderate', value: data.troughModerate || 11.9, color: '#22C55E' },
                 { name: 'Benchmark', value: data.troughBenchmark || 12.8, color: '#6B7280' },
-                { name: 'Jump-Off Q4/25', value: jumpOff, color: '#1E293B' }
+                { name: 'Jump-Off', value: jumpOff, color: '#1E293B' }
             ].sort((a, b) => a.value - b.value);
 
             const calcPos = (val) => Math.min(100, Math.max(0, (val / maxScale) * 100));
@@ -14617,22 +14300,11 @@ IMPORTANT: Write ONLY qualitative narrative. Do NOT mention ANY macro variables 
 
                     // Modifying styles for PDF perfection
                     clone.style.boxShadow = 'none'; // Reduce shadow for flat print look
-                    clone.style.background = 'transparent'; // Column bg transparent
-                    clone.style.border = 'none'; // No border on column div
+                    clone.style.background = '#FFFFFF'; // Ensure pure white background
+                    clone.style.border = '1px solid #E2E8F0'; // Crisp light border
                     clone.style.backdropFilter = 'none';
-                    clone.style.borderRadius = '0';
+                    clone.style.borderRadius = '16px';
                     clone.style.color = '#334155'; // Ensure dark text color
-                    clone.style.gap = '24px'; // Ensure gap between cards
-
-                    // Style all cards inside the column
-                    clone.querySelectorAll('.exec-card').forEach(card => {
-                        card.style.boxShadow = 'none';
-                        card.style.background = '#FFFFFF';
-                        card.style.border = '1px solid #E2E8F0';
-                        card.style.borderRadius = '16px';
-                        card.style.overflow = 'hidden'; // Critical: prevents chart overflow
-                        card.style.marginBottom = '24px'; // Gap between cards
-                    });
 
                     // Ensure specific text elements are dark
                     clone.querySelectorAll('*').forEach(el => {
@@ -14716,16 +14388,11 @@ IMPORTANT: Write ONLY qualitative narrative. Do NOT mention ANY macro variables 
 
                 // Update Header for PDF - Robust Selector
                 // Update Header for PDF - Robust Selector & Color
-                const exportHeader = document.querySelector('#pdfExportContainer .pdf-logo');
+                const exportHeader = document.querySelector('#pdfExportContainer h2');
                 if (exportHeader) {
-                    const now = new Date();
-                    const titleDate = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-
-                    exportHeader.innerHTML = `Astra Capital Pulse Brief <span style="font-size: 20px; font-weight: 400; color: #64748B; margin-left: 16px;">${titleDate}</span>`;
+                    exportHeader.textContent = 'Astra | Executive Report';
                     exportHeader.style.color = '#003168'; // Force RBC Navy
                     exportHeader.style.textShadow = 'none';
-                    exportHeader.style.display = 'flex';
-                    exportHeader.style.alignItems = 'center';
                 }
 
                 // Inject Dynamic Footer into the Container (Inside the "box")
@@ -14849,11 +14516,12 @@ IMPORTANT: Write ONLY qualitative narrative. Do NOT mention ANY macro variables 
         <div class="pdf-header"
             style="padding: 40px 40px 20px 64px; display: flex; justify-content: space-between; align-items: center;">
             <div class="pdf-logo" style="font-size: 32px; font-weight: 700; color: #003168; letter-spacing: -0.02em;">
-                Astra Capital Pulse Brief</div>
+                Astra | Executive Report</div>
         </div>
 
         <!-- Grid -->
-        <div class="pdf-grid" style="display: flex; align-items: stretch; gap: 24px; padding: 0 40px 40px 40px;">
+        <div class="pdf-grid"
+            style="display: grid; grid-template-columns: 1.6fr 1fr; gap: 24px; padding: 0 40px 40px 40px;">
             <!-- Content will be cloned here -->
         </div>
     </div>
@@ -14862,87 +14530,82 @@ IMPORTANT: Write ONLY qualitative narrative. Do NOT mention ANY macro variables 
     <div id="executiveReportPanel" class="report-panel exec-glass-bg"
         style="display: none; height: 100vh; overflow-y: auto;">
         <!-- Header for Logo -->
-        <div class="exec-logo">Astra Capital Pulse Brief</div>
+        <div class="exec-logo">Astra | Executive Report</div>
 
         <div class="exec-grid-container">
-            <!-- Left Column -->
-            <div style="flex: 2.1; display: flex; flex-direction: column; gap: 24px;">
-                <!-- Heat Map -->
-                <div class="exec-card" style="min-height: 500px;" onclick="if(!execState.heatMap) execPickHeatMap()">
-                    <div class="exec-card-header">
-                        <div class="exec-card-title">Heat Map</div>
+            <!-- Heat Map -->
+            <div class="exec-card" style="grid-row: span 2; min-height: 500px;"
+                onclick="if(!execState.heatMap) execPickHeatMap()">
+                <div class="exec-card-header">
+                    <div class="exec-card-title">Heat Map</div>
 
+                </div>
+                <div id="execHeatMapContent" class="exec-content-area">
+                    <div class="exec-empty-state">
+                        <div style="text-align: center;">
+                            <div style="font-size: 24px; margin-bottom: 8px;">📊</div>
+                            <div>Select Heat Map</div>
+                        </div>
                     </div>
-                    <div id="execHeatMapContent" class="exec-content-area">
-                        <div class="exec-empty-state">
-                            <div style="text-align: center;">
-                                <div style="font-size: 24px; margin-bottom: 8px;">📊</div>
-                                <div>Select Heat Map</div>
-                            </div>
+                </div>
+            </div>
+
+            <!-- Scenario Description & Macro Variables -->
+            <div class="exec-card" style="min-height: 580px;" onclick="if(!execState.scenario) execPickScenario()">
+                <div class="exec-card-header">
+                    <div class="exec-card-title">Scenario Description</div>
+                </div>
+                <div id="execScenarioDescContent" class="exec-content-area"
+                    style="flex: 1; margin-bottom: 24px; min-height: 200px;">
+                    <div class="exec-empty-state">
+                        <div style="text-align: center;">
+                            <div style="font-size: 24px; margin-bottom: 8px;">📝</div>
+                            <div>Select Scenario</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- CET1 Temperature -->
-                <div class="exec-card" style="height: 380px;" onclick="if(!execState.tempBar) execPickTempBar()">
-                    <div class="exec-card-header">
-                        <div class="exec-card-title">CET1 Temperature</div>
-                    </div>
-                    <div id="execTempBarContent" class="exec-content-area">
-                        <div class="exec-empty-state">
+                <!-- Moved Macro Projections -->
+                <div style="border-top: 1px solid #F1F5F9; padding-top: 20px;">
+                    <h4 style="font-size: 16px; font-weight: 700; color: #003168; margin-bottom: 16px;">Major Macro
+                        Variable Projections</h4>
+                    <div id="execMacroContent" class="exec-content-area">
+                        <div class="exec-empty-state" style="min-height: 120px;"
+                            onclick="if(execState.scenario && !execState.macro) execAutoLinkMacro()">
                             <div style="text-align: center;">
-                                <div style="font-size: 24px; margin-bottom: 8px;">🌡️</div>
-                                <div>Select Calculation</div>
+                                <div style="font-size: 24px; margin-bottom: 8px;">📈</div>
+                                <div>Auto-linked to Scenario</div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Column -->
-            <div style="flex: 0.9; display: flex; flex-direction: column; gap: 24px;">
-                <!-- Scenario Description & Macro Variables -->
-                <div class="exec-card" style="min-height: 580px;" onclick="if(!execState.scenario) execPickScenario()">
-                    <div class="exec-card-header">
-                        <div class="exec-card-title">Scenario Description</div>
-                    </div>
-                    <div id="execScenarioDescContent" class="exec-content-area"
-                        style="flex: 1; margin-bottom: 24px; min-height: 200px;">
-                        <div class="exec-empty-state">
-                            <div style="text-align: center;">
-                                <div style="font-size: 24px; margin-bottom: 8px;">📝</div>
-                                <div>Select Scenario</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Moved Macro Projections -->
-                    <div style="border-top: 1px solid #F1F5F9; padding-top: 20px;">
-                        <h4 style="font-size: 16px; font-weight: 700; color: #003168; margin-bottom: 16px;">Major Macro
-                            Variable Projections</h4>
-                        <div id="execMacroContent" class="exec-content-area">
-                            <div class="exec-empty-state" style="min-height: 120px;"
-                                onclick="if(execState.scenario && !execState.macro) execAutoLinkMacro()">
-                                <div style="text-align: center;">
-                                    <div style="font-size: 24px; margin-bottom: 8px;">📈</div>
-                                    <div>Auto-linked to Scenario</div>
-                                </div>
-                            </div>
+            <!-- CET1 Temperature -->
+            <div class="exec-card" style="height: 380px;" onclick="if(!execState.tempBar) execPickTempBar()">
+                <div class="exec-card-header">
+                    <div class="exec-card-title">CET1 Temperature</div>
+                </div>
+                <div id="execTempBarContent" class="exec-content-area">
+                    <div class="exec-empty-state">
+                        <div style="text-align: center;">
+                            <div style="font-size: 24px; margin-bottom: 8px;">🌡️</div>
+                            <div>Select Calculation</div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Sector Analysis (Future Content) -->
-                <div class="exec-card" style="height: 250px;">
-                    <div class="exec-card-header">
-                        <div class="exec-card-title">Sector Analysis (future content)</div>
-                    </div>
-                    <div class="exec-content-area">
-                        <div class="exec-empty-state">
-                            <div style="text-align: center;">
-                                <div style="font-size: 24px; margin-bottom: 8px;">✨</div>
-                                <div>Coming Soon</div>
-                            </div>
+            <!-- Placeholder for Future Content -->
+            <div class="exec-card" style="height: 250px;">
+                <div class="exec-card-header">
+                    <div class="exec-card-title">Future Content</div>
+                </div>
+                <div class="exec-content-area">
+                    <div class="exec-empty-state">
+                        <div style="text-align: center;">
+                            <div style="font-size: 24px; margin-bottom: 8px;">✨</div>
+                            <div>Coming Soon</div>
                         </div>
                     </div>
                 </div>
@@ -15406,31 +15069,6 @@ IMPORTANT: Write ONLY qualitative narrative. Do NOT mention ANY macro variables 
             setTimeout(() => openDriverDetails(newId), 500);
         }
 
-        async function extractTextFromPDF(file) {
-            try {
-                // Configure PDF.js worker
-                pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
-                const arrayBuffer = await file.arrayBuffer();
-                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-                let fullText = '';
-
-                // Extract text from all pages (limit to first 10 pages for performance)
-                const numPages = Math.min(pdf.numPages, 10);
-                for (let i = 1; i <= numPages; i++) {
-                    const page = await pdf.getPage(i);
-                    const textContent = await page.getTextContent();
-                    const pageText = textContent.items.map(item => item.str).join(' ');
-                    fullText += pageText + '\n';
-                }
-
-                return fullText;
-            } catch (error) {
-                console.error('PDF extraction error:', error);
-                throw new Error('Failed to extract text from PDF. The file may be corrupted or password-protected.');
-            }
-        }
-
         async function handlePlaygroundFile(input) {
             const file = input.files[0];
             if (!file) return;
@@ -15439,81 +15077,48 @@ IMPORTANT: Write ONLY qualitative narrative. Do NOT mention ANY macro variables 
             loader.style.display = 'flex';
             loader.innerHTML = '<span class="spinner" style="width: 16px; height: 16px; border: 2px solid #e5e7eb; border-top-color: #2563EB; border-radius: 50%; animation: spin 1s linear infinite;"></span> Reading file...';
 
-            try {
-                let text = '';
-
-                // Check if file is PDF
-                if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
-                    loader.innerHTML = '<span class="spinner" style="width: 16px; height: 16px; border: 2px solid #e5e7eb; border-top-color: #2563EB; border-radius: 50%; animation: spin 1s linear infinite;"></span> Extracting text from PDF...';
-                    text = await extractTextFromPDF(file);
-                } else {
-                    // Read as text file
-                    text = await new Promise((resolve, reject) => {
-                        const reader = new FileReader();
-                        reader.onerror = () => reject(new Error('Error reading file. Please make sure it is a valid text file.'));
-                        reader.onload = (e) => resolve(e.target.result);
-                        reader.readAsText(file);
-                    });
-                }
-
-                // Validate that we got readable text content
-                if (!text || text.trim().length === 0) {
-                    throw new Error('Could not extract any text from the file. Please ensure the file contains readable content.');
-                }
-
-                loader.innerHTML = '<span class="spinner" style="width: 16px; height: 16px; border: 2px solid #e5e7eb; border-top-color: #2563EB; border-radius: 50%; animation: spin 1s linear infinite;"></span> AI is analyzing...';
-
+            const reader = new FileReader();
+            reader.onload = async function (e) {
+                const text = e.target.result;
                 const prompt = `Analyze this document and generate 1-4 risk drivers: \n\n ${text.substring(0, 5000)}`;
 
                 // Populate input and submit via fetch directly to avoid UI confusion
-                const response = await fetch(AZURE_OPENAI_API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        model: 'gpt-4o-2024-11-20',
-                        messages: [{ role: 'user', content: prompt + "\n Return JSON { newDrivers: [{category, title, description}] }" }],
-                        max_completion_tokens: 3000
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error(`API request failed: ${response.status} ${response.statusText}`);
-                }
-
-                const data = await response.json();
-
-                if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-                    throw new Error('Invalid API response format');
-                }
-
-                const content = data.choices[0].message.content;
-                let result = {};
                 try {
-                    const jsonMatch = content.match(/\{[\s\S]*\}/);
-                    if (jsonMatch) result = JSON.parse(jsonMatch[0]);
-                } catch (e) {
-                    console.error('Failed to parse JSON from response:', e);
-                }
-
-                if (result.newDrivers && Array.isArray(result.newDrivers) && result.newDrivers.length > 0) {
-                    document.getElementById('playgroundPlaceholder').style.display = 'none';
-                    result.newDrivers.forEach(d => {
-                        d.id = 'pg_' + Date.now() + Math.random().toString(36).substr(2, 5);
-                        currentPlaygroundDrivers.push(d);
+                    const response = await fetch(AZURE_OPENAI_API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            model: 'gpt-5-2025-08-07-eastus-dz',
+                            messages: [{ role: 'user', content: prompt + "\n Return JSON { newDrivers: [{category, title, description}] }" }],
+                            max_tokens: 3000
+                        })
                     });
-                    renderPlaygroundCards();
-                } else {
-                    alert('No risk drivers could be generated from this document. Please try a different file or check the content.');
-                }
+                    const data = await response.json();
+                    const content = data.choices[0].message.content;
+                    let result = {};
+                    try {
+                        const jsonMatch = content.match(/\{[\s\S]*\}/);
+                        if (jsonMatch) result = JSON.parse(jsonMatch[0]);
+                    } catch (e) { }
 
-            } catch (err) {
-                console.error('Error processing file:', err);
-                alert(`Error: ${err.message || 'Failed to process file. Please try again.'}`);
-            } finally {
-                loader.style.display = 'none';
-                loader.innerHTML = '<span class="spinner" style="width: 16px; height: 16px; border: 2px solid #e5e7eb; border-top-color: #2563EB; border-radius: 50%; animation: spin 1s linear infinite;"></span> AI is brainstorming...';
-                input.value = '';
-            }
+                    if (result.newDrivers) {
+                        document.getElementById('playgroundPlaceholder').style.display = 'none';
+                        result.newDrivers.forEach(d => {
+                            d.id = 'pg_' + Date.now() + Math.random().toString(36).substr(2, 5);
+                            currentPlaygroundDrivers.push(d);
+                        });
+                        renderPlaygroundCards();
+                    }
+
+                } catch (err) {
+                    alert(err.message);
+                } finally {
+                    loader.style.display = 'none';
+                    loader.innerHTML = '<span class="spinner" style="width: 16px; height: 16px; border: 2px solid #e5e7eb; border-top-color: #2563EB; border-radius: 50%; animation: spin 1s linear infinite;"></span> AI is brainstorming...';
+                    input.value = '';
+                }
+            };
+            reader.readAsText(file);
         }
     </script>
 </body>
