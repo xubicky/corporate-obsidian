@@ -13,6 +13,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <!-- Marked.js for Markdown parsing -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="background_data.js"></script> <!-- Pre-loaded background data for PDF export -->
 
     <style>
         :root {
@@ -190,39 +191,78 @@
         }
 
         /* Executive Report Styles */
+        /* Executive Report Styles */
+        /* Executive Report Styles - RBC Redesign (Light Theme) */
         .exec-grid-container {
             display: grid;
-            grid-template-columns: 2fr 1fr;
-            /* Wide left, narrow right */
+            grid-template-columns: 2.1fr 0.9fr;
             grid-template-rows: auto auto;
-            /* Two rows */
             gap: 24px;
-            /* height: 100%; removed fixed height to fit content */
+            padding: 24px 40px;
+            max-width: 1600px;
+            margin: 0 auto;
+            font-family: 'Roboto', 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        .exec-logo {
+            font-size: 32px;
+            font-weight: 800;
+            color: #003168;
+            /* RBC Navy */
+            letter-spacing: -1px;
+            text-shadow: none;
+            /* Removed shadow for clean look */
+            margin-bottom: 24px;
+            padding-left: 24px;
+            padding-top: 24px;
         }
 
         .exec-card {
-            background: rgba(15, 23, 42, 0.75);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 20px;
+            background: #FFFFFF;
+            /* Pure White */
+            border-radius: 16px;
+            /* Slightly tighter radius */
             padding: 24px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            /* Soft shadow */
             display: flex;
             flex-direction: column;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #E2E8F0;
+            /* Subtle light border */
             transition: all 0.3s ease;
             position: relative;
-            color: white;
+            color: #334155;
+            /* Slate Text */
+        }
+
+        .exec-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #F1F5F9;
+            padding-bottom: 16px;
+        }
+
+        .exec-card-title {
+            font-size: 20px;
+            /* Larger title */
+            font-weight: 700;
+            color: #003168;
+            /* RBC Navy */
+            letter-spacing: -0.01em;
+        }
+
+        /* See all elements removed */
+        .exec-see-all {
+            display: none !important;
         }
 
         .exec-card:hover {
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 12px 32px rgba(0, 49, 104, 0.08);
+            /* Navy tinted shadow */
             transform: translateY(-2px);
-            border-color: rgba(255, 255, 255, 0.2);
-        }
-
-        .exec-card h3 {
-            color: white !important;
+            border-color: #CBD5E1;
         }
 
         .exec-empty-state {
@@ -230,52 +270,71 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(255, 255, 255, 0.05);
+            background: #F8FAFC;
             border-radius: 12px;
-            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border: 2px dashed #CBD5E1;
             margin-top: 10px;
             min-height: 150px;
             cursor: pointer;
             transition: all 0.2s;
-            color: rgba(255, 255, 255, 0.6);
+            color: #64748B;
         }
 
         .exec-empty-state:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.3);
+            background: #F1F5F9;
+            border-color: #94A3B8;
+            color: #003168;
         }
 
-        /* Glassmorphism panel background */
+        /* Executive Report Background - Light RBC Grey-Blue Gradient */
         .exec-glass-bg {
-            background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&q=80');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
+            background:
+                linear-gradient(155deg, transparent 0%, transparent 60%, rgba(200, 215, 230, 0.5) 70%, rgba(220, 230, 240, 0.4) 85%, transparent 100%),
+                linear-gradient(135deg, #E8EDF2 0%, #DCE3EA 30%, #D0DAE4 60%, #E4EAF0 100%) !important;
             position: relative;
         }
 
-        .exec-glass-bg::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.3) 0%, rgba(15, 23, 42, 0.5) 100%);
-            pointer-events: none;
+        #executiveReportPanel {
+            position: relative !important;
+            inset: auto !important;
+            width: 100% !important;
+            height: 100% !important;
+            z-index: 1 !important;
+            margin: 0 !important;
+            max-width: none !important;
+            border-radius: 24px !important;
+            padding: 24px 40px 40px 40px !important;
+            overflow-y: auto !important;
         }
 
-        .exec-week-tag {
-            background: #F1F5F9;
-            color: #475569;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
+        /* Subtle Vignette Overlay - REMOVED */
+        .exec-glass-bg::before {
+            display: none !important;
+        }
+
+        /* Ensure grid content is above overlay */
+        .exec-glass-bg .exec-grid-container {
+            position: relative;
+            z-index: 2;
+        }
+
+        .exec-glass-bg .exec-logo {
+            position: relative;
+            z-index: 2;
+        }
+
+        .exec-footer {
+            grid-column: 1 / -1;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 6px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 20px;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         /* Picker Modal */
@@ -3587,10 +3646,10 @@
                 style="display: none; height: calc(100vh - 130px); overflow-y: auto; padding: 24px; max-width: 1400px; margin: 0 auto;">
                 <!-- Astra Branding -->
                 <div
-                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; position: relative; z-index: 1;">
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; position: relative; z-index: 1; padding-left: 24px;">
                     <h2
-                        style="font-size: 36px; font-weight: 800; color: white; letter-spacing: -1px; text-shadow: 0 2px 20px rgba(0,0,0,0.3);">
-                        Astra
+                        style="font-size: 32px; font-weight: 800; color: white; letter-spacing: -1px; text-shadow: 0 2px 20px rgba(0,0,0,0.3);">
+                        Astra | Executive Report
                     </h2>
                     <button id="execExportBtn" onclick="exportExecutiveReportPDF()" style="
                         display: flex;
@@ -3618,18 +3677,30 @@
 
                     <!-- 1. Scenario Description (Swapped) -->
                     <div class="exec-card" id="execScenarioDescCard"
-                        style="grid-column: 2 / 3; grid-row: 1 / 2; min-height: 350px;">
+                        style="grid-column: 2 / 3; grid-row: 1 / 2; min-height: 580px;">
                         <div
                             style="display: flex; justify-content: space-between; margin-bottom: 16px; align-items: center;">
                             <h3 style="font-size: 18px; font-weight: 600;">Scenario Description</h3>
-                            <button onclick="showMarketplace()"
-                                style="background:none; border:none; color: rgba(96, 205, 255, 1); font-weight: 600; cursor: pointer;">See
-                                all</button>
                         </div>
-                        <div id="execScenarioDescContent" class="exec-empty-state" onclick="execPickScenario()">
+                        <div id="execScenarioDescContent" class="exec-empty-state" onclick="execPickScenario()"
+                            style="flex: 1; margin-bottom: 24px; min-height: 200px;">
                             <div style="text-align: center; color: var(--text-muted);">
                                 <div style="font-size: 24px; margin-bottom: 8px;">+</div>
                                 <div>Add Scenario Narrative</div>
+                            </div>
+                        </div>
+
+                        <!-- Moved Macro Projections -->
+                        <div style="border-top: 1px solid #E2E8F0; padding-top: 20px;">
+                            <h4 style="font-size: 16px; font-weight: 700; color: #003168; margin-bottom: 16px;">Major
+                                Macro
+                                Variable Projections</h4>
+                            <div id="execMacroContent" class="exec-empty-state" style="min-height: 120px;"
+                                onclick="event.stopPropagation(); execAutoLinkMacro()">
+                                <div style="text-align: center; color: var(--text-muted);">
+                                    <div style="font-size: 24px; margin-bottom: 8px;">📈</div>
+                                    <div>Add Macro Variables</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -3640,9 +3711,6 @@
                         <div
                             style="display: flex; justify-content: space-between; margin-bottom: 16px; align-items: center;">
                             <h3 style="font-size: 18px; font-weight: 600;">Heat Map</h3>
-                            <button onclick="showHeatMap()"
-                                style="background:none; border:none; color: rgba(96, 205, 255, 1); font-weight: 600; cursor: pointer;">See
-                                all</button>
                         </div>
                         <div id="execHeatMapContent" class="exec-empty-state" onclick="execPickHeatMap()">
                             <div style="text-align: center; color: var(--text-muted);">
@@ -3659,9 +3727,6 @@
                         <div
                             style="display: flex; justify-content: space-between; margin-bottom: 16px; align-items: center;">
                             <h3 style="font-size: 18px; font-weight: 600;">CET1 Temperature</h3>
-                            <button onclick="showCET1Analysis()"
-                                style="background:none; border:none; color: rgba(96, 205, 255, 1); font-weight: 600; cursor: pointer;">See
-                                all</button>
                         </div>
                         <div id="execTempBarContent" class="exec-empty-state" onclick="execAutoLinkTempBar()">
                             <div style="text-align: center; color: var(--text-muted);">
@@ -3672,38 +3737,24 @@
                     </div>
 
                     <!-- 4. Major Macro Variables (Swapped Position) -->
-                    <div class="exec-card" id="execMacroCard"
+                    <!-- Future Content Placeholder -->
+                    <div class="exec-card" id="execFutureContentCard"
                         style="grid-column: 2 / 3; grid-row: 2 / 3; min-height: 250px;">
                         <div
                             style="display: flex; justify-content: space-between; margin-bottom: 16px; align-items: center;">
-                            <h3 style="font-size: 18px; font-weight: 600;">Major Macro Variable Projections</h3>
-                            <button onclick="showCET1Analysis()"
-                                style="background:none; border:none; color: rgba(96, 205, 255, 1); font-weight: 600; cursor: pointer;">See
-                                all</button>
+                            <h3 style="font-size: 18px; font-weight: 600;">Future Content</h3>
                         </div>
-                        <div id="execMacroContent" class="exec-empty-state" onclick="execAutoLinkMacro()">
+                        <div class="exec-empty-state">
                             <div style="text-align: center; color: var(--text-muted);">
-                                <div style="font-size: 24px; margin-bottom: 8px;">+</div>
-                                <div>Add Macro Variables</div>
+                                <div style="font-size: 24px; margin-bottom: 8px;">✨</div>
+                                <div>Coming Soon</div>
                             </div>
                         </div>
                     </div>
 
                 </div>
 
-                <!-- Footer with timestamp -->
-                <div id="execFooter" style="
-                    margin-top: 24px; 
-                    padding-top: 16px; 
-                    border-top: 1px solid rgba(255,255,255,0.1); 
-                    text-align: right; 
-                    font-size: 11px; 
-                    color: rgba(255,255,255,0.6);
-                    position: relative;
-                    z-index: 1;
-                ">
-                    Produced by C&ST Analytics | Generated on <span id="execTimestamp"></span>
-                </div>
+                <!-- Footer removed per user request -->
             </section>
 
             <!-- CENTER: CET1 Capital Analysis Panel (Hidden by default) -->
@@ -4537,7 +4588,8 @@
     <script>
         // --- 0. CONFIGURATION ---
         // API keys no longer needed in frontend - handled by Flask backend
-        const AZURE_OPENAI_API_URL = '/api/chat';  // Azure OpenAI via RBC GenAI Gateway
+        const API_BASE_URL = window.location.protocol === 'file:' ? 'http://localhost:5001' : '';
+        const AZURE_OPENAI_API_URL = `${API_BASE_URL}/api/chat`;  // Azure OpenAI via RBC GenAI Gateway
         const CACHE_KEY = 'astra_market_dossier';
         const DRIVERS_CACHE_KEY = 'astra_risk_drivers';
         const CUSTOM_DRIVERS_KEY = 'astra_custom_drivers';
@@ -4915,8 +4967,11 @@
             for (let attempt = 1; attempt <= retries; attempt++) {
                 try {
                     console.log(`🔍 Tavily search (attempt ${attempt}/${retries}): "${query}"`);
+
+                    const API_BASE = window.location.protocol === 'file:' ? 'http://localhost:5001' : '';
+
                     // Use local Flask proxy endpoint instead of direct Tavily API
-                    const response = await fetch('/api/tavily/search', {
+                    const response = await fetch(`${API_BASE}/api/tavily/search`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -6107,7 +6162,8 @@ The drivers should reflect the actual risk environment of that time period.
                     console.log(`📅 Tavily request: topic=news, date=${dateRange.start} to ${dateRange.end}, domains=${trustedDomains.length} trusted`);
                 }
 
-                const response = await fetch('https://api.tavily.com/search', {
+                // Use local Flask proxy endpoint
+                const response = await fetch(`${API_BASE_URL}/api/tavily/search`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(requestBody)
@@ -12888,12 +12944,16 @@ Be conversational, ask thoughtful questions, and help the user think through all
     <script>
         /* Executive Report Logic */
         let execCurrentPickType = null;
-        const execState = {
-            heatMap: null,
-            scenario: null,
-            macro: null,
-            tempBar: null
-        };
+        /* Ensure execState is global */
+        if (!window.execState) {
+            window.execState = {
+                heatMap: null,
+                scenario: null,
+                macro: null,
+                tempBar: null,
+                scenarioBadgeOverride: null
+            };
+        }
 
         function showExecutiveReport() {
             // Hide all panels
@@ -13039,17 +13099,17 @@ Be conversational, ask thoughtful questions, and help the user think through all
 
             // 1. Render Legend Logic
             const velocityLegend = `
-                <div style="margin-bottom: 12px;">
-                    <div style="font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.5); text-transform: uppercase; margin-bottom: 6px;">Velocity</div>
-                    <div style="display: flex; flex-direction: column; gap: 4px;">
-                        <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: rgba(255,255,255,0.7);">
-                            <div style="width: 8px; height: 8px; border-radius: 50%; background: #EF4444;"></div> High (< 2 weeks)
+                <div style="margin-bottom: 16px;">
+                    <div style="font-size: 13px; font-weight: 700; color: #64748B; text-transform: uppercase; margin-bottom: 8px;">Velocity</div>
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                        <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #334155;">
+                            <div style="width: 10px; height: 10px; border-radius: 50%; background: #EF4444;"></div> High (< 2 weeks)
                         </div>
-                         <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: rgba(255,255,255,0.7);">
-                            <div style="width: 8px; height: 8px; border-radius: 50%; background: #F59E0B;"></div> Medium (2 wks - 3 mos)
+                         <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #334155;">
+                            <div style="width: 10px; height: 10px; border-radius: 50%; background: #F59E0B;"></div> Medium (2 wks - 3 mos)
                         </div>
-                         <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: rgba(255,255,255,0.7);">
-                            <div style="width: 8px; height: 8px; border-radius: 50%; background: #10B981;"></div> Low (> 3 months)
+                         <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #334155;">
+                            <div style="width: 10px; height: 10px; border-radius: 50%; background: #10B981;"></div> Low (> 3 months)
                         </div>
                     </div>
                 </div>
@@ -13059,9 +13119,9 @@ Be conversational, ask thoughtful questions, and help the user think through all
                 const dData = mapData[d.id] || {};
                 const velColor = dData.velocity === 3 ? '#EF4444' : dData.velocity === 2 ? '#F59E0B' : '#10B981';
                 return `
-                    <div style="display: flex; align-items: center; gap: 8px; font-size: 11px; overflow: hidden; white-space: nowrap; min-height: 20px;" title="${d.title}">
-                        <div style="width: 16px; height: 16px; border-radius: 50%; background: ${velColor}; color: white; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; flex-shrink: 0;">${i + 1}</div>
-                        <div style="text-overflow: ellipsis; overflow: hidden; color: rgba(255,255,255,0.8);">${d.title || d.name}</div>
+                    <div style="display: flex; align-items: flex-start; gap: 10px; font-size: 13px; min-height: 24px; margin-bottom: 8px;" title="${d.title}">
+                        <div style="width: 24px; height: 24px; border-radius: 50%; background: ${velColor}; color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; margin-top: 0;">${i + 1}</div>
+                        <div style="color: #1E293B; line-height: 1.4; word-break: break-word; padding-top: 2px;">${d.title || d.name}</div>
                     </div>
                 `;
             }).join('');
@@ -13084,18 +13144,18 @@ Be conversational, ask thoughtful questions, and help the user think through all
                         position: absolute; 
                         left: ${xPct}%; 
                         top: ${yPct}%; 
-                        width: 20px; 
-                        height: 20px; 
+                        width: 28px; 
+                        height: 28px; 
                         background: ${velColor}; 
                         border-radius: 50%; 
                         display: flex; 
                         align-items: center; 
                         justify-content: center; 
                         color: white; 
-                        font-size: 10px; 
+                        font-size: 13px; 
                         font-weight: 700; 
                         transform: translate(-50%, -50%);
-                        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
                         z-index: 10;
                         transition: transform 0.2s;
                     " onmouseover="this.style.transform='translate(-50%, -50%) scale(1.2)'; this.style.zIndex='20'" onmouseout="this.style.transform='translate(-50%, -50%)'; this.style.zIndex='10'" title="${d.title} (L:${dData.likelihood}, I:${dData.materiality})">
@@ -13111,41 +13171,41 @@ Be conversational, ask thoughtful questions, and help the user think through all
                          <div style="flex: 1; position: relative;">
                             <!-- Y Axis Label -->
                             <div style="position: absolute; left: 0; top: 0; bottom: 16px; width: 40px; display: flex; align-items: center; justify-content: center;">
-                                <div style="transform: rotate(-90deg); white-space: nowrap; font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.5px;">Impact to RBC</div>
+                                <div style="transform: rotate(-90deg); white-space: nowrap; font-size: 11px; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px;">Impact to RBC</div>
                             </div>
                             
                             <!-- Main Grid -->
                             <div style="
                                 position: absolute;
                                 left: 40px; right: 0; top: 0; bottom: 16px;
-                                background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(245, 158, 11, 0.1) 50%, rgba(239, 68, 68, 0.1) 100%);
+                                background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(245, 158, 11, 0.05) 50%, rgba(239, 68, 68, 0.05) 100%);
                                 border-radius: 12px;
-                                border: 1px solid rgba(255,255,255,0.1);
+                                border: 1px solid #E2E8F0;
                             ">
                                 <!-- Grid Lines -->
-                                <div style="position: absolute; top:0; bottom:0; left:33.3%; border-left: 1px dashed rgba(255,255,255,0.1);"></div>
-                                <div style="position: absolute; top:0; bottom:0; left:66.6%; border-left: 1px dashed rgba(255,255,255,0.1);"></div>
-                                <div style="position: absolute; left:0; right:0; top:33.3%; border-top: 1px dashed rgba(255,255,255,0.1);"></div>
-                                <div style="position: absolute; left:0; right:0; top:66.6%; border-top: 1px dashed rgba(255,255,255,0.1);"></div>
+                                <div style="position: absolute; top:0; bottom:0; left:33.3%; border-left: 1px dashed #CBD5E1;"></div>
+                                <div style="position: absolute; top:0; bottom:0; left:66.6%; border-left: 1px dashed #CBD5E1;"></div>
+                                <div style="position: absolute; left:0; right:0; top:33.3%; border-top: 1px dashed #CBD5E1;"></div>
+                                <div style="position: absolute; left:0; right:0; top:66.6%; border-top: 1px dashed #CBD5E1;"></div>
 
                                 <!-- Labels High/Low -->
-                                <div style="position: absolute; top: 8px; left: 8px; font-size: 9px; color: rgba(255,255,255,0.4);">High</div>
-                                <div style="position: absolute; bottom: 8px; left: 8px; font-size: 9px; color: rgba(255,255,255,0.4);">Low</div>
-                                <div style="position: absolute; bottom: 8px; right: 8px; font-size: 9px; color: rgba(255,255,255,0.4);">High</div>
+                                <div style="position: absolute; top: 8px; left: 8px; font-size: 11px; color: #94A3B8; font-weight: 600;">High</div>
+                                <div style="position: absolute; bottom: 8px; left: 8px; font-size: 11px; color: #94A3B8; font-weight: 600;">Low</div>
+                                <div style="position: absolute; bottom: 8px; right: 8px; font-size: 11px; color: #94A3B8; font-weight: 600;">High</div>
                                 
                                 ${bubbles}
                             </div>
                             
                             <!-- X Axis Label -->
-                            <div style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.5px; padding-left: 40px;">Likelihood</div>
+                            <div style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px; padding-left: 40px;">Likelihood</div>
                         </div>
                     </div>
 
                     <!-- Legend Sidebar -->
-                    <div style="width: 170px; display: flex; flex-direction: column; overflow-y: auto; padding-left: 12px; border-left: 1px solid rgba(255,255,255,0.1);">
+                    <div style="width: 260px; display: flex; flex-direction: column; overflow-y: auto; padding-left: 12px; border-left: 1px solid #E2E8F0;">
                         ${velocityLegend}
                         
-                        <div style="font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.5); text-transform: uppercase; margin-bottom: 8px; margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.1);">Drivers</div>
+                        <div style="font-size: 13px; font-weight: 700; color: #64748B; text-transform: uppercase; margin-bottom: 8px; margin-top: 8px; padding-top: 8px; border-top: 1px solid #E2E8F0;">Drivers</div>
                         <div style="display: flex; flex-direction: column; gap: 6px;">
                             ${driversList}
                         </div>
@@ -13180,20 +13240,114 @@ Be conversational, ask thoughtful questions, and help the user think through all
             const fallbackText = globalText || "No narrative available for this scenario.";
 
             /* Show Loading State */
+            /* Show Loading State */
             container.innerHTML = `
-                <div style="font-size: 14px; line-height: 1.6; color: rgba(255,255,255,0.9); height: 100%; display: flex; flex-direction: column;">
-                    <div style="font-weight: 700; font-size: 16px; margin-bottom: 12px; color: white;">${scenarioName}</div>
-                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: rgba(255,255,255,0.6); gap: 12px;">
-                        <div style="width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.2); border-top-color: rgba(96, 205, 255, 1); border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                <div style="font-size: 14px; line-height: 1.6; color: #334155; height: 100%; display: flex; flex-direction: column;">
+                    <div style="font-weight: 700; font-size: 16px; margin-bottom: 12px; color: #003168;">${scenarioName}</div>
+                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #64748B; gap: 12px;">
+                        <div style="width: 20px; height: 20px; border: 2px solid #E2E8F0; border-top-color: #003168; border-radius: 50%; animation: spin 1s linear infinite;"></div>
                         <div style="font-size: 12px;">Generating scenario summary...</div>
                     </div>
                 </div>
                 <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
             `;
 
+            /* Attempt to link to Heatmap Driver */
+            let badgeHtml = '';
+
+            console.log("Checking override:", window.execState.scenarioBadgeOverride);
+            // 1. Check for Manual Override
+            if (window.execState && window.execState.scenarioBadgeOverride) {
+                const ov = window.execState.scenarioBadgeOverride;
+                const colorMap = { 'high': '#EF4444', 'med': '#F59E0B', 'low': '#10B981' };
+                const bg = colorMap[ov.velocity] || '#EF4444';
+
+                badgeHtml = `
+                    <div onclick="event.stopPropagation(); openBadgeEditor()" style="
+                        display: inline-flex;
+                        cursor: pointer;
+                        align-items: center;
+                        justify-content: center;
+                        width: 28px;
+                        height: 28px;
+                        background: ${bg};
+                        color: white;
+                        border-radius: 50%;
+                        font-size: 14px;
+                        font-weight: 700;
+                        margin-right: 12px;
+                        flex-shrink: 0;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                        transition: transform 0.2s;
+                    " onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" title="Click to edit">${ov.number}</div>
+                `;
+            }
+            // 2. Fallback to Fuzzy Match
+            else if (window.execState && window.execState.heatMap && window.execState.heatMap.drivers) {
+                const drivers = window.execState.heatMap.drivers;
+                const mapData = window.execState.heatMap.heatMapData || {};
+
+                // Fuzzy match: check if one name includes the other
+                // We use aggressive normalization (removing special chars) for better matching
+                const normalize = (s) => (s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+                const cleanScenario = normalize(scenarioName);
+
+                const matchIdx = drivers.findIndex(d => {
+                    const cleanDriver = normalize(d.title || d.name);
+                    return cleanDriver && (cleanDriver.includes(cleanScenario) || cleanScenario.includes(cleanDriver));
+                });
+
+                if (matchIdx !== -1) {
+                    const d = drivers[matchIdx];
+                    const dData = mapData[d.id] || {};
+                    const velColor = dData.velocity === 3 ? '#EF4444' : dData.velocity === 2 ? '#F59E0B' : '#10B981';
+
+                    badgeHtml = `
+                        <div style="
+                            display: inline-flex;
+                            align-items: center;
+                            justify-content: center;
+                            width: 24px;
+                            height: 24px;
+                            background: ${velColor};
+                            color: white;
+                            border-radius: 50%;
+                            font-size: 14px;
+                            font-weight: 700;
+                            margin-right: 12px;
+                            flex-shrink: 0;
+                            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                        ">${matchIdx + 1}</div>
+                    `;
+                }
+            }
+
+            // 3. Fallback Empty Token (Click to Add)
+            if (!badgeHtml) {
+                badgeHtml = `
+                    <div onclick="event.stopPropagation(); openBadgeEditor()" style="
+                        display: inline-flex;
+                        cursor: pointer;
+                        align-items: center;
+                        justify-content: center;
+                        width: 28px;
+                        height: 28px;
+                        border: 2px dashed #CBD5E1;
+                        background: transparent;
+                        color: #94A3B8;
+                        border-radius: 50%;
+                        font-size: 16px;
+                        font-weight: 600;
+                        margin-right: 12px;
+                        flex-shrink: 0;
+                        transition: all 0.2s;
+                    " onmouseover="this.style.borderColor='#2563EB'; this.style.color='#2563EB';" onmouseout="this.style.borderColor='#CBD5E1'; this.style.color='#94A3B8';" title="Link to Heat Map Driver">+</div>
+                `;
+            }
+
             /* If no conditions to work with, just show fallback */
             if (!globalText && !canadianText) {
-                renderDescHTML(container, scenarioName, fallbackText, false);
+                renderDescHTML(container, scenarioName, fallbackText, false, badgeHtml);
                 return;
             }
 
@@ -13235,19 +13389,27 @@ Be conversational, ask thoughtful questions, and help the user think through all
                 const resData = await response.json();
                 const aiText = resData.choices[0].message.content;
 
-                renderDescHTML(container, scenarioName, aiText, true);
+                renderDescHTML(container, scenarioName, aiText, true, badgeHtml);
 
             } catch (e) {
                 console.error("AI Gen Failed:", e);
                 /* Fallback: Use global conditions text directly */
-                renderDescHTML(container, scenarioName, fallbackText, false);
+                renderDescHTML(container, scenarioName, fallbackText, false, badgeHtml);
             }
         }
 
-        function renderDescHTML(container, title, text, isAI) {
+        function renderDescHTML(container, title, text, isAI, badgeHtml) {
+            // Ensure badgeHtml is a string
+            const safeBadge = badgeHtml || '';
+
             container.innerHTML = `
-                <div style="font-size: 14px; line-height: 1.6; color: rgba(255,255,255,0.9); height: 100%; display: flex; flex-direction: column;">
-                    <div style="font-weight: 700; font-size: 16px; margin-bottom: 12px; color: white;">${title}</div>
+                <div style="font-size: 16px; line-height: 1.5; color: #334155; height: 100%; display: flex; flex-direction: column;">
+                    <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                        ${safeBadge}
+                        <div style="font-weight: 700; font-size: 20px; color: #003168; line-height: 1.2;">
+                            ${title}
+                        </div>
+                    </div>
                     <div style="flex: 1; overflow-y: auto; padding-right: 4px;">
                         ${text}
                         ${isAI ? `<div style="margin-top: 16px; padding: 12px; background: rgba(37, 99, 235, 0.2); border-radius: 8px; border-left: 3px solid rgba(96, 205, 255, 1); font-size: 12px; color: rgba(96, 205, 255, 1);">
@@ -13347,7 +13509,8 @@ Be conversational, ask thoughtful questions, and help the user think through all
                 return `
                     <select onchange="updateMacroSlot(${slotIndex}, this.value)" style="
                         font-size: 11px;
-                        color: rgba(255,255,255,0.6);
+                        font-weight: 600;
+                        color: #64748B;
                         background: transparent;
                         border: none;
                         cursor: pointer;
@@ -13357,6 +13520,8 @@ Be conversational, ask thoughtful questions, and help the user think through all
                         outline: none;
                         appearance: none;
                         -webkit-appearance: none;
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
                     ">
                         ${options}
                     </select>
@@ -13369,10 +13534,11 @@ Be conversational, ask thoughtful questions, and help the user think through all
                 const isNegativeOutcome = data.isNegative !== false; // Default to negative styling
 
                 // Determine value color - red for negative outcomes, green for positive
-                const valueColor = isNegativeOutcome ? '#F87171' : '#4ADE80';
+                // Determine value color - Darker red/green for light theme
+                const valueColor = isNegativeOutcome ? '#DC2626' : '#16A34A';
 
                 return `
-                    <div style="padding: 12px; background: rgba(255,255,255,0.05); border-radius: 12px; display: flex; flex-direction: column; justify-content: center; min-height: 80px; border: 1px solid rgba(255,255,255,0.1);">
+                    <div style="padding: 12px; background: #F8FAFC; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; min-height: 80px; border: 1px solid #E2E8F0;">
                         ${buildDropdown(idx, key)}
                         <div style="font-size: 18px; font-weight: 700; color: ${valueColor};">
                             ${data.value}
@@ -13433,15 +13599,16 @@ Be conversational, ask thoughtful questions, and help the user think through all
 
             // Smart staggering: 4 levels (above-high, above-low, below-low, below-high)
             // Track last used position at each level
-            const levelLastPos = { 0: -100, 1: -100, 2: -100, 3: -100 };
-            const minGap = 12; // Minimum % gap between labels at same level
+            // Smart staggering: 6 levels to ensure no overlap
+            const levelLastPos = { 0: -100, 1: -100, 2: -100, 3: -100, 4: -100, 5: -100 };
+            const minGap = 18; // Reduced to 18 to allow specific pairing (V.Severe+Benchmark)
 
             // Assign each scenario to a level
             scenarios.forEach(s => {
                 s.pos = calcPos(s.value);
 
-                // Try levels in order: above-low(0), below-low(1), above-high(2), below-high(3)
-                const levelOrder = [0, 1, 2, 3];
+                // Try levels in order
+                const levelOrder = [0, 1, 2, 3, 4, 5];
                 for (const lvl of levelOrder) {
                     if (s.pos - levelLastPos[lvl] >= minGap) {
                         s.level = lvl;
@@ -13449,15 +13616,18 @@ Be conversational, ask thoughtful questions, and help the user think through all
                         break;
                     }
                 }
-                if (s.level === undefined) s.level = 3; // Fallback
+                if (s.level === undefined) s.level = 5;
             });
 
             // Level configurations: [isAbove, lineHeight, labelOffset]
+            // Increased offsets significantly to clear larger font labels
             const levelConfig = {
-                0: { above: true, lineHeight: 25, labelOffset: 29 },  // Above, close
-                1: { above: false, lineHeight: 25, labelOffset: 29 }, // Below, close
-                2: { above: true, lineHeight: 45, labelOffset: 49 },  // Above, far
-                3: { above: false, lineHeight: 45, labelOffset: 49 }  // Below, far
+                0: { above: true, lineHeight: 25, labelOffset: 29 },
+                1: { above: false, lineHeight: 25, labelOffset: 29 },
+                2: { above: true, lineHeight: 60, labelOffset: 64 },  // Clears Level 0 (35px gap)
+                3: { above: false, lineHeight: 60, labelOffset: 64 },
+                4: { above: true, lineHeight: 95, labelOffset: 99 }, // Clears Level 2 (35px gap)
+                5: { above: false, lineHeight: 95, labelOffset: 99 }
             };
 
             const markersHtml = scenarios.map(s => {
@@ -13466,6 +13636,28 @@ Be conversational, ask thoughtful questions, and help the user think through all
                 const labelPos = cfg.above
                     ? `bottom: ${cfg.labelOffset + 10}px;`
                     : `top: ${cfg.labelOffset + 10}px;`;
+
+                // Build badge HTML for custom scenario if badge override exists
+                let badgeCircle = '';
+                if (s.isCustom && window.execState && window.execState.scenarioBadgeOverride && window.execState.scenario) {
+                    const ov = window.execState.scenarioBadgeOverride;
+                    const colorMap = { 'high': '#EF4444', 'med': '#F59E0B', 'low': '#10B981' };
+                    const bg = colorMap[ov.velocity] || '#10B981';
+                    badgeCircle = `<span style="
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 16px;
+                        height: 16px;
+                        background: ${bg};
+                        color: white;
+                        border-radius: 50%;
+                        font-size: 10px;
+                        font-weight: 700;
+                        margin-right: 4px;
+                        flex-shrink: 0;
+                    ">${ov.number}</span>`;
+                }
 
                 return `
                     <!-- Marker line -->
@@ -13487,16 +13679,18 @@ Be conversational, ask thoughtful questions, and help the user think through all
                         transform: translateX(-50%);
                         background: ${s.color};
                         color: white;
-                        padding: 2px 6px;
-                        border-radius: 5px;
-                        font-size: 9px;
-                        font-weight: 600;
+                        padding: 4px 8px;
+                        border-radius: 6px;
+                        font-size: 12px;
+                        font-weight: 700;
                         white-space: nowrap;
-                        box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+                        box-shadow: 0 4px 8px rgba(0,0,0,0.25);
                         z-index: 10;
+                        display: flex;
+                        align-items: center;
                         ${s.isCustom ? 'border: 2px solid #1E40AF;' : ''}
                     ">
-                        ${s.name}: ${s.value.toFixed(1)}%
+                        ${badgeCircle}${s.name}: ${s.value.toFixed(1)}%
                     </div>
                 `;
             }).join('');
@@ -13520,7 +13714,7 @@ Be conversational, ask thoughtful questions, and help the user think through all
                     </div>
                     
                     <!-- Scale Labels -->
-                    <div style="display: flex; justify-content: space-between; font-size: 8px; color: rgba(255,255,255,0.6); font-weight: 500;">
+                    <div style="display: flex; justify-content: space-between; font-size: 8px; color: #64748B; font-weight: 500;">
                         <span>0% (MIN)</span>
                         <span>4.5% (CCB)</span>
                         <span>8.1% (DSB)</span>
@@ -13533,12 +13727,6 @@ Be conversational, ask thoughtful questions, and help the user think through all
 
         // Export Executive Report as Landscape US Letter PDF
         async function exportExecutiveReportPDF() {
-            const panel = document.getElementById('executiveReportPanel');
-            if (!panel) {
-                alert('Executive Report panel not found.');
-                return;
-            }
-
             // Show loading overlay
             const loader = document.getElementById('loaderOverlay');
             const loaderText = document.querySelector('.loader-text');
@@ -13547,92 +13735,365 @@ Be conversational, ask thoughtful questions, and help the user think through all
                 loader.style.display = 'flex';
             }
 
+            const exportContainer = document.getElementById('pdfExportContainer');
+            const exportGrid = exportContainer.querySelector('.pdf-grid');
+
+            // Handle duplicate IDs by finding the VISIBLE one
+            const panels = document.querySelectorAll('#executiveReportPanel');
+            let sourcePanel = Array.from(panels).find(p => {
+                const style = window.getComputedStyle(p);
+                return style.display !== 'none' && style.visibility !== 'hidden';
+            });
+            // Fallback to last if none visible (unlikely) or first
+            if (!sourcePanel) sourcePanel = panels.length > 0 ? panels[panels.length - 1] : document.getElementById('executiveReportPanel');
+
+            const sourceGrid = sourcePanel.querySelector('.exec-grid-container');
+
             try {
-                // Wait a moment for any renders to settle
-                await new Promise(r => setTimeout(r, 100));
+                // 1. CLEAR & POPULATE EXPORT CONTAINER
+                exportGrid.innerHTML = ''; // Clear previous
 
-                // Get the exec-grid-container for capture
-                const gridContainer = panel.querySelector('.exec-grid-container');
-                const exportTarget = gridContainer || panel;
+                // Clone all children from source grid
+                Array.from(sourceGrid.children).forEach(child => {
+                    // Deep clone
+                    const clone = child.cloneNode(true);
 
-                // Capture using html2canvas
-                const canvas = await html2canvas(exportTarget, {
-                    scale: 2,
-                    useCORS: true,
-                    allowTaint: true,
-                    backgroundColor: '#ffffff',
-                    logging: false,
-                    onclone: (clonedDoc) => {
-                        // Hide the export button in the cloned document
-                        const exportBtn = clonedDoc.querySelector('button[onclick="exportExecutiveReportPDF()"]');
-                        if (exportBtn) exportBtn.style.display = 'none';
+                    // CRITICAL: Strip all IDs from clones to prevent duplicate ID conflicts
+                    clone.removeAttribute('id');
+                    clone.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
+
+                    // Modifying styles for PDF perfection
+                    clone.style.boxShadow = 'none'; // Reduce shadow for flat print look
+                    clone.style.background = '#FFFFFF'; // Ensure pure white background
+                    clone.style.border = '1px solid #E2E8F0'; // Crisp light border
+                    clone.style.backdropFilter = 'none';
+                    clone.style.borderRadius = '16px';
+                    clone.style.color = '#334155'; // Ensure dark text color
+
+                    // Ensure specific text elements are dark
+                    clone.querySelectorAll('*').forEach(el => {
+                        const computed = window.getComputedStyle(el);
+                        // If color is white (from old dark mode styles?), force dark
+                        if (computed.color === 'rgb(255, 255, 255)' || computed.color === 'rgba(255, 255, 255, 0.9)') {
+                            el.style.color = '#334155';
+                        }
+                    });
+
+                    // FIX MACRO TITLES: convert select elements to divs for perfect PDF rendering
+                    // This fixes the 'cut-off' text issue
+                    clone.querySelectorAll('select').forEach(select => {
+                        const selectedText = select.options[select.selectedIndex]?.text || '';
+                        const div = document.createElement('div');
+                        div.textContent = selectedText;
+                        div.style.fontSize = '13px'; // slightly larger for readability
+                        div.style.fontWeight = '700'; /* Bold for header look */
+                        div.style.color = '#003168'; /* Navy text */
+                        div.style.marginBottom = '4px';
+                        div.style.textTransform = 'uppercase';
+                        select.parentNode.replaceChild(div, select);
+                    });
+
+                    // REMOVE "See all" buttons for PDF - Strict Check
+                    clone.querySelectorAll('.exec-see-all, div').forEach(el => {
+                        if (el.classList.contains('exec-see-all') || el.textContent.trim() === 'See all') {
+                            el.remove();
+                            el.style.setProperty('display', 'none', 'important');
+                        }
+                    });
+
+                    // Remove legacy footer if caught in grid
+                    clone.querySelectorAll('#execFooter').forEach(el => el.remove());
+
+                    // REMOVE "click variable names to change" hint for PDF
+                    // Usually this is a small text at bottom of macro card
+                    clone.querySelectorAll('div, span, p').forEach(el => {
+                        // Check exact text or partial match, ensure we don't hide parents
+                        if (el.children.length === 0 && el.textContent.toLowerCase().includes('click variable names to change')) {
+                            el.style.display = 'none';
+                        }
+                    });
+
+                    // FIX SCENARIO TEXT SCALING
+                    // Reduce font size in PDF to ensure it fits validly like the web view
+                    const descriptionContent = clone.querySelector('#execScenarioDescContent');
+                    if (descriptionContent) {
+                        // Target the inner text container specifically
+                        // The structure is: parent > flex column > header > scrollable content
+                        const scrollableDiv = descriptionContent.querySelector('div[style*="overflow-y"]');
+                        if (scrollableDiv) {
+                            // Adjust the text directly inside
+                            scrollableDiv.style.fontSize = '18px';
+                            scrollableDiv.style.lineHeight = '1.6';
+                        }
+
+                        // General fallback: reduce any 14px text in this card
+                        descriptionContent.querySelectorAll('*').forEach(el => {
+                            const style = window.getComputedStyle(el);
+                            if (style.fontSize === '14px' || style.fontSize === '16px' || style.fontSize === '18px') {
+                                el.style.fontSize = '18px';
+                                el.style.lineHeight = '1.6';
+                            }
+                        });
                     }
+
+                    exportGrid.appendChild(clone);
                 });
 
-                // Create PDF in landscape US Letter size
-                const { jsPDF } = window.jspdf;
-                // US Letter: 8.5 x 11 inches = 215.9 x 279.4 mm
-                // Landscape: 279.4 x 215.9 mm (11 x 8.5 inches)
-                const pdf = new jsPDF({
-                    orientation: 'landscape',
-                    unit: 'mm',
-                    format: 'letter'
-                });
+                // 2. APPLY LIGHT GREY-BLUE GRADIENT BACKGROUND
+                exportContainer.style.background = `
+                    linear-gradient(155deg, transparent 0%, transparent 60%, rgba(200, 215, 230, 0.5) 70%, rgba(220, 230, 240, 0.4) 85%, transparent 100%),
+                    linear-gradient(135deg, #E8EDF2 0%, #DCE3EA 30%, #D0DAE4 60%, #E4EAF0 100%)
+                `;
+                exportContainer.style.backgroundSize = 'cover';
+                exportContainer.style.backgroundPosition = 'center';
 
-                const pdfWidth = pdf.internal.pageSize.getWidth();
-                const pdfHeight = pdf.internal.pageSize.getHeight();
+                // Make it visible to html2canvas (but kept behind other content via z-index)
+                exportContainer.style.visibility = 'visible';
 
-                // Calculate image dimensions to fit the page with margins
-                const margin = 10; // 10mm margin
-                const availableWidth = pdfWidth - (margin * 2);
-                const availableHeight = pdfHeight - (margin * 2);
-
-                const imgRatio = canvas.width / canvas.height;
-                const pageRatio = availableWidth / availableHeight;
-
-                let imgWidth, imgHeight;
-                if (imgRatio > pageRatio) {
-                    // Image is wider than page ratio, fit to width
-                    imgWidth = availableWidth;
-                    imgHeight = availableWidth / imgRatio;
-                } else {
-                    // Image is taller than page ratio, fit to height
-                    imgHeight = availableHeight;
-                    imgWidth = availableHeight * imgRatio;
+                // Update Header for PDF - Robust Selector
+                // Update Header for PDF - Robust Selector & Color
+                const exportHeader = document.querySelector('#pdfExportContainer h2');
+                if (exportHeader) {
+                    exportHeader.textContent = 'Astra | Executive Report';
+                    exportHeader.style.color = '#003168'; // Force RBC Navy
+                    exportHeader.style.textShadow = 'none';
                 }
 
-                // Center the image
-                const xOffset = margin + (availableWidth - imgWidth) / 2;
-                const yOffset = margin + (availableHeight - imgHeight) / 2;
+                // Inject Dynamic Footer into the Container (Inside the "box")
+                const now = new Date();
+                const dateStr = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+                const timeStr = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
 
-                // Add title
-                pdf.setFontSize(16);
-                pdf.setFont('helvetica', 'bold');
-                pdf.text('Executive Report', margin, margin + 5);
+                const footerDiv = document.createElement('div');
+                footerDiv.id = 'pdfExportFooter'; // Unique ID for cleanup
+                footerDiv.textContent = `Produced by CEST Analytics | Generated on ${dateStr} at ${timeStr}`;
+                footerDiv.style.position = 'absolute';
+                footerDiv.style.bottom = '16px';
+                footerDiv.style.right = '40px';
+                footerDiv.style.color = '#64748B'; // Slate Grey
+                footerDiv.style.fontSize = '14px'; // Larger font
+                footerDiv.style.fontWeight = '500';
+                footerDiv.style.zIndex = '100';
 
-                // Add timestamp
-                pdf.setFontSize(9);
-                pdf.setFont('helvetica', 'normal');
-                pdf.setTextColor(100);
-                const timestamp = new Date().toLocaleString();
-                pdf.text(`Generated: ${timestamp}`, pdfWidth - margin, margin + 5, { align: 'right' });
+                // Store original position and temporarily change
+                const originalPosition = exportContainer.style.position;
+                exportContainer.style.position = 'relative'; // Ensure context for absolute footer
+                exportContainer.appendChild(footerDiv);
 
-                // Add the image below the title
-                const imgData = canvas.toDataURL('image/png', 1.0);
-                pdf.addImage(imgData, 'PNG', xOffset, margin + 10, imgWidth, Math.min(imgHeight, availableHeight - 10));
+                // Wait for content layout
+                await new Promise(r => setTimeout(r, 500));
 
-                // Save the PDF
-                const fileName = `Executive_Report_${new Date().toISOString().split('T')[0]}.pdf`;
+                // 3. CAPTURE - Fix height calculation
+                // Temporarily set overflow visible to get accurate height
+                const originalOverflow = exportContainer.style.overflow;
+                exportContainer.style.overflow = 'visible';
+
+                // Calculate actual content height from grid + header + footer padding
+                // Use explicit sum to avoid stale scrollHeight issues and reduce bottom gap
+                const headerHeight = exportContainer.querySelector('.pdf-header')?.offsetHeight || 80;
+                const gridHeight = exportGrid.scrollHeight;
+                const totalHeight = headerHeight + gridHeight + 60;
+
+                // CRITICAL: Set explicit height on container so gradient background extends fully
+                const originalHeight = exportContainer.style.minHeight;
+                exportContainer.style.minHeight = totalHeight + 'px';
+                exportContainer.style.height = totalHeight + 'px';
+
+                // Wait for layout recalc
+                await new Promise(r => setTimeout(r, 100));
+
+                const canvas = await html2canvas(exportContainer, {
+                    scale: 1.5,
+                    useCORS: false,
+                    allowTaint: false,
+                    logging: false,
+                    scrollX: 0,
+                    scrollY: 0,
+                    width: 1600,
+                    height: totalHeight,
+                    backgroundColor: '#FFFFFF' // White background for corners
+                });
+
+                // Restore overflow and height
+                exportContainer.style.overflow = originalOverflow || 'hidden';
+                exportContainer.style.minHeight = originalHeight || '';
+                exportContainer.style.height = '';
+
+                // 4. GENERATE PDF - Custom size to match content exactly (no whitespace)
+                const { jsPDF } = window.jspdf;
+
+                // Convert pixels to mm for PDF sizing (1px = 0.264583mm approx)
+                const pxToMm = 0.264583;
+                const imgWidthMm = canvas.width * pxToMm;
+                const imgHeightMm = canvas.height * pxToMm;
+
+                // Add margins to page (10mm on each side)
+                const margin = 10;
+                const pageWidthMm = imgWidthMm + (margin * 2);
+                const pageHeightMm = imgHeightMm + (margin * 2);
+
+                const pdf = new jsPDF({
+                    orientation: pageWidthMm > pageHeightMm ? 'landscape' : 'portrait',
+                    unit: 'mm',
+                    format: [pageWidthMm, pageHeightMm]
+                });
+
+                // Use JPEG with 0.8 quality for much smaller file size
+                const imgData = canvas.toDataURL('image/jpeg', 0.8);
+
+                // PDF Background White
+                pdf.setFillColor(255, 255, 255);
+                pdf.rect(0, 0, pageWidthMm, pageHeightMm, 'F');
+
+                // Footer added via HTML injection above
+
+                // Add image centered with margin
+                pdf.addImage(imgData, 'JPEG', margin, margin, imgWidthMm, imgHeightMm);
+
+                const fileName = `Astra_Executive_Report_${new Date().toISOString().split('T')[0]}.pdf`;
                 pdf.save(fileName);
 
             } catch (error) {
-                console.error('Error exporting Executive Report PDF:', error);
-                alert('Failed to export PDF. Please try again.');
+                console.error('PDF Export Error:', error);
+                alert('Export failed: ' + error.message);
             } finally {
+                // CLEANUP - Restore state and clear DOM
                 if (loader) loader.style.display = 'none';
+
+                // Restore original container position
+                exportContainer.style.position = 'fixed';
+                exportContainer.style.visibility = 'hidden';
+
+                // Remove injected footer
+                const injectedFooter = document.getElementById('pdfExportFooter');
+                if (injectedFooter) injectedFooter.remove();
+
+                // Clear cloned content
+                exportGrid.innerHTML = '';
             }
         }
     </script>
+    <!-- Dedicated PDF Export Container (Hidden/Off-screen usually) -->
+    <div id="pdfExportContainer" class="pdf-export-container"
+        style="position: fixed; top: 0; left: 0; width: 1600px; border-radius: 24px; overflow: hidden; z-index: -9999; visibility: hidden;">
+        <!-- Header -->
+        <div class="pdf-header"
+            style="padding: 40px 40px 20px 64px; display: flex; justify-content: space-between; align-items: center;">
+            <div class="pdf-logo" style="font-size: 32px; font-weight: 700; color: #003168; letter-spacing: -0.02em;">
+                Astra | Executive Report</div>
+        </div>
+
+        <!-- Grid -->
+        <div class="pdf-grid"
+            style="display: grid; grid-template-columns: 1.6fr 1fr; gap: 24px; padding: 0 40px 40px 40px;">
+            <!-- Content will be cloned here -->
+        </div>
+    </div>
+
+    <!-- Executive Report Panel -->
+    <div id="executiveReportPanel" class="report-panel exec-glass-bg"
+        style="display: none; height: 100vh; overflow-y: auto;">
+        <!-- Header for Logo -->
+        <div class="exec-logo">Astra | Executive Report</div>
+
+        <div class="exec-grid-container">
+            <!-- Heat Map -->
+            <div class="exec-card" style="grid-row: span 2; min-height: 500px;"
+                onclick="if(!execState.heatMap) execPickHeatMap()">
+                <div class="exec-card-header">
+                    <div class="exec-card-title">Heat Map</div>
+
+                </div>
+                <div id="execHeatMapContent" class="exec-content-area">
+                    <div class="exec-empty-state">
+                        <div style="text-align: center;">
+                            <div style="font-size: 24px; margin-bottom: 8px;">📊</div>
+                            <div>Select Heat Map</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scenario Description & Macro Variables -->
+            <div class="exec-card" style="min-height: 580px;" onclick="if(!execState.scenario) execPickScenario()">
+                <div class="exec-card-header">
+                    <div class="exec-card-title">Scenario Description</div>
+                </div>
+                <div id="execScenarioDescContent" class="exec-content-area"
+                    style="flex: 1; margin-bottom: 24px; min-height: 200px;">
+                    <div class="exec-empty-state">
+                        <div style="text-align: center;">
+                            <div style="font-size: 24px; margin-bottom: 8px;">📝</div>
+                            <div>Select Scenario</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Moved Macro Projections -->
+                <div style="border-top: 1px solid #F1F5F9; padding-top: 20px;">
+                    <h4 style="font-size: 16px; font-weight: 700; color: #003168; margin-bottom: 16px;">Major Macro
+                        Variable Projections</h4>
+                    <div id="execMacroContent" class="exec-content-area">
+                        <div class="exec-empty-state" style="min-height: 120px;"
+                            onclick="if(execState.scenario && !execState.macro) execAutoLinkMacro()">
+                            <div style="text-align: center;">
+                                <div style="font-size: 24px; margin-bottom: 8px;">📈</div>
+                                <div>Auto-linked to Scenario</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CET1 Temperature -->
+            <div class="exec-card" style="height: 380px;" onclick="if(!execState.tempBar) execPickTempBar()">
+                <div class="exec-card-header">
+                    <div class="exec-card-title">CET1 Temperature</div>
+                </div>
+                <div id="execTempBarContent" class="exec-content-area">
+                    <div class="exec-empty-state">
+                        <div style="text-align: center;">
+                            <div style="font-size: 24px; margin-bottom: 8px;">🌡️</div>
+                            <div>Select Calculation</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Placeholder for Future Content -->
+            <div class="exec-card" style="height: 250px;">
+                <div class="exec-card-header">
+                    <div class="exec-card-title">Future Content</div>
+                </div>
+                <div class="exec-content-area">
+                    <div class="exec-empty-state">
+                        <div style="text-align: center;">
+                            <div style="font-size: 24px; margin-bottom: 8px;">✨</div>
+                            <div>Coming Soon</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <!-- Footer Removed -->
+
+            <!-- Floating PDF Button -->
+            <button class="astra-btn astra-btn-primary"
+                style="position: fixed; bottom: 30px; right: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); z-index: 100;"
+                onclick="exportExecutiveReportPDF()">
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    Export PDF
+                </div>
+            </button>
+        </div>
+    </div>
+
+    <!-- Exec Picker Modal -->
     <div class="exec-picker-modal" id="execPickerModal">
         <div class="exec-picker-content">
             <h3 style="margin-bottom: 16px;">Select Item from Folder</h3>
@@ -13644,6 +14105,172 @@ Be conversational, ask thoughtful questions, and help the user think through all
             </div>
         </div>
     </div>
+
+    <!-- Badge Editor Modal -->
+    <div class="exec-picker-modal" id="execBadgeModal" style="z-index: 10001;">
+        <div class="exec-picker-content" style="width: 400px;">
+            <h3 style="margin-bottom: 20px;">Link to Heat Map Driver</h3>
+
+            <div style="margin-bottom: 20px;">
+                <label
+                    style="display: block; font-size: 13px; font-weight: 600; color: #64748B; margin-bottom: 8px;">Driver
+                    Number</label>
+                <input type="number" id="badgeNumberInput" placeholder="e.g. 5" min="1" max="99" style="
+                    width: 100%;
+                    padding: 10px 12px;
+                    border: 1px solid #E2E8F0;
+                    border-radius: 8px;
+                    font-size: 14px;
+                    outline: none;
+                ">
+            </div>
+
+            <div style="margin-bottom: 24px;">
+                <!-- Velocity removed - auto-detected -->
+
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <button class="astra-btn astra-btn-secondary" onclick="clearBadgeOverride()"
+                        style="color: #DC2626;">Clear Link</button>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="astra-btn astra-btn-secondary" onclick="closeBadgeModal()">Cancel</button>
+                        <button class="astra-btn astra-btn-primary" onclick="saveBadgeOverride()">Save Link</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.onload = function () {
+            // Initialize data
+            if (!window.savedScenarios) window.savedScenarios = [];
+
+            // Render initial view (Marketplace)
+            if (typeof renderMarketplace === 'function') {
+                renderMarketplace();
+            } else {
+                console.error("renderMarketplace not found");
+            }
+
+            // Update UI
+            if (typeof updateBasketCount === 'function') updateBasketCount();
+
+            // Reset Nav
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            // Find Marketplace nav - usually the first one or by title
+            const marketNav = Array.from(document.querySelectorAll('.nav-item')).find(el => el.textContent.includes('Marketplace') || el.title === 'Risk Driver Marketplace');
+            if (marketNav) marketNav.classList.add('active');
+        };
+
+        // --- BADGE EDITOR LOGIC ---
+
+        function openBadgeEditor() {
+            document.getElementById('execBadgeModal').style.display = 'flex';
+
+            // Pre-fill if override exists
+            if (window.execState && window.execState.scenarioBadgeOverride) {
+                document.getElementById('badgeNumberInput').value = window.execState.scenarioBadgeOverride.number;
+            } else {
+                document.getElementById('badgeNumberInput').value = '';
+            }
+        }
+
+        function closeBadgeModal() {
+            document.getElementById('execBadgeModal').style.display = 'none';
+        }
+
+        function saveBadgeOverride() {
+            try {
+                const numVal = document.getElementById('badgeNumberInput').value;
+                const num = parseInt(numVal, 10);
+
+                if (!num || isNaN(num)) return alert('Please enter a valid driver number');
+
+                // Auto-detect velocity from Heat Map ('high' if driver not found)
+                let velocity = 'high';
+
+                // Check both casing variants
+                const hm = window.execState.heatMap || window.execState.heatmap;
+                console.log("Heatmap data:", hm);
+
+                if (hm && hm.drivers) {
+                    const drivers = hm.drivers;
+                    // Use heatMapData (matching renderExecHeatMap) not mapData
+                    const mapData = hm.heatMapData || {};
+                    console.log("Drivers:", drivers);
+                    console.log("HeatMapData:", mapData);
+
+                    // Driver number matches index+1
+                    const driverIndex = num - 1;
+                    console.log("Looking for driver index:", driverIndex, "for number:", num);
+
+                    if (driverIndex >= 0 && driverIndex < drivers.length) {
+                        const d = drivers[driverIndex];
+                        console.log("Driver found:", d);
+
+                        const dData = mapData[d.id] || {}; // Default to empty object like renderer
+                        console.log("Driver data:", dData);
+
+                        // Match logic from renderExecHeatMap exactly:
+                        // velColor = dData.velocity === 3 ? '#EF4444' : dData.velocity === 2 ? '#F59E0B' : '#10B981'
+                        // Use == for type coercion (velocity might be string or number)
+                        const vel = dData.velocity;
+                        console.log("Velocity value:", vel, "type:", typeof vel);
+
+                        // Use Number() to ensure consistent comparison
+                        const velNum = Number(vel);
+                        if (velNum === 3) velocity = 'high';
+                        else if (velNum === 2) velocity = 'med';
+                        else velocity = 'low'; // Default to low/green, matching renderer
+
+                        console.log("Determined velocity:", velocity);
+                    } else {
+                        console.warn("Driver index out of range");
+                    }
+                } else {
+                    console.warn("No heatmap data available. execState:", window.execState);
+                }
+
+                if (!window.execState) window.execState = {};
+
+                // Save to state
+                window.execState.scenarioBadgeOverride = {
+                    number: num,
+                    velocity: velocity
+                };
+
+                // Re-render scenario description and temp bar (to update badge on both)
+                if (window.execState.scenario) {
+                    renderExecScenarioDesc(window.execState.scenario);
+                }
+                if (window.execState.tempBar) {
+                    renderExecTempBar(window.execState.tempBar);
+                }
+                closeBadgeModal();
+            } catch (e) {
+                console.error("Error saving badge:", e);
+                alert("An error occurred: " + e.message);
+            }
+        }
+
+        function clearBadgeOverride() {
+            try {
+                if (window.execState.scenarioBadgeOverride) {
+                    delete window.execState.scenarioBadgeOverride;
+                    // Re-render to revert to auto or empty
+                    if (window.execState.scenario) {
+                        renderExecScenarioDesc(window.execState.scenario);
+                    }
+                    if (window.execState.tempBar) {
+                        renderExecTempBar(window.execState.tempBar);
+                    }
+                }
+                closeBadgeModal();
+            } catch (e) {
+                console.error("Error clearing badge:", e);
+            }
+        }
+    </script>
 </body>
 
 </html>
