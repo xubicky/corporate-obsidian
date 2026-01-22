@@ -4270,22 +4270,59 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
                 });
             }, [data, searchTerm, activeFilters, aiDateFilter, headerFilters]);
 
-            // Snapshot visible items ONLY when filter state changes (not when data changes)
-            // This is critical for auto-filter OFF behavior: edited tasks stay visible
+            // Snapshot visible items ONLY when PRIMARY filter state changes (not searchTerm)
+            // searchTerm is a SECONDARY filter - it filters the view but doesn't update the snapshot
+            // This means clearing searchTerm restores the previous view without losing tasks
             useEffect(() => {
                 const prev = prevFiltersRef.current;
-                const filtersChanged =
-                    prev.searchTerm !== searchTerm ||
+                // Only check primary filters (exclude searchTerm - it's a secondary filter)
+                const primaryFiltersChanged =
                     JSON.stringify(prev.activeFilters) !== JSON.stringify(activeFilters) ||
                     JSON.stringify(prev.aiDateFilter) !== JSON.stringify(aiDateFilter) ||
-                    JSON.stringify(prev.headerFilters) !== JSON.stringify(headerFilters);
+                    prev.headerFilters.ID !== headerFilters.ID; // ID filter is primary
 
-                if (filtersChanged) {
-                    // Filters changed - update the persisted snapshot
-                    setPersistedIds(new Set(strictMatches.map(d => d._id)));
+                if (primaryFiltersChanged) {
+                    // Primary filters changed - compute base matches WITHOUT searchTerm
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+
+                    const baseMatches = data.filter(row => {
+                        // Header Filters (ID only - Task/searchTerm is secondary)
+                        if (headerFilters.ID) {
+                            const val = String(row["Task Number"] || row._id || '').toLowerCase();
+                            if (!val.includes(headerFilters.ID.toLowerCase())) return false;
+                        }
+
+                        // Apply active filters (sidebar filters)
+                        for (const [key, selectedValues] of Object.entries(activeFilters)) {
+                            if (!selectedValues || selectedValues.length === 0) continue;
+                            const rowValue = row[key];
+                            if (!rowValue) return false;
+                            if (!selectedValues.includes(rowValue)) return false;
+                        }
+
+                        // AI Date Filter
+                        if (aiDateFilter) {
+                            const endDate = parseLocalDate(row["End Date"]);
+                            if (aiDateFilter.start && aiDateFilter.end) {
+                                if (!endDate) return false;
+                                if (endDate < aiDateFilter.start || endDate > aiDateFilter.end) return false;
+                            }
+                            if (aiDateFilter.type === 'overdue') {
+                                if (!endDate) return false;
+                                const status = String(row.Status).toLowerCase();
+                                if (endDate >= today || status.includes('complete')) return false;
+                            }
+                        }
+
+                        return true;
+                    });
+
+                    // Update the persisted snapshot based on primary filters only
+                    setPersistedIds(new Set(baseMatches.map(d => d._id)));
                     prevFiltersRef.current = { searchTerm, activeFilters, aiDateFilter, headerFilters };
                 }
-            }, [strictMatches, searchTerm, activeFilters, aiDateFilter, headerFilters]);
+            }, [data, activeFilters, aiDateFilter, headerFilters, parseLocalDate]);
 
             // Final displayed data
             const filteredData = useMemo(() => {
