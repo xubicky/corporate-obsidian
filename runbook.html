@@ -314,7 +314,9 @@
             ShoppingCart: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" /><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" /></svg>,
             DollarSign: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><line x1="12" y1="1" x2="12" y2="23" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></svg>,
             Target: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" /></svg>,
-            Globe: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></svg>
+            Globe: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></svg>,
+            ArrowUp: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="m5 12 7-7 7 7" /><path d="M12 19V5" /></svg>,
+            ArrowDown: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M12 5v14" /><path d="m19 12-7 7-7-7" /></svg>
         };
 
         // --- INDICATOR HELPERS ---
@@ -2850,8 +2852,9 @@ Structure:
             const [smartFilterQuery, setSmartFilterQuery] = useState('');
             const [smartFilterLoading, setSmartFilterLoading] = useState(false);
             const [aiDateFilter, setAiDateFilter] = useState(null); // { type: 'due_within_days' | 'overdue', value: number | boolean, label: string }
-            const [autoFilterEnabled, setAutoFilterEnabled] = useState(true);
+            const [autoFilterEnabled, setAutoFilterEnabled] = useState(false);
             const [persistedIds, setPersistedIds] = useState(new Set());
+            const prevFiltersRef = useRef({ searchTerm: '', activeFilters: {}, aiDateFilter: null, headerFilters: { ID: '', Task: '' } });
             const [dueDateSort, setDueDateSort] = useState('asc'); // 'asc' = earliest first, 'desc' = latest first, null = no sort
 
             // Calendar
@@ -2898,20 +2901,18 @@ Structure:
             // Refs for scrolling to current date
             const tableRowRefs = useRef({});
 
-            // Load filters from localStorage on mount
+            // Reset all filters on app initialization
             useEffect(() => {
-                try {
-                    const savedFilters = localStorage.getItem('runbook_filters');
-                    const savedSearch = localStorage.getItem('runbook_search');
-                    if (savedFilters) {
-                        setActiveFilters(JSON.parse(savedFilters));
-                    }
-                    if (savedSearch) {
-                        setSearchTerm(savedSearch);
-                    }
-                } catch (e) {
-                    console.warn('Could not load saved filters:', e);
-                }
+                // Clear all filter states on mount
+                setActiveFilters({});
+                setSearchTerm('');
+                setHeaderFilters({ ID: '', Task: '' });
+                setSmartFilterQuery('');
+                setAiDateFilter(null);
+                setPersistedIds(new Set());
+                // Clear saved filters from localStorage
+                localStorage.removeItem('runbook_filters');
+                localStorage.removeItem('runbook_search');
             }, []);
 
             // Save filters to localStorage when they change
@@ -4269,23 +4270,37 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
                 });
             }, [data, searchTerm, activeFilters, aiDateFilter, headerFilters]);
 
-            // Snapshot visible items when filters change - only when auto-filter is ON
+            // Snapshot visible items ONLY when filter state changes (not when data changes)
+            // This is critical for auto-filter OFF behavior: edited tasks stay visible
             useEffect(() => {
-                if (autoFilterEnabled) {
+                const prev = prevFiltersRef.current;
+                const filtersChanged =
+                    prev.searchTerm !== searchTerm ||
+                    JSON.stringify(prev.activeFilters) !== JSON.stringify(activeFilters) ||
+                    JSON.stringify(prev.aiDateFilter) !== JSON.stringify(aiDateFilter) ||
+                    JSON.stringify(prev.headerFilters) !== JSON.stringify(headerFilters);
+
+                if (filtersChanged) {
+                    // Filters changed - update the persisted snapshot
                     setPersistedIds(new Set(strictMatches.map(d => d._id)));
+                    prevFiltersRef.current = { searchTerm, activeFilters, aiDateFilter, headerFilters };
                 }
-            }, [searchTerm, activeFilters, aiDateFilter, headerFilters, autoFilterEnabled]);
+            }, [strictMatches, searchTerm, activeFilters, aiDateFilter, headerFilters]);
 
             // Final displayed data
             const filteredData = useMemo(() => {
                 let result;
                 if (autoFilterEnabled) {
+                    // Auto-filter ON: only show tasks that currently match filters
+                    // If you edit a task and it no longer matches, it disappears
                     result = [...strictMatches];
                 } else {
-                    // Union of strictMatches and persistedIds found in data
+                    // Auto-filter OFF: show tasks that either:
+                    // 1. Currently match filters (strictMatches), OR
+                    // 2. Were visible when filters were last applied (persistedIds)
+                    // This keeps edited tasks visible even if they no longer match filters
                     const strictSet = new Set(strictMatches.map(d => d._id));
-                    const persistedInStrict = new Set([...strictSet, ...persistedIds]);
-                    result = data.filter(d => persistedInStrict.has(d._id));
+                    result = data.filter(d => strictSet.has(d._id) || persistedIds.has(d._id));
                 }
 
                 // Apply due date sorting
