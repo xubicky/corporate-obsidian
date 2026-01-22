@@ -15782,6 +15782,13 @@ Output ONLY JSON.`;
                 }
             }
 
+            // Make news functions globally accessible
+            window.openNewsModal = openNewsModal;
+            window.closeNewsModal = closeNewsModal;
+            window.selectNewsFeed = selectNewsFeed;
+            window.selectNewsArticle = selectNewsArticle;
+            window.generateRiskFromNews = generateRiskFromNews;
+
             async function extractTextFromPDF(file) {
                 try {
                     // Configure PDF.js worker
