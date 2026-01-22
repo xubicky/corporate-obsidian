@@ -4333,11 +4333,25 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
                     result = [...strictMatches];
                 } else {
                     // Auto-filter OFF: show tasks that either:
-                    // 1. Currently match filters (strictMatches), OR
-                    // 2. Were visible when filters were last applied (persistedIds)
-                    // This keeps edited tasks visible even if they no longer match filters
+                    // 1. Currently match PRIMARY filters (strictMatches), OR
+                    // 2. Were visible when primary filters were last applied (persistedIds)
+                    // THEN apply searchTerm as a secondary filter on top
                     const strictSet = new Set(strictMatches.map(d => d._id));
-                    result = data.filter(d => strictSet.has(d._id) || persistedIds.has(d._id));
+
+                    // First, get all tasks that match primary filters OR are persisted
+                    let baseResult = data.filter(d => strictSet.has(d._id) || persistedIds.has(d._id));
+
+                    // Then apply searchTerm as secondary filter (if active)
+                    if (searchTerm.trim()) {
+                        const searchLower = searchTerm.toLowerCase();
+                        baseResult = baseResult.filter(row =>
+                            Object.values(row).some(val =>
+                                String(val).toLowerCase().includes(searchLower)
+                            )
+                        );
+                    }
+
+                    result = baseResult;
                 }
 
                 // Apply due date sorting
@@ -4355,7 +4369,7 @@ If you cannot parse the query, return: {"error": "Could not parse query"}`;
                 }
 
                 return result;
-            }, [strictMatches, persistedIds, autoFilterEnabled, data, dueDateSort]);
+            }, [strictMatches, persistedIds, autoFilterEnabled, data, dueDateSort, searchTerm]);
 
             // Scroll to first task (for Total Tasks click)
             const scrollToFirstTask = useCallback(() => {
