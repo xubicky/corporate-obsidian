@@ -3921,7 +3921,7 @@
                     style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; position: relative; z-index: 1; padding-left: 24px;">
                     <h2
                         style="font-size: 32px; font-weight: 800; color: white; letter-spacing: -1px; text-shadow: 0 2px 20px rgba(0,0,0,0.3);">
-                        Astra Capital Pulse Brief
+                        Astra | Capital Pulse Brief
                     </h2>
                     <div style="display: flex; gap: 12px;">
                         <button onclick="saveExecutiveReport()" style="
@@ -3986,6 +3986,20 @@
                             </div>
                         </div>
 
+                        <!-- Minimum Pre-MA CET1 Ratio -->
+                        <div class="exec-card" id="execTempBarCard" style="min-height: 250px;">
+                            <div
+                                style="display: flex; justify-content: space-between; margin-bottom: 16px; align-items: center;">
+                                <h3 style="font-size: 18px; font-weight: 600;">Minimum Pre-MA CET1 Ratio</h3>
+                            </div>
+                            <div id="execTempBarContent" class="exec-empty-state" onclick="execAutoLinkTempBar()">
+                                <div style="text-align: center; color: var(--text-muted);">
+                                    <div style="font-size: 24px; margin-bottom: 8px;">+</div>
+                                    <div>Add CET1 Calculation</div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- CET1 Waterfall -->
                         <div class="exec-card" id="execWaterfallCard" style="min-height: 320px;">
                             <div
@@ -3995,20 +4009,6 @@
                             <div id="execWaterfallContent" class="exec-empty-state" onclick="execPickWaterfall()">
                                 <div style="text-align: center; color: var(--text-muted);">
                                     <div style="font-size: 24px; margin-bottom: 8px;">📊</div>
-                                    <div>Add CET1 Calculation</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- CET1 Temperature Bar -->
-                        <div class="exec-card" id="execTempBarCard" style="min-height: 250px;">
-                            <div
-                                style="display: flex; justify-content: space-between; margin-bottom: 16px; align-items: center;">
-                                <h3 style="font-size: 18px; font-weight: 600;">CET1 Temperature</h3>
-                            </div>
-                            <div id="execTempBarContent" class="exec-empty-state" onclick="execAutoLinkTempBar()">
-                                <div style="text-align: center; color: var(--text-muted);">
-                                    <div style="font-size: 24px; margin-bottom: 8px;">+</div>
                                     <div>Add CET1 Calculation</div>
                                 </div>
                             </div>
@@ -5756,6 +5756,9 @@ The drivers should reflect the actual risk environment of that time period.
 
 
             try {
+                // Notify user that this may take several minutes for large dossiers
+                progressCallback && progressCallback('🤖 AI is analyzing the dossier... This may take 5-10 minutes for comprehensive results.');
+
                 const response = await fetch(AZURE_OPENAI_API_URL, {
                     method: 'POST',
                     headers: {
@@ -5765,7 +5768,7 @@ The drivers should reflect the actual risk environment of that time period.
                         model: 'gpt-5-2025-08-07-eastus-dz',
                         messages: [{ role: 'user', content: prompt }],
                         // temperature omitted - GPT-5 only supports default value of 1
-                        max_completion_tokens: 32384  // Keep reasonable for 50 drivers
+                        max_completion_tokens: 24000  // Optimized for quality while avoiding timeout (50 drivers)
                     })
                 });
 
@@ -8181,7 +8184,7 @@ CRITICAL INSTRUCTIONS - FORWARD-LOOKING RISK DRIVER:
 1. Use the search results as CONTEXT about current/recent developments
 2. DO NOT simply summarize what has already happened
 3. Focus on what COULD HAPPEN NEXT - potential escalation, contagion, or deterioration
-4. Project 6-12 months forward: "If current trends continue/worsen, what are the risks?"
+4. Project forward: "If current trends continue/worsen, what are the risks?"
 5. Describe TRANSMISSION CHANNELS: How does this evolve into an RBC/Canadian banking risk?
 6. Quantify POTENTIAL impacts using conditional language ("could lead to...", "may result in...")
 
@@ -8230,7 +8233,7 @@ Generate a FORWARD-LOOKING risk driver. Return a JSON object:
 {
   "category": "Macroeconomic" | "Geopolitical" | "Cyber / Tech" | "Financial" | "Environmental" | "Social" | "Regulatory",
   "title": "Concise 4-8 word title focused on the FUTURE risk",
-  "description": "50-100 word FORWARD-LOOKING description. Use conditional/future language ('could', 'may', 'if...then'). Describe NEXT 6-12 months: escalation pathways, contagion risks, transmission to RBC. ${isHypothetical ? 'Explain HOW scenario evolves and impacts specific RBC business lines. DO NOT claim this has happened.' : 'Be specific and actionable.'}",
+  "description": "50-100 word FORWARD-LOOKING description. Use conditional/future language ('could', 'may', 'if...then'). Describe future impacts: escalation pathways, contagion risks, transmission to RBC. ${isHypothetical ? 'Explain HOW scenario evolves and impacts specific RBC business lines. DO NOT claim this has happened.' : 'Be specific and actionable.'}",
   "keyFindings": ["${isHypothetical ? 'Escalation pathway 1 if scenario unfolds' : 'Forward-looking risk 1'}", "${isHypothetical ? 'Contagion risk 2' : 'Potential development 2'}", "${isHypothetical ? 'RBC transmission channel 3' : 'Future impact 3'}"],
   "suggestedRefinements": ["Adjust severity/time horizon", "Refine transmission assumptions"]
 }
@@ -8288,7 +8291,7 @@ Return ONLY the JSON object.`;
                 const initialChatMessage = usingTavily && tavilyResults.length > 0
                     ? `I've created a <strong>FORWARD-LOOKING</strong> risk driver based on ${tavilyResults.length} sources about "${query}".
 
-<strong>Projected Risk Pathways (Next 6-12 months):</strong><br>${keyFindingsHtml}
+<strong>Projected Risk Pathways:</strong><br>${keyFindingsHtml}
 
 <strong>You can refine this driver by asking me to:</strong><br>${refinementsHtml}
 
@@ -13095,7 +13098,7 @@ These are reference values for context only.Generate stress projections as absol
                     body: JSON.stringify({
                         model: 'gpt-5-2025-08-07-eastus-dz',
                         messages: cet1ConversationHistory,
-                        max_completion_tokens: 32384
+                        max_completion_tokens: 24000  // Optimized for quality while avoiding timeout
                     })
                 });
 
@@ -14341,44 +14344,45 @@ IMPORTANT: Write ONLY qualitative narrative. Do NOT mention ANY macro variables 
 
             // Define bar chart data for waterfall effect
             const x = ['Jump-Off Q4/25'];
-            const y = [startVal];
+            const y = [startVal / 100]; // Convert to percentage
             const base = [0];
             const colors = ['#2563EB'];
-            const texts = [displayJumpOff.toFixed(1) + '%'];
+            const texts = [displayJumpOff.toFixed(2) + '%'];
 
-            let runningTotal = startVal;
+            let runningTotal = startVal / 100; // In percentage form
 
             // Categories mapping to finalImpactsValues indices
             const catLabels = ['PPNR', 'Dividend', 'Credit Provision', 'Market Risk Losses', 'Operational Risk Losses', 'Other', 'RWA', 'RWA', 'RWA'];
 
-            // Calculate RWA Total for single label
-            const rwaTotal = (finalImpactsValues[6] || 0) + (finalImpactsValues[7] || 0) + (finalImpactsValues[8] || 0);
+            // Calculate RWA Total for single label (convert to %)
+            const rwaTotal = ((finalImpactsValues[6] || 0) + (finalImpactsValues[7] || 0) + (finalImpactsValues[8] || 0)) / 100;
 
             finalImpactsValues.forEach((val, i) => {
+                const valPercent = val / 100; // Convert BPS to percentage
                 x.push(catLabels[i]);
-                y.push(val);
+                y.push(valPercent);
                 base.push(runningTotal);
-                colors.push(val >= 0 ? '#10B981' : '#EF4444');
+                colors.push(valPercent >= 0 ? '#10B981' : '#EF4444');
 
                 // Text Logic: Hide individual RWA labels, show Total on last RWA segment
                 if (i === 6 || i === 7) {
                     texts.push('');
                 } else if (i === 8) {
-                    texts.push((rwaTotal > 0 ? '+' : '') + rwaTotal.toFixed(0));
+                    texts.push((rwaTotal > 0 ? '+' : '') + rwaTotal.toFixed(2) + '%');
                 } else {
-                    texts.push((val > 0 ? '+' : '') + val.toFixed(0));
+                    texts.push((valPercent > 0 ? '+' : '') + valPercent.toFixed(2) + '%');
                 }
 
                 // Update running total
-                runningTotal += val;
+                runningTotal += valPercent;
             });
 
             // Trough
             x.push('Trough');
-            y.push(endVal);
+            y.push(endVal / 100); // Convert to percentage
             base.push(0);
             colors.push('#2563EB');
-            texts.push(displayTrough.toFixed(1) + '%');
+            texts.push(displayTrough.toFixed(2) + '%');
 
             const chartId = 'execWaterfallPlotly';
             container.innerHTML = `<div id="${chartId}" style="width: 100%; height: 100%;"></div>`;
@@ -14391,7 +14395,7 @@ IMPORTANT: Write ONLY qualitative narrative. Do NOT mention ANY macro variables 
                 marker: { color: colors },
                 text: texts,
                 textposition: 'outside',
-                textfont: { size: 9, color: '#64748B' },
+                textfont: { size: 11, color: '#64748B' },
                 cliponaxis: false
             };
 
@@ -14402,15 +14406,16 @@ IMPORTANT: Write ONLY qualitative narrative. Do NOT mention ANY macro variables 
                 plot_bgcolor: 'rgba(0,0,0,0)',
                 xaxis: {
                     tickangle: -45,
-                    tickfont: { size: 9, color: '#64748B' },
+                    tickfont: { size: 11, color: '#64748B' },
                     fixedrange: true
                 },
                 yaxis: {
-                    title: { text: isSimulated ? 'Impact (bps) [Simulated]' : 'Impact (bps)', font: { size: 10 } },
+                    title: { text: isSimulated ? 'CET1 Ratio (%) [Simulated]' : 'CET1 Ratio (%)', font: { size: 12 } },
                     gridcolor: '#F1F5F9',
                     zerolinecolor: '#CBD5E1',
                     fixedrange: true,
-                    tickfont: { size: 9 }
+                    tickfont: { size: 11 },
+                    ticksuffix: '%'
                 },
                 margin: { t: 20, b: 80, l: 50, r: 10 },
                 showlegend: false,
@@ -14721,7 +14726,7 @@ IMPORTANT: Write ONLY qualitative narrative. Do NOT mention ANY macro variables 
                     const now = new Date();
                     const titleDate = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
-                    exportHeader.innerHTML = `Astra Capital Pulse Brief <span style="font-size: 20px; font-weight: 400; color: #64748B; margin-left: 16px;">${titleDate}</span>`;
+                    exportHeader.innerHTML = `Astra | Capital Pulse Brief <span style="font-size: 20px; font-weight: 400; color: #64748B; margin-left: 16px;">${titleDate}</span>`;
                     exportHeader.style.color = '#003168'; // Force RBC Navy
                     exportHeader.style.textShadow = 'none';
                     exportHeader.style.display = 'flex';
@@ -14849,7 +14854,7 @@ IMPORTANT: Write ONLY qualitative narrative. Do NOT mention ANY macro variables 
         <div class="pdf-header"
             style="padding: 40px 40px 20px 64px; display: flex; justify-content: space-between; align-items: center;">
             <div class="pdf-logo" style="font-size: 32px; font-weight: 700; color: #003168; letter-spacing: -0.02em;">
-                Astra Capital Pulse Brief</div>
+                Astra | Capital Pulse Brief</div>
         </div>
 
         <!-- Grid -->
@@ -14862,7 +14867,7 @@ IMPORTANT: Write ONLY qualitative narrative. Do NOT mention ANY macro variables 
     <div id="executiveReportPanel" class="report-panel exec-glass-bg"
         style="display: none; height: 100vh; overflow-y: auto;">
         <!-- Header for Logo -->
-        <div class="exec-logo">Astra Capital Pulse Brief</div>
+        <div class="exec-logo">Astra | Capital Pulse Brief</div>
 
         <div class="exec-grid-container">
             <!-- Left Column -->
@@ -14883,10 +14888,10 @@ IMPORTANT: Write ONLY qualitative narrative. Do NOT mention ANY macro variables 
                     </div>
                 </div>
 
-                <!-- CET1 Temperature -->
+                <!-- Minimum Pre-MA CET1 Ratio -->
                 <div class="exec-card" style="height: 380px;" onclick="if(!execState.tempBar) execPickTempBar()">
                     <div class="exec-card-header">
-                        <div class="exec-card-title">CET1 Temperature</div>
+                        <div class="exec-card-title">Minimum Pre-MA CET1 Ratio</div>
                     </div>
                     <div id="execTempBarContent" class="exec-content-area">
                         <div class="exec-empty-state">
