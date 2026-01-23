@@ -15612,16 +15612,36 @@ IMPORTANT: Write ONLY qualitative narrative. Do NOT mention ANY macro variables 
             document.getElementById('newsPreview').style.display = 'none';
 
             try {
-                // Use a CORS proxy to fetch RSS
-                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(feedUrl)}`;
-                const response = await fetch(proxyUrl);
-                const data = await response.json();
+                // Try multiple CORS proxies as fallbacks
+                const corsProxies = [
+                    (url) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+                    (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+                    (url) => `https://thingproxy.freeboard.io/fetch/${url}`
+                ];
 
-                if (!data.contents) throw new Error('Failed to fetch feed');
+                let rssText = null;
+                let lastError = null;
+
+                for (const proxyFn of corsProxies) {
+                    try {
+                        const proxyUrl = proxyFn(feedUrl);
+                        const response = await fetch(proxyUrl);
+                        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                        rssText = await response.text();
+                        if (rssText && rssText.includes('<item>')) break; // Valid RSS
+                    } catch (e) {
+                        lastError = e;
+                        console.log('Proxy failed, trying next...', e.message);
+                    }
+                }
+
+                if (!rssText || !rssText.includes('<item>')) {
+                    throw new Error(lastError?.message || 'All proxies failed');
+                }
 
                 // Parse RSS XML
                 const parser = new DOMParser();
-                const xmlDoc = parser.parseFromString(data.contents, 'text/xml');
+                const xmlDoc = parser.parseFromString(rssText, 'text/xml');
                 const items = xmlDoc.querySelectorAll('item');
 
                 currentNewsArticles = [];
