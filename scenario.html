@@ -15586,7 +15586,7 @@ IMPORTANT: Write ONLY qualitative narrative. Do NOT mention ANY macro variables 
         function openNewsModal() {
             document.getElementById('newsModal').style.display = 'flex';
             // Auto-load politics feed
-            selectNewsFeed('politics');
+            selectNewsFeedRobust('politics');
         }
 
         function closeNewsModal() {
@@ -15782,6 +15782,111 @@ Output ONLY JSON.`;
         window.selectNewsFeed = selectNewsFeed;
         window.selectNewsArticle = selectNewsArticle;
         window.generateRiskFromNews = generateRiskFromNews;
+
+        async function selectNewsFeedRobust(feedKey) {
+            document.querySelectorAll('.news-tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.dataset.feed === feedKey) tab.classList.add('active');
+            });
+
+            const feedUrl = NEWS_FEEDS[feedKey];
+            const loading = document.getElementById('newsLoading');
+            const list = document.getElementById('newsList');
+
+            loading.style.display = 'block';
+            list.innerHTML = '';
+            selectedNewsArticle = null;
+            document.getElementById('newsPreview').style.display = 'none';
+
+            try {
+                const parseAndRender = (xmlStr) => {
+                    const parser = new DOMParser();
+                    const xmlDoc = parser.parseFromString(xmlStr, 'text/xml');
+                    if (xmlDoc.querySelector('parsererror')) throw new Error('XML parsing failed');
+                    const items = xmlDoc.querySelectorAll('item');
+                    currentNewsArticles = [];
+                    items.forEach((item, index) => {
+                        const title = item.querySelector('title')?.textContent || 'No title';
+                        const description = item.querySelector('description')?.textContent || '';
+                        const link = item.querySelector('link')?.textContent || '';
+                        const pubDate = item.querySelector('pubDate')?.textContent || '';
+                        const cleanDesc = description.replace(/<[^>]*>/g, '').substring(0, 200);
+                        currentNewsArticles.push({ id: index, title, description: cleanDesc, link, pubDate, category: feedKey });
+                    });
+                    renderNewsArticles();
+                };
+
+                let success = false;
+
+                // Strategy 1: rss2json
+                try {
+                    const rss2jsonUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}`;
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 5000);
+                    const response = await fetch(rss2jsonUrl, { signal: controller.signal });
+                    clearTimeout(timeoutId);
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.status === 'ok') {
+                            currentNewsArticles = (data.items || []).map((item, index) => ({
+                                id: index,
+                                title: item.title || 'No title',
+                                description: (item.description || '').replace(/<[^>]*>/g, '').substring(0, 200),
+                                link: item.link || '',
+                                pubDate: item.pubDate || '',
+                                category: feedKey
+                            }));
+                            renderNewsArticles();
+                            success = true;
+                        }
+                    }
+                } catch (e) { }
+
+                if (success) return;
+
+                // Strategy 2: allorigins
+                try {
+                    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(feedUrl)}`;
+                    const response = await fetch(proxyUrl);
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.contents) {
+                            parseAndRender(data.contents);
+                            success = true;
+                        }
+                    }
+                } catch (e) { }
+
+                if (success) return;
+
+                // Strategy 3: corsproxy.io
+                try {
+                    const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(feedUrl)}`;
+                    const response = await fetch(proxyUrl);
+                    if (response.ok) {
+                        const text = await response.text();
+                        parseAndRender(text);
+                        success = true;
+                    }
+                } catch (e) { }
+
+                if (!success) throw new Error('All news fetch strategies failed.');
+
+            } catch (error) {
+                console.error('Error fetching news:', error);
+                list.innerHTML = `
+                        <div style="text-align: center; color: #EF4444; padding: 40px;">
+                            <div style="font-size: 32px; margin-bottom: 12px;">⚠️</div>
+                            <div>Failed to load news feed. Please try again.</div>
+                            <div style="font-size: 12px; margin-top: 8px; color: #94A3B8;">${error.message}</div>
+                        </div>
+                    `;
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        window.selectNewsFeed = selectNewsFeedRobust;
 
         async function extractTextFromPDF(file) {
             try {
