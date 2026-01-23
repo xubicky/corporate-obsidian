@@ -15612,54 +15612,33 @@ IMPORTANT: Write ONLY qualitative narrative. Do NOT mention ANY macro variables 
             document.getElementById('newsPreview').style.display = 'none';
 
             try {
-                // Try multiple CORS proxies as fallbacks
-                const corsProxies = [
-                    (url) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
-                    (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-                    (url) => `https://thingproxy.freeboard.io/fetch/${url}`
-                ];
+                // Use rss2json.com - a reliable RSS-to-JSON API service
+                const rss2jsonUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}`;
 
-                let rssText = null;
-                let lastError = null;
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
-                for (const proxyFn of corsProxies) {
-                    try {
-                        const proxyUrl = proxyFn(feedUrl);
-                        const response = await fetch(proxyUrl);
-                        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                        rssText = await response.text();
-                        if (rssText && rssText.includes('<item>')) break; // Valid RSS
-                    } catch (e) {
-                        lastError = e;
-                        console.log('Proxy failed, trying next...', e.message);
-                    }
+                const response = await fetch(rss2jsonUrl, { signal: controller.signal });
+                clearTimeout(timeoutId);
+
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+
+                if (data.status !== 'ok') {
+                    throw new Error(data.message || 'RSS feed error');
                 }
-
-                if (!rssText || !rssText.includes('<item>')) {
-                    throw new Error(lastError?.message || 'All proxies failed');
-                }
-
-                // Parse RSS XML
-                const parser = new DOMParser();
-                const xmlDoc = parser.parseFromString(rssText, 'text/xml');
-                const items = xmlDoc.querySelectorAll('item');
 
                 currentNewsArticles = [];
-                items.forEach((item, index) => {
-                    const title = item.querySelector('title')?.textContent || 'No title';
-                    const description = item.querySelector('description')?.textContent || '';
-                    const link = item.querySelector('link')?.textContent || '';
-                    const pubDate = item.querySelector('pubDate')?.textContent || '';
-
+                (data.items || []).forEach((item, index) => {
                     // Clean HTML from description
-                    const cleanDesc = description.replace(/<[^>]*>/g, '').substring(0, 200);
+                    const cleanDesc = (item.description || '').replace(/<[^>]*>/g, '').substring(0, 200);
 
                     currentNewsArticles.push({
                         id: index,
-                        title: title,
+                        title: item.title || 'No title',
                         description: cleanDesc,
-                        link: link,
-                        pubDate: pubDate,
+                        link: item.link || '',
+                        pubDate: item.pubDate || '',
                         category: feedKey
                     });
                 });
