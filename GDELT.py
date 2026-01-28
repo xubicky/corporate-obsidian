@@ -1,49 +1,45 @@
-import requests
-import time
+import urllib.request
+import xml.etree.ElementTree as ET
 
-# Fetch top 5 geopolitical news for Canada or US today
-# Geopolitical themes: diplomacy, sanctions, tariffs, trade agreements, foreign policy
-url = "https://api.gdeltproject.org/api/v2/doc/doc"
+# Fetch latest Axios news via Google News RSS (bypasses Cloudflare on main site)
+url = "https://news.google.com/rss/search?q=site:axios.com&hl=en-US&gl=US&ceid=US:en"
 
-# Query for geopolitical topics in US or Canada, English language, last 24 hours
-params = {
-    "query": "(United States OR Canada OR US OR American OR Canadian) AND (geopolitical OR diplomacy OR sanctions OR tariff OR trade war OR foreign policy OR treaty OR summit OR bilateral OR NATO OR G7) sourcelang:english",
-    "mode": "artlist",
-    "maxrecords": "5",
-    "format": "json",
-    "timespan": "24h",  # Last 24 hours
-    "sort": "hybridrel"  # Sort by relevance
-}
-
-print("Fetching top 5 geopolitical news for Canada/US today...\n")
+print("Fetching latest Axios news...\n")
 print("=" * 70)
 
-response = requests.get(url, params=params)
-
-if response.status_code == 429:
-    print("Rate limited - waiting 5 seconds and retrying...")
-    time.sleep(5)
-    response = requests.get(url, params=params)
-
-if response.status_code == 200:
-    try:
-        data = response.json()
-        articles = data.get("articles", [])
-        
-        if articles:
-            for i, article in enumerate(articles, 1):
-                print(f"\n📰 Article {i}:")
-                print(f"   Title: {article.get('title', 'N/A')}")
-                print(f"   Source: {article.get('domain', 'N/A')} ({article.get('sourcecountry', 'N/A')})")
-                print(f"   Date: {article.get('seendate', 'N/A')}")
-                print(f"   URL: {article.get('url', 'N/A')}")
-                print("-" * 70)
+try:
+    # Use urllib which is standard library
+    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+    with urllib.request.urlopen(req, timeout=10) as response:
+        if response.status == 200:
+            try:
+                xml_content = response.read()
+                root = ET.fromstring(xml_content)
+                channel = root.find("channel")
+                items = channel.findall("item")
+                
+                if items:
+                    for i, item in enumerate(items[:10], 1):  # Show top 10
+                        title = item.find("title").text if item.find("title") is not None else "N/A"
+                        link = item.find("link").text if item.find("link") is not None else "N/A"
+                        pub_date = item.find("pubDate").text if item.find("pubDate") is not None else "N/A"
+                        
+                        # Clean title (Google News often adds " - Axios" at end)
+                        if " - Axios" in title:
+                            title = title.replace(" - Axios", "")
+                            
+                        print(f"\n📰 Article {i}:")
+                        print(f"   Title: {title}")
+                        print(f"   Date: {pub_date}")
+                        print(f"   Link: {link}")
+                        print("-" * 70)
+                else:
+                    print("No articles found.")
+                    
+            except Exception as e:
+                print(f"Error parsing XML: {e}")
         else:
-            print("No articles found matching the criteria.")
-            
-    except Exception as e:
-        print(f"Error parsing JSON: {e}")
-        print(f"Raw response: {response.text[:500]}")
-else:
-    print(f"Error: Status Code {response.status_code}")
-    print(f"Response: {response.text}")
+            print(f"Error: Status Code {response.status}")
+
+except Exception as e:
+    print(f"Connection Error: {e}")

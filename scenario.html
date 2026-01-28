@@ -4765,7 +4765,7 @@
     <div class="modal-overlay" id="newsModal" style="display: none;">
         <div class="modal-content" style="max-width: 900px; max-height: 85vh; display: flex; flex-direction: column;">
             <div class="modal-header">
-                <h2>📰 News Scanner - Axios Feeds</h2>
+                <h2>📰 Live News Scanner</h2>
                 <button class="modal-close" onclick="closeNewsModal()">×</button>
             </div>
             <div class="modal-body"
@@ -4773,16 +4773,37 @@
                 <!-- Category Tabs -->
                 <div
                     style="display: flex; gap: 8px; padding: 16px 24px; border-bottom: 1px solid #E2E8F0; flex-wrap: wrap;">
-                    <button class="news-tab active" data-feed="politics" onclick="selectNewsFeed('politics')">🏛️
+                    <button class="news-tab active" data-feed="main" onclick="selectNewsFeedRobust('main')">📋 All
+                        News</button>
+                    <button class="news-tab" data-feed="trump" onclick="selectNewsFeedRobust('trump')">🇺🇸
+                        Trump</button>
+                    <button class="news-tab" data-feed="politics" onclick="selectNewsFeedRobust('politics')">🏛️
                         Politics</button>
-                    <button class="news-tab" data-feed="world" onclick="selectNewsFeed('world')">🌍 World</button>
-                    <button class="news-tab" data-feed="business" onclick="selectNewsFeed('business')">💼
+                    <button class="news-tab" data-feed="world" onclick="selectNewsFeedRobust('world')">🌍 World</button>
+                    <button class="news-tab" data-feed="business" onclick="selectNewsFeedRobust('business')">💼
                         Business</button>
-                    <button class="news-tab" data-feed="economy" onclick="selectNewsFeed('economy')">📈
+                    <button class="news-tab" data-feed="economy" onclick="selectNewsFeedRobust('economy')">📈
                         Economy</button>
-                    <button class="news-tab" data-feed="technology" onclick="selectNewsFeed('technology')">💻
+                    <button class="news-tab" data-feed="technology" onclick="selectNewsFeedRobust('technology')">💻
                         Technology</button>
-                    <button class="news-tab" data-feed="main" onclick="selectNewsFeed('main')">📋 All News</button>
+
+                </div>
+
+                <!-- Search Bar -->
+                <div
+                    style="padding: 12px 24px; border-bottom: 1px solid #E2E8F0; display: flex; gap: 8px; background: #F8FAFC;">
+                    <div style="position: relative; flex: 1;">
+                        <span
+                            style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94A3B8;">🔍</span>
+                        <input type="text" id="newsSearchInput"
+                            placeholder="Search news (e.g., 'interest rates', 'crypto')..."
+                            onkeydown="if(event.key === 'Enter') searchNews()"
+                            style="width: 100%; padding: 10px 12px 10px 36px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 14px; outline: none; transition: all 0.2s;">
+                    </div>
+                    <button onclick="searchNews()"
+                        style="background: #2563EB; color: white; border: none; padding: 0 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background 0.2s;">
+                        Search
+                    </button>
                 </div>
 
                 <!-- Loading State -->
@@ -15507,43 +15528,89 @@ IMPORTANT: Write ONLY qualitative narrative. Do NOT mention ANY macro variables 
                          <div style="font-size: 48px; margin-bottom: 20px;">✨</div>
                          <h2 style="font-size: 24px; color: #1f2937; margin-bottom: 12px; font-weight: 600;">Explore your ideas</h2>
                          <p style="color: #6b7280; max-width: 400px; line-height: 1.5;">
-                            Describe a risk scenario or upload a document to brainstorm creative risk drivers.
+                            Describe a risk scenario, select a news article, or upload a document to brainstorm creative risk drivers.
                          </p>
                      </div>`;
                 return;
             }
 
             currentPlaygroundDrivers.forEach(d => {
+                // Default colors if not present
+                const tagBg = d.tagColor || '#DBEAFE'; // Blue-100
+                const tagText = d.textColor || '#1E40AF'; // Blue-800
+
                 const card = document.createElement('div');
+                card.className = 'driver-card'; // Use official class
+                // Override some driver-card styles for playground context
                 Object.assign(card.style, {
-                    background: 'white', border: '1px solid #e5e7eb', borderRadius: '16px', padding: '24px',
-                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)', display: 'flex', flexDirection: 'column', gap: '16px',
-                    transition: 'all 0.2s', position: 'relative'
+                    display: 'flex', flexDirection: 'column',
+                    cursor: 'default', // Don't look clickable like a button
+                    minHeight: '280px' // Ensure some height consistency
                 });
 
-                // Build source info if from news
-                let sourceHtml = '';
-                if (d.sourceArticle || d.sourceUrl) {
-                    sourceHtml = `
-                            <div style="font-size: 11px; color: #94A3B8; margin-top: -8px; display: flex; align-items: center; gap: 6px;">
-                                📰 Source: ${d.sourceUrl ? `<a href="${d.sourceUrl}" target="_blank" style="color: #2563EB; text-decoration: none;">${d.sourceArticle || 'Axios Article'}</a>` : (d.sourceArticle || 'News')}
-                            </div>
-                        `;
-                }
+                // Build source info
+                let sourceIcon = d.sourceUrl ? '📰' : '✨';
+                let sourceTooltip = d.sourceArticle || 'Generative AI';
 
                 card.innerHTML = `
-                    <div style="font-size: 12px; font-weight: 700; color: #2563EB; letter-spacing: 0.05em; text-transform: uppercase;">${d.category || 'Idea'}</div>
-                    <h3 style="font-size: 18px; font-weight: 700; color: #111827; margin: 0; line-height: 1.4;">${d.title}</h3>
-                    ${sourceHtml}
-                    <p style="font-size: 14px; color: #4b5563; line-height: 1.6; flex: 1;">${d.description}</p>
-                    <div style="padding-top: 16px; border-top: 1px solid #f3f4f6; display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                         <span class="driver-tag pg-category" contenteditable="true" 
+                            style="background:${tagBg}; color:${tagText}; border: 1px dashed transparent; outline: none; transition: all 0.2s; cursor: text;">
+                            ${d.category || 'Uncategorized'}
+                        </span>
+                        <div style="font-size: 16px; opacity: 0.5;" title="${sourceTooltip}">${sourceIcon}</div>
+                    </div>
+                    
+                    <div class="driver-title pg-title" contenteditable="true" 
+                        style="border: 1px dashed transparent; outline: none; margin-bottom: 8px; cursor: text;">
+                        ${d.title}
+                    </div>
+
+                    <div class="driver-desc pg-desc" contenteditable="true" 
+                        style="border: 1px dashed transparent; outline: none; flex: 1; cursor: text;">
+                       ${d.description}
+                    </div>
+
+                    <div style="padding-top: 20px; margin-top: auto; border-top: 1px solid #f3f4f6; display: flex; align-items: center; justify-content: space-between;">
                          <button onclick="exportPlaygroundDriver('${d.id}')" 
-                            style="background: #F3F4F6; color: #374151; border: none; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s;">
-                            Export
+                            style="background: #111827; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.1);"
+                            onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 6px -1px rgba(0,0,0,0.1)';" 
+                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 1px 2px rgba(0,0,0,0.1)';">
+                            Export to Drivers
                         </button>
-                        <div style="font-size: 20px; opacity: 0.5;">${d.sourceUrl ? '📰' : '✨'}</div>
+                        <div style="font-size: 11px; color: #94A3B8;">Editable Preview</div>
                     </div>
                 `;
+
+                // Add listeners for auto-save
+                const addSaveListener = (selector, field) => {
+                    const el = card.querySelector(selector);
+                    if (el) {
+                        el.addEventListener('focus', () => {
+                            el.style.borderColor = '#cbd5e1';
+                            el.style.backgroundColor = '#F8FAFC';
+                        });
+                        el.addEventListener('blur', () => {
+                            el.style.borderColor = 'transparent';
+                            el.style.backgroundColor = 'transparent';
+                            d[field] = el.innerText.trim();
+                        });
+                        // Prevent Enter key in category/title from adding newlines
+                        if (selector !== '.pg-desc') {
+                            el.addEventListener('keydown', (e) => {
+                                if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    el.blur();
+                                }
+                            });
+                        }
+                    }
+                };
+
+                addSaveListener('.pg-category', 'category');
+                addSaveListener('.pg-title', 'title');
+                addSaveListener('.pg-desc', 'description');
+
                 container.appendChild(card);
             });
         }
@@ -15555,7 +15622,7 @@ IMPORTANT: Write ONLY qualitative narrative. Do NOT mention ANY macro variables 
             const newId = 'cust_' + Date.now();
             INITIAL_DRIVERS.push({
                 id: newId,
-                cat: 'Customized',
+                cat: d.category || 'Customized',
                 title: d.title,
                 desc: d.description,
                 tagColor: '#CFFAFE',
@@ -15571,13 +15638,37 @@ IMPORTANT: Write ONLY qualitative narrative. Do NOT mention ANY macro variables 
         // =============================================
         // NEWS SCANNER FUNCTIONS
         // =============================================
-        const NEWS_FEEDS = {
-            politics: 'https://www.axios.com/politics-policy/rss',
-            world: 'https://www.axios.com/world/rss',
-            business: 'https://www.axios.com/business/rss',
-            economy: 'https://www.axios.com/economy/rss',
-            technology: 'https://www.axios.com/technology/rss',
-            main: 'https://www.axios.com/feeds/feed.rss'
+        // NEWS SCANNER - FAST & RELIABLE MULTI-SOURCE
+        // Uses reputable news sources: Google News, BBC, NPR, Ars Technica
+        // =============================================
+
+        // Category-specific RSS feeds from reputable sources
+        const NEWS_SOURCES = {
+            main: [
+                { name: 'Google News', url: 'https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en' }
+            ],
+            trump: [
+                { name: 'Google News', url: 'https://news.google.com/rss/search?q=Trump&hl=en-US&gl=US&ceid=US:en' }
+            ],
+            politics: [
+                { name: 'Google News', url: 'https://news.google.com/rss/search?q=politics+congress+senate&hl=en-US&gl=US&ceid=US:en' },
+                { name: 'NPR Politics', url: 'https://feeds.npr.org/1014/rss.xml' }
+            ],
+            world: [
+                { name: 'Google News World', url: 'https://news.google.com/rss/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNRGx1YlY4U0FtVnVHZ0pWVXlnQVAB?hl=en-US&gl=US&ceid=US:en' },
+                { name: 'BBC World', url: 'https://feeds.bbci.co.uk/news/world/rss.xml' }
+            ],
+            business: [
+                { name: 'Google News Business', url: 'https://news.google.com/rss/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNRGx6TVdZU0FtVnVHZ0pWVXlnQVAB?hl=en-US&gl=US&ceid=US:en' }
+            ],
+            economy: [
+                { name: 'Google News', url: 'https://news.google.com/rss/search?q=economy+inflation+federal+reserve&hl=en-US&gl=US&ceid=US:en' },
+                { name: 'NPR Economy', url: 'https://feeds.npr.org/1017/rss.xml' }
+            ],
+            technology: [
+                { name: 'Google News Tech', url: 'https://news.google.com/rss/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNRGRqTVhZU0FtVnVHZ0pWVXlnQVAB?hl=en-US&gl=US&ceid=US:en' },
+                { name: 'Ars Technica', url: 'https://feeds.arstechnica.com/arstechnica/index' }
+            ]
         };
 
         let currentNewsArticles = [];
@@ -15585,8 +15676,8 @@ IMPORTANT: Write ONLY qualitative narrative. Do NOT mention ANY macro variables 
 
         function openNewsModal() {
             document.getElementById('newsModal').style.display = 'flex';
-            // Auto-load politics feed
-            selectNewsFeedRobust('politics');
+            // Auto-load main feed
+            selectNewsFeedRobust('main');
         }
 
         function closeNewsModal() {
@@ -15595,14 +15686,21 @@ IMPORTANT: Write ONLY qualitative narrative. Do NOT mention ANY macro variables 
             document.getElementById('newsPreview').style.display = 'none';
         }
 
-        async function selectNewsFeed(feedKey) {
-            // Update tab styling
+        // Search News Function
+        function searchNews() {
+            const query = document.getElementById('newsSearchInput').value.trim();
+            if (!query) return;
+            selectNewsFeedRobust('search', query);
+        }
+
+        // Fast parallel news fetching from multiple sources
+        async function selectNewsFeedRobust(feedKey, customQuery = null) {
+            // Update tabs UI
             document.querySelectorAll('.news-tab').forEach(tab => {
                 tab.classList.remove('active');
-                if (tab.dataset.feed === feedKey) tab.classList.add('active');
+                if (!customQuery && tab.dataset.feed === feedKey) tab.classList.add('active');
             });
 
-            const feedUrl = NEWS_FEEDS[feedKey];
             const loading = document.getElementById('newsLoading');
             const list = document.getElementById('newsList');
 
@@ -15611,53 +15709,114 @@ IMPORTANT: Write ONLY qualitative narrative. Do NOT mention ANY macro variables 
             selectedNewsArticle = null;
             document.getElementById('newsPreview').style.display = 'none';
 
-            try {
-                // Use rss2json.com - a reliable RSS-to-JSON API service
-                const rss2jsonUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}`;
+            let sources = [];
 
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+            if (feedKey === 'search' && customQuery) {
+                // Dynamic search source
+                sources = [
+                    { name: 'Google News Search', url: `https://news.google.com/rss/search?q=${encodeURIComponent(customQuery)}&hl=en-US&gl=US&ceid=US:en` }
+                ];
+            } else {
+                sources = NEWS_SOURCES[feedKey] || NEWS_SOURCES.main;
+            }
 
-                const response = await fetch(rss2jsonUrl, { signal: controller.signal });
-                clearTimeout(timeoutId);
+            let allArticles = [];
 
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                const data = await response.json();
+            // Fetch from all sources in parallel for speed
+            const fetchPromises = sources.map(async (source) => {
+                try {
+                    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(source.url)}`;
 
-                if (data.status !== 'ok') {
-                    throw new Error(data.message || 'RSS feed error');
-                }
+                    const controller = new AbortController();
+                    const timeout = setTimeout(() => controller.abort(), 5000);
 
-                currentNewsArticles = [];
-                (data.items || []).forEach((item, index) => {
-                    // Clean HTML from description
-                    const cleanDesc = (item.description || '').replace(/<[^>]*>/g, '').substring(0, 200);
+                    const response = await fetch(proxyUrl, { signal: controller.signal });
+                    clearTimeout(timeout);
 
-                    currentNewsArticles.push({
-                        id: index,
-                        title: item.title || 'No title',
-                        description: cleanDesc,
-                        link: item.link || '',
-                        pubDate: item.pubDate || '',
-                        category: feedKey
-                    });
-                });
+                    if (response.ok) {
+                        const text = await response.text();
+                        const parser = new DOMParser();
+                        const xmlDoc = parser.parseFromString(text, "text/xml");
+                        const items = Array.from(xmlDoc.querySelectorAll("item"));
 
+                        return items.slice(0, 12).map(item => {
+                            const title = item.querySelector("title")?.textContent || 'No title';
+                            const link = item.querySelector("link")?.textContent || '';
+                            const pubDate = item.querySelector("pubDate")?.textContent || '';
+                            const rawDesc = item.querySelector("description")?.textContent || '';
+
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = rawDesc;
+                            const description = tempDiv.textContent || tempDiv.innerText || '';
+
+                            let formattedDate = 'Recent';
+                            let rawDate = Date.now(); // Default to now if date missing so it shows at top
+
+                            if (pubDate) {
+                                try {
+                                    const dateObj = new Date(pubDate);
+                                    if (!isNaN(dateObj.getTime())) {
+                                        rawDate = dateObj.getTime();
+                                        const now = new Date();
+                                        const diffMs = now - dateObj;
+                                        const diffMins = Math.floor(diffMs / (1000 * 60));
+                                        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                                        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+                                        if (diffMins < 60) {
+                                            formattedDate = diffMins <= 1 ? 'Just now' : `${diffMins}m ago`;
+                                        } else if (diffHours < 24) {
+                                            formattedDate = `${diffHours}h ago`;
+                                        } else if (diffDays < 7) {
+                                            formattedDate = `${diffDays}d ago`;
+                                        } else {
+                                            formattedDate = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                                        }
+                                    }
+                                } catch (e) {
+                                    console.log('Date parse error:', e);
+                                }
+                            }
+
+                            return {
+                                title: title.replace(/ - [^-]+$/, ''),
+                                description: description.substring(0, 180) + (description.length > 180 ? '...' : ''),
+                                link: link,
+                                pubDate: formattedDate,
+                                rawDate: rawDate,
+                                source: source.name,
+                                category: feedKey
+                            };
+                        });
+                    }
+                } catch (e) { console.log(`${source.name} failed`); }
+                return [];
+            });
+
+            const results = await Promise.all(fetchPromises);
+            allArticles = results.flat();
+            allArticles.sort((a, b) => b.rawDate - a.rawDate);
+
+            const seenTitles = new Set();
+            allArticles = allArticles.filter(article => {
+                const key = article.title.toLowerCase().substring(0, 40);
+                if (seenTitles.has(key)) return false;
+                seenTitles.add(key);
+                return true;
+            });
+
+            currentNewsArticles = allArticles.slice(0, 15).map((article, index) => ({ ...article, id: index }));
+            loading.style.display = 'none';
+
+            if (currentNewsArticles.length > 0) {
                 renderNewsArticles();
-            } catch (error) {
-                console.error('Error fetching news:', error);
-                list.innerHTML = `
-                        <div style="text-align: center; color: #EF4444; padding: 40px;">
-                            <div style="font-size: 32px; margin-bottom: 12px;">⚠️</div>
-                            <div>Failed to load news feed. Please try again.</div>
-                            <div style="font-size: 12px; margin-top: 8px; color: #94A3B8;">${error.message}</div>
-                        </div>
-                    `;
-            } finally {
-                loading.style.display = 'none';
+            } else {
+                list.innerHTML = '<div style="text-align:center;color:#EF4444;padding:40px;"><div style="font-size:32px;margin-bottom:12px;">⚠️</div><div>Failed to load news. Check connection.</div></div>';
             }
         }
 
+
+        // Render articles list
         function renderNewsArticles() {
             const list = document.getElementById('newsList');
 
@@ -15672,13 +15831,14 @@ IMPORTANT: Write ONLY qualitative narrative. Do NOT mention ANY macro variables 
                         <div class="news-item-title">${article.title}</div>
                         <div class="news-item-desc">${article.description}</div>
                         <div class="news-item-meta">
-                            <span>📅 ${formatNewsDate(article.pubDate)}</span>
+                            <span>📅 ${article.pubDate}</span>
                             <span>🔗 <a href="${article.link}" target="_blank" onclick="event.stopPropagation()" style="color: #2563EB;">Read full article</a></span>
                         </div>
                     </div>
                 `).join('');
         }
 
+        // Format Date Helper
         function formatNewsDate(dateStr) {
             if (!dateStr) return 'Unknown date';
             try {
@@ -15689,6 +15849,7 @@ IMPORTANT: Write ONLY qualitative narrative. Do NOT mention ANY macro variables 
             }
         }
 
+        // Select Article Handler
         function selectNewsArticle(id) {
             selectedNewsArticle = currentNewsArticles.find(a => a.id === id);
             if (!selectedNewsArticle) return;
@@ -15702,6 +15863,7 @@ IMPORTANT: Write ONLY qualitative narrative. Do NOT mention ANY macro variables 
             document.getElementById('newsPreview').style.display = 'block';
         }
 
+        // AI Risk Generation from News
         async function generateRiskFromNews() {
             if (!selectedNewsArticle) {
                 alert('Please select a news article first.');
@@ -15710,7 +15872,7 @@ IMPORTANT: Write ONLY qualitative narrative. Do NOT mention ANY macro variables 
 
             closeNewsModal();
 
-            // Show playground and loading
+            // Show playground
             showPlayground();
             const loader = document.getElementById('playgroundLoader');
             loader.style.display = 'flex';
@@ -15776,117 +15938,18 @@ Output ONLY JSON.`;
             }
         }
 
-        // Make news functions globally accessible
+        // Aliases and Exports
+        async function selectNewsFeed(feedKey) {
+            return selectNewsFeedRobust(feedKey);
+        }
+
         window.openNewsModal = openNewsModal;
         window.closeNewsModal = closeNewsModal;
         window.selectNewsFeed = selectNewsFeed;
+        window.selectNewsFeedRobust = selectNewsFeedRobust;
         window.selectNewsArticle = selectNewsArticle;
         window.generateRiskFromNews = generateRiskFromNews;
-
-        async function selectNewsFeedRobust(feedKey) {
-            document.querySelectorAll('.news-tab').forEach(tab => {
-                tab.classList.remove('active');
-                if (tab.dataset.feed === feedKey) tab.classList.add('active');
-            });
-
-            const feedUrl = NEWS_FEEDS[feedKey];
-            const loading = document.getElementById('newsLoading');
-            const list = document.getElementById('newsList');
-
-            loading.style.display = 'block';
-            list.innerHTML = '';
-            selectedNewsArticle = null;
-            document.getElementById('newsPreview').style.display = 'none';
-
-            try {
-                const parseAndRender = (xmlStr) => {
-                    const parser = new DOMParser();
-                    const xmlDoc = parser.parseFromString(xmlStr, 'text/xml');
-                    if (xmlDoc.querySelector('parsererror')) throw new Error('XML parsing failed');
-                    const items = xmlDoc.querySelectorAll('item');
-                    currentNewsArticles = [];
-                    items.forEach((item, index) => {
-                        const title = item.querySelector('title')?.textContent || 'No title';
-                        const description = item.querySelector('description')?.textContent || '';
-                        const link = item.querySelector('link')?.textContent || '';
-                        const pubDate = item.querySelector('pubDate')?.textContent || '';
-                        const cleanDesc = description.replace(/<[^>]*>/g, '').substring(0, 200);
-                        currentNewsArticles.push({ id: index, title, description: cleanDesc, link, pubDate, category: feedKey });
-                    });
-                    renderNewsArticles();
-                };
-
-                let success = false;
-
-                // Strategy 1: rss2json
-                try {
-                    const rss2jsonUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}`;
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 5000);
-                    const response = await fetch(rss2jsonUrl, { signal: controller.signal });
-                    clearTimeout(timeoutId);
-                    if (response.ok) {
-                        const data = await response.json();
-                        if (data.status === 'ok') {
-                            currentNewsArticles = (data.items || []).map((item, index) => ({
-                                id: index,
-                                title: item.title || 'No title',
-                                description: (item.description || '').replace(/<[^>]*>/g, '').substring(0, 200),
-                                link: item.link || '',
-                                pubDate: item.pubDate || '',
-                                category: feedKey
-                            }));
-                            renderNewsArticles();
-                            success = true;
-                        }
-                    }
-                } catch (e) { }
-
-                if (success) return;
-
-                // Strategy 2: allorigins
-                try {
-                    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(feedUrl)}`;
-                    const response = await fetch(proxyUrl);
-                    if (response.ok) {
-                        const data = await response.json();
-                        if (data.contents) {
-                            parseAndRender(data.contents);
-                            success = true;
-                        }
-                    }
-                } catch (e) { }
-
-                if (success) return;
-
-                // Strategy 3: corsproxy.io
-                try {
-                    const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(feedUrl)}`;
-                    const response = await fetch(proxyUrl);
-                    if (response.ok) {
-                        const text = await response.text();
-                        parseAndRender(text);
-                        success = true;
-                    }
-                } catch (e) { }
-
-                if (!success) throw new Error('All news fetch strategies failed.');
-
-            } catch (error) {
-                console.error('Error fetching news:', error);
-                list.innerHTML = `
-                        <div style="text-align: center; color: #EF4444; padding: 40px;">
-                            <div style="font-size: 32px; margin-bottom: 12px;">⚠️</div>
-                            <div>Failed to load news feed. Please try again.</div>
-                            <div style="font-size: 12px; margin-top: 8px; color: #94A3B8;">${error.message}</div>
-                        </div>
-                    `;
-            } finally {
-                loading.style.display = 'none';
-            }
-        }
-
-        window.selectNewsFeed = selectNewsFeedRobust;
+        window.searchNews = searchNews;
 
         async function extractTextFromPDF(file) {
             try {
@@ -15945,7 +16008,26 @@ Output ONLY JSON.`;
 
                 loader.innerHTML = '<span class="spinner" style="width: 16px; height: 16px; border: 2px solid #e5e7eb; border-top-color: #2563EB; border-radius: 50%; animation: spin 1s linear infinite;"></span> AI is analyzing...';
 
-                const prompt = `Analyze this document and generate 1-4 risk drivers: \n\n ${text.substring(0, 5000)}`;
+                const prompt = `Analyze this document and identify key risk themes.
+Generate 1 to 4 unique Risk Drivers based on the content.
+For each driver, provide:
+- A short, punchy Title
+- A Category (e.g., Macroeconomic, Operational, Credit, Market, Geopolitical, Regulatory, Cyber, Environmental)
+- A Description (2-3 sentences explaining the risk and its impact)
+
+Text Content:
+${text.substring(0, 8000)}
+
+Return ONLY a JSON object with this structure:
+{
+  "newDrivers": [
+    { 
+      "category": "Category Name", 
+      "title": "Risk Title", 
+      "description": "Description text..." 
+    }
+  ]
+}`;
 
                 // Populate input and submit via fetch directly to avoid UI confusion
                 const response = await fetch(AZURE_OPENAI_API_URL, {
@@ -15953,7 +16035,7 @@ Output ONLY JSON.`;
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         model: 'gpt-4o-2024-11-20',
-                        messages: [{ role: 'user', content: prompt + "\n Return JSON { newDrivers: [{category, title, description}] }" }],
+                        messages: [{ role: 'user', content: prompt }],
                         max_completion_tokens: 3000
                     })
                 });
